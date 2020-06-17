@@ -13,6 +13,9 @@
     <ClCompile Include="src/Token.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Parser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include/Cursor.h">
@@ -27,7 +30,10 @@
     <ClInclude Include="include/Token.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="Nodes.h">
+    <ClInclude Include="include\Parser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Nodes.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

@@ -20,9 +20,9 @@ void Lexer::advance()
 		: NULL;
 }
 
-std::vector<Token> Lexer::index_tokens()
+std::vector<Token*> Lexer::index_tokens()
 {
-	std::vector<Token> tokens;
+	std::vector<Token*> tokens;
 
 	while (current_char != NULL) {
 		if (current_char == ' ' || current_char == '\t') {
@@ -32,27 +32,27 @@ std::vector<Token> Lexer::index_tokens()
 			tokens.push_back(create_numeric_token());
 		}
 		else if (current_char == '+') {
-			tokens.push_back(Token(Token::Type::PLUS, current_char));
+			tokens.push_back(new Token(Token::Type::PLUS, current_char));
 			advance();
 		}
 		else if (current_char == '-') {
-			tokens.push_back(Token(Token::Type::MINUS, current_char));
+			tokens.push_back(new Token(Token::Type::MINUS, current_char));
 			advance();
 		}
 		else if (current_char == '*') {
-			tokens.push_back(Token(Token::Type::MUL, current_char));
+			tokens.push_back(new Token(Token::Type::MUL, current_char));
 			advance();
 		}
 		else if (current_char == '/') {
-			tokens.push_back(Token(Token::Type::DIV, current_char));
+			tokens.push_back(new Token(Token::Type::DIV, current_char));
 			advance();
 		}
 		else if (current_char == '(') {
-			tokens.push_back(Token(Token::Type::LPAREN, current_char));
+			tokens.push_back(new Token(Token::Type::LPAREN, current_char));
 			advance();
 		}
 		else if (current_char == ')') {
-			tokens.push_back(Token(Token::Type::RPAREN, current_char));
+			tokens.push_back(new Token(Token::Type::RPAREN, current_char));
 			advance();
 		}
 		else {
@@ -63,20 +63,21 @@ std::vector<Token> Lexer::index_tokens()
 			IllegarCharError error(start, cursor, std::string(1, c));
 			std::cout << error << "\n";
 
-			return std::vector<Token>();
+			return std::vector<Token*>();
 		}
 	}
 
 	return tokens;
 }
 
-Token Lexer::create_numeric_token()
+Token* Lexer::create_numeric_token()
 {
 	std::string str;
 	unsigned int dots = 0;
-	bool hasDot = (digits + ".").find(current_char) != std::string::npos;
 
-	while (current_char != NULL && hasDot) {
+	auto hasDot = [=]() { return (digits + ".").find(current_char) != std::string::npos; };
+
+	while (current_char != NULL && hasDot()) {
 		if (current_char == '.') {
 			
 			if (dots == 1)
@@ -93,9 +94,9 @@ Token Lexer::create_numeric_token()
 	}
 
 	if (dots == 0) {
-		return Token(Token::Type::INT, (int)std::atoi(str.c_str()));
+		return new Token(Token::Type::INT, (int)std::atoi(str.c_str()));
 	}
 	else {
-		return Token(Token::Type::FLOAT, (float)std::atof(str.c_str()));
+		return new Token(Token::Type::FLOAT, (float)std::atof(str.c_str()));
 	}
 }

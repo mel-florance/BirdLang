@@ -157,13 +157,15 @@
     <ClCompile Include="src/Cursor.cpp" />
     <ClCompile Include="src/Lexer.cpp" />
     <ClCompile Include="src/Token.cpp" />
+    <ClCompile Include="src\Parser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include/Cursor.h" />
     <ClInclude Include="include/Error.h" />
     <ClInclude Include="include/Lexer.h" />
     <ClInclude Include="include/Token.h" />
-    <ClInclude Include="Nodes.h" />
+    <ClInclude Include="include\Nodes.h" />
+    <ClInclude Include="include\Parser.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="grammar.txt" />

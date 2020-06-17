@@ -4,28 +4,37 @@
 
 class Node {
 public:
-	Node(const Token& token) : 
-		token(token) {}
-	Token token;
+	Node(Token* token, Node* left = nullptr, Node* right = nullptr) : 
+		token(token),
+		left(left),
+		right(right)
+	{}
 
-	inline friend std::ostream& operator << (std::ostream& stream, const NumericNode& node) {
-		return stream << node.token;
+	Token* token;
+	Node* left;
+	Node* right;
+
+	inline friend std::ostream& operator << (std::ostream& stream, Node* node) {
+		return stream << "Node, Token:" << node->token;
 	}
 };
 
 class NumericNode : public Node {
 public:
-	NumericNode(const Token& token) : 
+	NumericNode(Token* token) :
 		Node(token) {}
+
+	inline friend std::ostream& operator << (std::ostream& stream, NumericNode* node) {
+		return stream << "NumericNode, Token:" << node->token;
+	}
 };
 
 class BinaryOperationNode : public Node {
 public:
-	BinaryOperationNode(const Node& left, const Token& token, const Node& right) : 
-		Node(token),
-		left(left), 
-		right(right) {}
+	BinaryOperationNode(Node* left, Token* token, Node* right) :
+		Node(token, left, right) {}
 
-	Node left;
-	Node right;
+	inline friend std::ostream& operator << (std::ostream& stream, BinaryOperationNode* node) {
+		return stream << "BinaryOperationNode, Token:" << node->token;
+	}
 };

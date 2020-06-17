@@ -16,10 +16,15 @@ public:
 		MUL,
 		DIV,
 		LPAREN,
-		RPAREN
+		RPAREN,
+		NONE
 	};
 
-	Token(const Type& type, const std::variant<float, int, char, std::string>& value);
+	Token(Token* token) {
+		type = token->type;
+		value = token->value;
+	}
+	Token(const Type& type = Type::NONE, const std::variant<float, int, char, std::string>& value = '0');
 
 	static inline std::string toString(Type type) {
 		switch (type) {
@@ -37,21 +42,34 @@ public:
 		return "UNDEFINED";
 	}
 
-	inline friend std::ostream& operator << (std::ostream& stream, const Token& token) {
-		auto token_type = toString(token.type) + ": ";
+	inline friend std::ostream& operator << (std::ostream& stream, Token* token) {
+		auto token_type = toString(token->type) + ": ";
+		stream << token_type;
 
-		switch (token.type) {
+		switch (token->type) {
 		default:
-			stream << token_type << std::get<char>(token.value);
+			try { 
+				stream << std::get<char>(token->value);
+			}
+			catch (const std::bad_variant_access&) {}
 			break;
 		case Type::INT:
-			stream << token_type << std::get<int>(token.value);
+			try {
+				stream << std::get<int>(token->value);
+			}
+			catch (const std::bad_variant_access&) {}
 			break;
 		case Type::FLOAT:
-			stream << token_type << std::get<float>(token.value);
+			try {
+				stream << std::get<float>(token->value);
+			}
+			catch (const std::bad_variant_access&) {}
 			break;
 		case Type::STRING:
-			stream << token_type << std::get<std::string>(token.value);
+			try {
+				stream << std::get<std::string>(token->value);
+			}
+			catch (const std::bad_variant_access&) {}
 			break;
 		}
 
