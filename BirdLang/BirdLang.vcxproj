@@ -163,6 +163,10 @@
     <ClInclude Include="include/Error.h" />
     <ClInclude Include="include/Lexer.h" />
     <ClInclude Include="include/Token.h" />
+    <ClInclude Include="Nodes.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="grammar.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

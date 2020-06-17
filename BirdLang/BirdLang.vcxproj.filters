@@ -27,6 +27,9 @@
     <ClInclude Include="include/Token.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="Nodes.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -35,5 +38,13 @@
     <Filter Include="include">
       <UniqueIdentifier>{b2edce0a-170d-4c88-bad7-25c30c204163}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{970ceb87-cf4c-40cd-9682-0308a4d35a87}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="grammar.txt">
+      <Filter>resources</Filter>
+    </Text>
   </ItemGroup>
 </Project>
