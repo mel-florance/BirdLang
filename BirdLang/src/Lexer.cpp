@@ -20,7 +20,7 @@ void Lexer::advance()
 		: NULL;
 }
 
-std::vector<Token> Lexer::make_tokens()
+std::vector<Token> Lexer::index_tokens()
 {
 	std::vector<Token> tokens;
 
@@ -29,7 +29,7 @@ std::vector<Token> Lexer::make_tokens()
 			advance();
 		}
 		else if (digits.find(current_char) != std::string::npos) {
-			tokens.push_back(make_number());
+			tokens.push_back(create_numeric_token());
 		}
 		else if (current_char == '+') {
 			tokens.push_back(Token(Token::Type::PLUS, current_char));
@@ -70,18 +70,19 @@ std::vector<Token> Lexer::make_tokens()
 	return tokens;
 }
 
-Token Lexer::make_number()
+Token Lexer::create_numeric_token()
 {
 	std::string str;
-	unsigned int dot_count = 0;
+	unsigned int dots = 0;
+	bool hasDot = (digits + ".").find(current_char) != std::string::npos;
 
-	while (current_char != NULL && (digits + ".").find(current_char) != std::string::npos) {
+	while (current_char != NULL && hasDot) {
 		if (current_char == '.') {
 			
-			if (dot_count == 1)
+			if (dots == 1)
 				break;
 
-			++dot_count;
+			++dots;
 			str += '.';
 		}
 		else {
@@ -91,7 +92,7 @@ Token Lexer::make_number()
 		advance();
 	}
 
-	if (dot_count == 0) {
+	if (dots == 0) {
 		return Token(Token::Type::INT, (int)std::atoi(str.c_str()));
 	}
 	else {

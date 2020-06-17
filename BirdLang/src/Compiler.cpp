@@ -16,7 +16,7 @@ int main()
 		std::getline(std::cin >> std::ws, input);
 
 		Lexer lexer("<stdin>", input);
-		auto tokens = lexer.make_tokens();
+		auto tokens = lexer.index_tokens();
 
 		for (auto token : tokens) {
 			std::cout << token << "\n";
