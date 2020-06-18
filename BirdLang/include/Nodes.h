@@ -10,6 +10,8 @@ public:
 		right(right)
 	{}
 
+	virtual ~Node() {}
+
 	Token* token;
 	Node* left;
 	Node* right;

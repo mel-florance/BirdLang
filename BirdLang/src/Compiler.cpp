@@ -4,6 +4,7 @@
 #include "Token.h"
 #include "Lexer.h"
 #include "Parser.h"
+#include "Interpreter.h"
 
 int main()
 {
@@ -32,6 +33,11 @@ int main()
 		if (ast != nullptr) {
 			if (ast->error != nullptr)
 				std::cout << ast->error << std::endl;
+			else {
+				// Interpret the AST
+				Interpreter interpreter;
+				interpreter.visit(ast->node);
+			}
 		}
 	}
 }
