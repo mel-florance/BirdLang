@@ -59,13 +59,46 @@ Parser::Result* Parser::factor()
 
 		Result* result = new Result();
 
-		if (current_token->type == Token::Type::FLOAT ||
+		if (current_token->type == Token::Type::PLUS ||
+			current_token->type == Token::Type::MINUS) {
+			Token* token = new Token(current_token);
+
+			result->record(advance());
+			auto fac = result->record(factor());
+
+			if (result->error != nullptr)
+				return result;
+
+			return result->success(new UnaryOperationNode(fac, token));
+;		}
+		else if (current_token->type == Token::Type::FLOAT ||
 			current_token->type == Token::Type::INT) {
 			Token* token = new Token(current_token);
 			
 			result->record(advance());
 
 			return result->success(new NumericNode(token));
+		}
+		else if (current_token->type == Token::Type::LPAREN) {
+			Token* token = new Token(current_token);
+
+			result->record(advance());
+			auto exp = result->record(expr());
+
+			if (result->error != nullptr)
+				return result;
+
+			if (current_token->type == Token::Type::RPAREN) {
+				result->record(advance());
+				return result->success(exp);
+			}
+			else {
+				return result->failure(new InvalidSyntaxError(
+					current_token->start, 
+					current_token->end, 
+					"Expected ')'"
+				));
+			}
 		}
 
 		return result->failure(new InvalidSyntaxError(

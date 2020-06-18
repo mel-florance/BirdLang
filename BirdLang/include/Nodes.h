@@ -38,3 +38,16 @@ public:
 		return stream << "BinaryOperationNode, Token:" << node->token;
 	}
 };
+
+class UnaryOperationNode : public Node {
+public:
+	UnaryOperationNode(Node* node, Token* token) :
+		Node(token, nullptr, node),
+		node(node) {}
+
+	inline friend std::ostream& operator << (std::ostream& stream, UnaryOperationNode* node) {
+		return stream << "UnaryOperationNode, Token:" << node->token;
+	}
+
+	Node* node;
+};
