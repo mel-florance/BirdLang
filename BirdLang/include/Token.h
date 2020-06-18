@@ -4,6 +4,8 @@
 #include <variant>
 #include <string>
 
+#include "Cursor.h"
+
 class Token
 {
 public:
@@ -17,14 +19,17 @@ public:
 		DIV,
 		LPAREN,
 		RPAREN,
+		ENDFILE,
 		NONE
 	};
 
 	Token(Token* token) {
 		type = token->type;
 		value = token->value;
+		start = token->start;
+		end = token->end;
 	}
-	Token(const Type& type = Type::NONE, const std::variant<float, int, char, std::string>& value = '0');
+	Token(const Type& type = Type::NONE, const std::variant<float, int, char, std::string>& value = '0', Cursor* start = nullptr, Cursor* end = nullptr);
 
 	static inline std::string toString(Type type) {
 		switch (type) {
@@ -37,6 +42,7 @@ public:
 		case Type::DIV: return "DIV";
 		case Type::LPAREN: return "LAPREN";
 		case Type::RPAREN: return "RPAREN";
+		case Type::ENDFILE: return "ENDFILE";
 		}
 
 		return "UNDEFINED";
@@ -77,5 +83,7 @@ public:
 	}
 
 	Type type;
+	Cursor* start;
+	Cursor* end;
 	std::variant<float, int, char, std::string> value;
 };

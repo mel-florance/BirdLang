@@ -56,16 +56,18 @@ std::vector<Token*> Lexer::index_tokens()
 			advance();
 		}
 		else {
-			Cursor start = cursor.copy();
+			Cursor start = Cursor(cursor);
 			char c = current_char;
 			advance();
 
-			IllegarCharError error(start, cursor, std::string(1, c));
+			IllegarCharError* error = new IllegarCharError(start, cursor, std::string(1, c));
 			std::cout << error << "\n";
 
 			return std::vector<Token*>();
 		}
 	}
+
+	tokens.push_back(new Token(Token::Type::ENDFILE, 0, &cursor));
 
 	return tokens;
 }
@@ -74,6 +76,7 @@ Token* Lexer::create_numeric_token()
 {
 	std::string str;
 	unsigned int dots = 0;
+	Cursor* start = new Cursor(cursor);
 
 	auto hasDot = [=]() { return (digits + ".").find(current_char) != std::string::npos; };
 
@@ -94,9 +97,9 @@ Token* Lexer::create_numeric_token()
 	}
 
 	if (dots == 0) {
-		return new Token(Token::Type::INT, (int)std::atoi(str.c_str()));
+		return new Token(Token::Type::INT, (int)std::atoi(str.c_str()), start, &cursor);
 	}
 	else {
-		return new Token(Token::Type::FLOAT, (float)std::atof(str.c_str()));
+		return new Token(Token::Type::FLOAT, (float)std::atof(str.c_str()), start, &cursor);
 	}
 }

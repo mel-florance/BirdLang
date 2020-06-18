@@ -9,27 +9,37 @@ Parser::Parser(const std::vector<Token*>& tokens) :
 	advance();
 }
 
-Node* Parser::parse()
+Parser::Result* Parser::parse()
 {
-	Node* node = expr();
+	Result* result = expr();
 
-	if (debug) {
-		traverse(node, 0);
+	if (result != nullptr) {
+		if (result->error == nullptr && current_token->type != Token::Type::ENDFILE) {
+			return result->failure(new InvalidSyntaxError(
+				current_token->start,
+				current_token->end,
+				"Expected '+', '-', '*' or '/'"
+			));
+		}
+
+		if (debug) {
+			traverse(result->node, 0);
+		}
 	}
 
-	return node;
+	return result;
 }
 
 void Parser::traverse(Node* node, unsigned int depth)
 {
 	if (node == nullptr)
 		return;
-
+	
 	++depth;
 
-	traverse(node->right, depth);
-	std::cout << std::string(depth, '\t') << node << std::endl;
 	traverse(node->left, depth);
+	std::cout << std::string(depth, '\t') << node << std::endl;
+	traverse(node->right, depth);
 }
 
 Token* Parser::advance()
@@ -43,49 +53,68 @@ Token* Parser::advance()
 	return current_token;
 }
 
-Node* Parser::factor()
+Parser::Result* Parser::factor()
 {
 	if (current_token != nullptr) {
+
+		Result* result = new Result();
+
 		if (current_token->type == Token::Type::FLOAT ||
 			current_token->type == Token::Type::INT) {
 			Token* token = new Token(current_token);
-			advance();
+			
+			result->record(advance());
 
-			return new NumericNode(token);
+			return result->success(new NumericNode(token));
 		}
+
+		return result->failure(new InvalidSyntaxError(
+			current_token->start,
+			current_token->end,
+			"Expected Integer or Float"
+		));
 	}
 
 	return nullptr;
 }
 
-Node* Parser::term()
+Parser::Result* Parser::term()
 {
 	return binary_operation([=]() {
 		return factor();
 	}, { Token::Type::MUL, Token::Type::DIV });
 }
 
-Node* Parser::expr()
+Parser::Result* Parser::expr()
 {
 	return binary_operation([=]() {
 		return term();
 	}, { Token::Type::PLUS, Token::Type::MINUS });
 }
 
-Node* Parser::binary_operation(std::function<Node*()> fn, const std::vector<Token::Type>& operations)
+Parser::Result* Parser::binary_operation(std::function<Result*()> fn, const std::vector<Token::Type>& operations)
 {
 	if (current_token != nullptr) {
-		Node* left = fn();
+
+		Result* result = new Result();
+		Node* left = result->record(fn());
+
+		if (result->error != nullptr)
+			return result;
 
 		while (std::find(operations.begin(), operations.end(), current_token->type) != operations.end()) {
 			Token* token = new Token(current_token);
 
- 			advance();
-			Node* right = fn();
+ 			result->record(advance());
+			Node* right = result->record(fn());
+
+			if (result->error != nullptr)
+				return result;
+
 			left = new BinaryOperationNode(left, token, right);
 		}
 
-		return left;
+		return result->success(left);
 	}
 
 	return nullptr;

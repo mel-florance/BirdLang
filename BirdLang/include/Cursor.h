@@ -12,13 +12,30 @@ public:
 		filename(filename),
 		input(input) {}
 
+	Cursor(const Cursor& cursor) {
+		index = cursor.index;
+		line = cursor.line;
+		column = cursor.column;
+		filename = cursor.filename;
+		input = cursor.input;
+	}
+
+	Cursor(Cursor* cursor) {
+		if (cursor != nullptr) {
+			index = cursor->index;
+			line = cursor->line;
+			column = cursor->column;
+			filename = cursor->filename;
+			input = cursor->input;
+		}
+	}
+
 	size_t index;
 	int line;
 	int column;
 	std::string filename;
 	std::string input;
 
-	void advance(const char& character);
-	Cursor copy();
+	void advance(const char& character = NULL);
 };
 

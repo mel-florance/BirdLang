@@ -28,5 +28,10 @@ int main()
 		// Generate AST
 		Parser parser(tokens);
 		auto ast = parser.parse();
+
+		if (ast != nullptr) {
+			if (ast->error != nullptr)
+				std::cout << ast->error << std::endl;
+		}
 	}
 }

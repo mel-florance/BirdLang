@@ -10,8 +10,3 @@ void Cursor::advance(const char& character)
 		column = 0;
 	}
 }
-
-Cursor Cursor::copy()
-{
-	return Cursor(index, line, column, filename, input);
-}

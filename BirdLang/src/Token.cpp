@@ -1,7 +1,18 @@
 #include "Token.h"
 
-Token::Token(const Token::Type& type, const std::variant<float, int, char, std::string>& value) :
+Token::Token(const Token::Type& type, const std::variant<float, int, char, std::string>& value, Cursor* start, Cursor* end) :
     type(type), 
-    value(value)
+    value(value),
+    start(start),
+    end(end)
 {
+    if (start != nullptr) {
+        this->start = new Cursor(start);
+        this->end = new Cursor(start);
+        this->end->advance();
+    }
+
+	if (end != nullptr) {
+		this->end = new Cursor(end);
+	}
 }
