@@ -9,19 +9,19 @@ class Number {
 public:
 	Number(const std::variant<float, int>& value = 0);
 
-	Number add(const Number& other);
-	Number subtract(const Number& other);
-	Number multiply(const Number& other);
-	Number divide(const Number& other);
+	Number* add(Number* other);
+	Number* subtract(Number* other);
+	Number* multiply(Number* other);
+	Number* divide(Number* other);
 
-	inline friend std::ostream& operator << (std::ostream& stream, const Number& number) {
+	inline friend std::ostream& operator << (std::ostream& stream, Number* number) {
 
-		if (number.value.index() == 0) {
-			try { stream << std::to_string(std::get<float>(number.value)); }
+		if (number->value.index() == 0) {
+			try { stream << std::to_string(std::get<float>(number->value)); }
 			catch (const std::bad_variant_access&) {}
 		}
 		else {
-			try { stream << std::to_string(std::get<int>(number.value)); }
+			try { stream << std::to_string(std::get<int>(number->value)); }
 			catch (const std::bad_variant_access&) {}
 		}
 

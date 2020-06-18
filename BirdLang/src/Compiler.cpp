@@ -34,9 +34,9 @@ int main()
 			else {
 				// Interpret the AST
 				Interpreter interpreter;
-				auto number = interpreter.visit(ast->node);
+				auto result = interpreter.visit(ast->node);
 
-				std::cout << number << std::endl;
+				std::cout << result->value << std::endl;
 			}
 		}
 	}

@@ -34,3 +34,8 @@ class InvalidSyntaxError : public Error {
 public:
 	InvalidSyntaxError(const Cursor& start, const Cursor& end, const std::string& details) : Error("Invalid Syntax", start, end, details) {}
 };
+
+class RuntimeError : public Error {
+public:
+	RuntimeError(const Cursor& start, const Cursor& end, const std::string& details) : Error("Runtime Error", start, end, details) {}
+};

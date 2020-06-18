@@ -7,64 +7,64 @@ Number::Number(const std::variant<float, int>& value) :
 
 }
 
-Number Number::add(const Number& other)
+Number* Number::add(Number* other)
 {
-    Number result;
+    Number* result = new Number();
     
     if (value.index() == 0) {
-		try { result.value = std::get<float>(value) + std::get<float>(other.value); }
+		try { result->value = std::get<float>(value) + std::get<float>(other->value); }
 		catch (const std::bad_variant_access&) {}
     }
     else {
-		try { result.value = std::get<int>(value) + std::get<int>(other.value); }
+		try { result->value = std::get<int>(value) + std::get<int>(other->value); }
 		catch (const std::bad_variant_access&) {}
     }
 
     return result;
 }
 
-Number Number::subtract(const Number& other)
+Number* Number::subtract(Number* other)
 {
-	Number result;
+	Number* result = new Number();
 
 	if (value.index() == 0) {
-		try { result.value = std::get<float>(value) - std::get<float>(other.value); }
+		try { result->value = std::get<float>(value) - std::get<float>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else {
-		try { result.value = std::get<int>(value) - std::get<int>(other.value); }
+		try { result->value = std::get<int>(value) - std::get<int>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 
 	return result;
 }
 
-Number Number::multiply(const Number& other)
+Number* Number::multiply(Number* other)
 {
-	Number result;
+	Number* result = new Number();
 
 	if (value.index() == 0) {
-		try { result.value = std::get<float>(value) * std::get<float>(other.value); }
+		try { result->value = std::get<float>(value) * std::get<float>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else {
-		try { result.value = std::get<int>(value) * std::get<int>(other.value); }
+		try { result->value = std::get<int>(value) * std::get<int>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 
 	return result;
 }
 
-Number Number::divide(const Number& other)
+Number* Number::divide(Number* other)
 {
-	Number result;
+	Number* result = new Number();
 
 	if (value.index() == 0) {
-		try { result.value = std::get<float>(value) / std::get<float>(other.value); }
+		try { result->value = std::get<float>(value) / std::get<float>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else {
-		try { result.value = std::get<int>(value) / std::get<int>(other.value); }
+		try { result->value = std::get<int>(value) / std::get<int>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 
