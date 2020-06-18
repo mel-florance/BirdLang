@@ -20,14 +20,12 @@ int main()
 
 		// Index tokens
 		Lexer lexer("<stdin>", input);
+		lexer.debug = false;
 		auto tokens = lexer.index_tokens();
-
-		for (auto token : tokens) {
-			std::cout << token << "\n";
-		}
 
 		// Generate AST
 		Parser parser(tokens);
+		parser.debug = false;
 		auto ast = parser.parse();
 
 		if (ast != nullptr) {
@@ -36,7 +34,9 @@ int main()
 			else {
 				// Interpret the AST
 				Interpreter interpreter;
-				interpreter.visit(ast->node);
+				auto number = interpreter.visit(ast->node);
+
+				std::cout << number << std::endl;
 			}
 		}
 	}

@@ -20,5 +20,6 @@ public:
 	std::string input;
 	Cursor cursor;
 	char current_char;
+	bool debug;
 };
 

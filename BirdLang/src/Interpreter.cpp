@@ -5,7 +5,7 @@ Interpreter::Interpreter()
 
 }
 
-void Interpreter::visit(Node* node)
+Number Interpreter::visit(Node* node)
 {
 	auto type = typeid(*node).name();
 
@@ -23,22 +23,58 @@ void Interpreter::visit(Node* node)
 	}
 }
 
-void Interpreter::visit_numeric_node(Node* node)
+Number Interpreter::visit_numeric_node(Node* node)
 {
-	std::cout << "Found numeric node" << std::endl;
+	Number number;
+	number.start = node->token->start;
+	number.end = node->token->end;
+
+	if (node->token->value.index() == 0) {
+		try { number.value = std::get<float>(node->token->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else {
+		try { number.value = std::get<int>(node->token->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+
+	return number;
 }
 
-void Interpreter::visit_binary_operation_node(Node* node)
+Number Interpreter::visit_binary_operation_node(Node* node)
 {
-	std::cout << "Found binary node" << std::endl;
+	Number result;
+	result.start = node->token->start;
+	result.end = node->token->end;
 
-	visit(node->left);
-	visit(node->right);
+	auto left = visit(node->left);
+	auto right = visit(node->right);
+
+	if (node->token->type == Token::Type::PLUS) {
+		result = left.add(right);
+	}
+	else if (node->token->type == Token::Type::MINUS) {
+		result = left.subtract(right);
+	}
+	else if (node->token->type == Token::Type::MUL) {
+		result = left.multiply(right);
+	}
+	else if (node->token->type == Token::Type::DIV) {
+		result = left.divide(right);
+	}
+
+	return result;
 }
 
-void Interpreter::visit_unary_operation_node(Node* node)
+Number Interpreter::visit_unary_operation_node(Node* node)
 {
-	std::cout << "Found unary node" << std::endl;
+	auto number = visit(node->right);
+	number.start = node->token->start;
+	number.end = node->token->end;
 
-	visit(node->right);
+	if (node->token->type == Token::Type::MINUS) {
+		number = number.multiply(Number(-1));
+	}
+
+	return number;
 }

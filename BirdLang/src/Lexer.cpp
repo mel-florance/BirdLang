@@ -6,7 +6,8 @@ Lexer::Lexer(const std::string& filename, const std::string& input) :
 	filename(filename),
 	input(input),
 	cursor(Cursor(-1, 0, -1, filename, input)),
-	current_char(NULL)
+	current_char(NULL),
+	debug(true)
 {
 	advance();
 }
@@ -68,6 +69,12 @@ std::vector<Token*> Lexer::index_tokens()
 	}
 
 	tokens.push_back(new Token(Token::Type::ENDFILE, 0, &cursor));
+
+	if (debug) {
+		for (auto token : tokens) {
+			std::cout << token << "\n";
+		}
+	}
 
 	return tokens;
 }
