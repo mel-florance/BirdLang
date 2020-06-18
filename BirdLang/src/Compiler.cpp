@@ -36,7 +36,12 @@ int main()
 				Interpreter interpreter;
 				auto result = interpreter.visit(ast->node);
 
-				std::cout << result->value << std::endl;
+				if (result->error != nullptr) {
+					std::cout << result->error << std::endl;
+				}
+				else {
+					std::cout << result->value << std::endl;
+				}
 			}
 		}
 	}

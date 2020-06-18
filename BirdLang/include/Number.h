@@ -4,15 +4,16 @@
 #include <iostream>
 
 #include "Cursor.h"
+#include "Error.h"
 
 class Number {
 public:
 	Number(const std::variant<float, int>& value = 0);
 
-	Number* add(Number* other);
-	Number* subtract(Number* other);
-	Number* multiply(Number* other);
-	Number* divide(Number* other);
+	std::pair<Number*, Error*> add(Number* other);
+	std::pair<Number*, Error*> subtract(Number* other);
+	std::pair<Number*, Error*> multiply(Number* other);
+	std::pair<Number*, Error*> divide(Number* other);
 
 	inline friend std::ostream& operator << (std::ostream& stream, Number* number) {
 

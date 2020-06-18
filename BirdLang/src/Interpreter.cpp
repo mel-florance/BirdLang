@@ -59,17 +59,31 @@ Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node)
 	if (result->error != nullptr)
 		return result;
 
+	Error* error = nullptr;
+
 	if (node->token->type == Token::Type::PLUS) {
-		number = left->add(right);
+		auto op_result = left->add(right);
+		number = op_result.first;
+		error = op_result.second;
 	}
 	else if (node->token->type == Token::Type::MINUS) {
-		number = left->subtract(right);
+		auto op_result = left->subtract(right);
+		number = op_result.first;
+		error = op_result.second;
 	}
 	else if (node->token->type == Token::Type::MUL) {
-		number = left->multiply(right);
+		auto op_result = left->multiply(right);
+		number = op_result.first;
+		error = op_result.second;
 	}
 	else if (node->token->type == Token::Type::DIV) {
-		number = left->divide(right);
+		auto op_result = left->divide(right);
+		number = op_result.first;
+		error = op_result.second;
+	}
+
+	if (error != nullptr) {
+		return result->failure(error);
 	}
 
 	return result->success(number);
@@ -87,8 +101,16 @@ Interpreter::Result* Interpreter::visit_unary_operation_node(Node* node)
 	number->start = node->token->start;
 	number->end = node->token->end;
 
+	Error* error = nullptr;
+
 	if (node->token->type == Token::Type::MINUS) {
-		number = number->multiply(new Number(-1));
+		auto op_result = number->multiply(new Number(-1));
+		number = op_result.first;
+		error = op_result.second;
+	}
+
+	if (error != nullptr) {
+		return result->failure(error);
 	}
 
 	return result->success(number);

@@ -4,10 +4,9 @@ Number::Number(const std::variant<float, int>& value) :
     value(value),
     start(nullptr),
     end(nullptr) {
-
 }
 
-Number* Number::add(Number* other)
+std::pair<Number*, Error*> Number::add(Number* other)
 {
     Number* result = new Number();
     
@@ -20,10 +19,10 @@ Number* Number::add(Number* other)
 		catch (const std::bad_variant_access&) {}
     }
 
-    return result;
+    return std::make_pair(result, nullptr);
 }
 
-Number* Number::subtract(Number* other)
+std::pair<Number*, Error*> Number::subtract(Number* other)
 {
 	Number* result = new Number();
 
@@ -36,10 +35,10 @@ Number* Number::subtract(Number* other)
 		catch (const std::bad_variant_access&) {}
 	}
 
-	return result;
+	return std::make_pair(result, nullptr);
 }
 
-Number* Number::multiply(Number* other)
+std::pair<Number*, Error*> Number::multiply(Number* other)
 {
 	Number* result = new Number();
 
@@ -52,21 +51,40 @@ Number* Number::multiply(Number* other)
 		catch (const std::bad_variant_access&) {}
 	}
 
-	return result;
+	return std::make_pair(result, nullptr);
 }
 
-Number* Number::divide(Number* other)
+std::pair<Number*, Error*> Number::divide(Number* other)
 {
 	Number* result = new Number();
 
 	if (value.index() == 0) {
-		try { result->value = std::get<float>(value) / std::get<float>(other->value); }
+		try { 
+			auto rhs = std::get<float>(other->value);
+
+			if (rhs == 0.0f) {
+				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero"));
+			}
+			else {
+				result->value = std::get<float>(value) / rhs;
+			}
+		}
 		catch (const std::bad_variant_access&) {}
 	}
 	else {
-		try { result->value = std::get<int>(value) / std::get<int>(other->value); }
+		try { 
+			auto rhs = std::get<int>(other->value);
+
+			if (rhs == 0) {
+				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero"));
+			}
+			else {
+				result->value = std::get<int>(value) / std::get<int>(other->value);
+			}
+		
+		}
 		catch (const std::bad_variant_access&) {}
 	}
 
-	return result;
+	return std::make_pair(result, nullptr);
 }
