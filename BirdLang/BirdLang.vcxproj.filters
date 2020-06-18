@@ -19,6 +19,9 @@
     <ClCompile Include="src/Interpreter.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src/Number.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include/Cursor.h">
@@ -40,6 +43,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include/Interpreter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include/Number.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

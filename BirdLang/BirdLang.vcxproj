@@ -153,6 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src/Number.cpp" />
     <ClCompile Include="src/Compiler.cpp" />
     <ClCompile Include="src/Cursor.cpp" />
     <ClCompile Include="src/Lexer.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="include/Nodes.h" />
     <ClInclude Include="include/Parser.h" />
     <ClInclude Include="include/Interpreter.h" />
+    <ClInclude Include="include/Number.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="grammar.txt" />
