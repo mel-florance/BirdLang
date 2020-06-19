@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include "Windows.h"
 
 #include "Token.h"
 #include "Lexer.h"
@@ -18,14 +19,20 @@ int main()
 		std::cout << "\n" << "> ";
 		std::getline(std::cin >> std::ws, input);
 
+		// Clear the console if asked
+		if (input == "clear") {
+			system("cls");
+			continue;
+		}
+
 		// Index tokens
 		Lexer lexer("<stdin>", input);
-		lexer.debug = true;
+		lexer.debug = false;
 		auto tokens = lexer.index_tokens();
 
 		// Generate AST
 		Parser parser(tokens);
-		parser.debug = true;
+		parser.debug = false;
 		auto ast = parser.parse();
 
 		if (ast != nullptr) {
