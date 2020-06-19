@@ -3,6 +3,7 @@
 #include "Nodes.h"
 #include "Number.h"
 #include "Error.h"
+#include "Context.h"
 
 class Interpreter {
 public:
@@ -32,8 +33,8 @@ public:
 		Error* error = nullptr;
 	};
 	
-	Result* visit(Node* node);
-	Result* visit_numeric_node(Node* node);
-	Result* visit_binary_operation_node(Node* node);
-	Result* visit_unary_operation_node(Node* node);
+	Result* visit(Node* node, Context* context);
+	Result* visit_numeric_node(Node* node, Context* context);
+	Result* visit_binary_operation_node(Node* node, Context* context);
+	Result* visit_unary_operation_node(Node* node, Context* context);
 };

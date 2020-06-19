@@ -9,6 +9,7 @@ Number::Number(const std::variant<float, int>& value) :
 std::pair<Number*, Error*> Number::add(Number* other)
 {
     Number* result = new Number();
+	result->context = context;
     
     if (value.index() == 0 && other->value.index() == 0) {
 		try { result->value = std::get<float>(value) + std::get<float>(other->value); }
@@ -33,6 +34,7 @@ std::pair<Number*, Error*> Number::add(Number* other)
 std::pair<Number*, Error*> Number::subtract(Number* other)
 {
 	Number* result = new Number();
+	result->context = context;
 
 	if (value.index() == 0 && other->value.index() == 0) {
 		try { result->value = std::get<float>(value) - std::get<float>(other->value); }
@@ -57,6 +59,7 @@ std::pair<Number*, Error*> Number::subtract(Number* other)
 std::pair<Number*, Error*> Number::multiply(Number* other)
 {
 	Number* result = new Number();
+	result->context = context;
 
 	if (value.index() == 0 && other->value.index() == 0) {
 		try { result->value = std::get<float>(value) * std::get<float>(other->value); }
@@ -81,13 +84,14 @@ std::pair<Number*, Error*> Number::multiply(Number* other)
 std::pair<Number*, Error*> Number::divide(Number* other)
 {
 	Number* result = new Number();
+	result->context = context;
 
 	if (value.index() == 0 && other->value.index() == 0) {
 		try { 
 			auto rhs = std::get<float>(other->value);
 
 			if (rhs == 0.0f)
-				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero"));
+				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero", context));
 			else
 				result->value = std::get<float>(value) / rhs;
 		}
@@ -98,7 +102,7 @@ std::pair<Number*, Error*> Number::divide(Number* other)
 			auto rhs = std::get<int>(other->value);
 
 			if (rhs == 0)
-				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero"));
+				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero", context));
 			else
 				result->value = std::get<int>(value) / rhs;
 		}
@@ -109,7 +113,7 @@ std::pair<Number*, Error*> Number::divide(Number* other)
 			auto rhs = std::get<int>(other->value);
 
 			if (rhs == 0)
-				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero"));
+				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero", context));
 			else
 				result->value = std::get<float>(value) / (float)rhs;
 		}
@@ -120,7 +124,7 @@ std::pair<Number*, Error*> Number::divide(Number* other)
 			auto rhs = std::get<float>(other->value);
 
 			if (rhs == 0)
-				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero"));
+				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero", context));
 			else
 				result->value = (float)std::get<int>(value) / rhs;
 		}

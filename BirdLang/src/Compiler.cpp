@@ -5,6 +5,7 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "Interpreter.h"
+#include "Context.h"
 
 int main()
 {
@@ -40,10 +41,20 @@ int main()
 			else {
 				// Interpret the AST
 				Interpreter interpreter;
-				auto result = interpreter.visit(ast->node);
+				Context context("<program>");
+
+				auto result = interpreter.visit(ast->node, &context);
 
 				if (result->error != nullptr) {
-					std::cout << result->error << std::endl;
+					if (strcmp(typeid(*result->error).name(), "class RuntimeError") == 0) {
+						RuntimeError* error = static_cast<RuntimeError*>(result->error);
+
+						if (error != nullptr) {
+							std::cout << error << std::endl;
+						}
+					}
+					else
+						std::cout << result->error << std::endl;
 				}
 				else {
 					std::cout << result->value << std::endl;

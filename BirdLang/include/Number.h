@@ -5,6 +5,7 @@
 
 #include "Cursor.h"
 #include "Error.h"
+#include "Context.h"
 
 class Number {
 public:
@@ -32,4 +33,5 @@ public:
 	std::variant<float, int> value;
 	Cursor* start;
 	Cursor* end;
+	Context* context;
 };

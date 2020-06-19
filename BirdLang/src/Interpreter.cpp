@@ -5,28 +5,31 @@ Interpreter::Interpreter()
 
 }
 
-Interpreter::Result* Interpreter::visit(Node* node)
+Interpreter::Result* Interpreter::visit(Node* node, Context* context)
 {
 	auto type = typeid(*node).name();
 
 	if (strcmp(type, "class BinaryOperationNode") == 0) {
-		return visit_binary_operation_node(node);
+		return visit_binary_operation_node(node, context);
 	}
 	else if (strcmp(type, "class NumericNode") == 0) {
-		return visit_numeric_node(node);
+		return visit_numeric_node(node, context);
 	} 
 	else if (strcmp(type, "class UnaryOperationNode") == 0) {
-		return visit_unary_operation_node(node);
+		return visit_unary_operation_node(node, context);
 	} 
 	else {
 		std::cout << "No visit " << type << " method defined" << std::endl;
 	}
+
+	return nullptr;
 }
 
-Interpreter::Result* Interpreter::visit_numeric_node(Node* node)
+Interpreter::Result* Interpreter::visit_numeric_node(Node* node, Context* context)
 {
 	Result* result = new Result();
 	Number* number = new Number();
+	number->context = context;
 	number->start = node->token->start;
 	number->end = node->token->end;
 
@@ -42,19 +45,19 @@ Interpreter::Result* Interpreter::visit_numeric_node(Node* node)
 	return result->success(number);
 }
 
-Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node)
+Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, Context* context)
 {
 	Result* result = new Result();
 	Number* number = new Number();
 	number->start = node->token->start;
 	number->end = node->token->end;
 
-	Number* left = result->record(visit(node->left));
+	Number* left = result->record(visit(node->left, context));
 
 	if (result->error != nullptr)
 		return result;
 
-	Number* right = result->record(visit(node->right));
+	Number* right = result->record(visit(node->right, context));
 
 	if (result->error != nullptr)
 		return result;
@@ -89,10 +92,10 @@ Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node)
 	return result->success(number);
 }
 
-Interpreter::Result* Interpreter::visit_unary_operation_node(Node* node)
+Interpreter::Result* Interpreter::visit_unary_operation_node(Node* node, Context* context)
 {
 	Result* result = new Result();
-	Number* number = result->record(visit(node->right));
+	Number* number = result->record(visit(node->right, context));
 	
 	if (result->error != nullptr) {
 		return result;
