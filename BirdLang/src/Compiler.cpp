@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include "Windows.h"
 
 #include "Token.h"
 #include "Lexer.h"
