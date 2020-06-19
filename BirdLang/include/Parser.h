@@ -46,7 +46,9 @@ public:
 	Result* factor();
 	Result* term();
 	Result* expr();
-	Result* binary_operation(std::function<Result*()> fn, const std::vector<Token::Type>& operations);
+	Result* atom();
+	Result* power();
+	Result* binary_operation(std::function<Result*()> fna, const std::vector<Token::Type>& operations, std::function<Result* ()> fnb = nullptr);
 
 	std::vector<Token*> tokens;
 	Token* current_token;

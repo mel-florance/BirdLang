@@ -70,42 +70,9 @@ Parser::Result* Parser::factor()
 				return result;
 
 			return result->success(new UnaryOperationNode(fac, token));
-;		}
-		else if (current_token->type == Token::Type::FLOAT ||
-			current_token->type == Token::Type::INT) {
-			Token* token = new Token(current_token);
-			
-			result->record(advance());
-
-			return result->success(new NumericNode(token));
-		}
-		else if (current_token->type == Token::Type::LPAREN) {
-			Token* token = new Token(current_token);
-
-			result->record(advance());
-			auto exp = result->record(expr());
-
-			if (result->error != nullptr)
-				return result;
-
-			if (current_token->type == Token::Type::RPAREN) {
-				result->record(advance());
-				return result->success(exp);
-			}
-			else {
-				return result->failure(new InvalidSyntaxError(
-					current_token->start, 
-					current_token->end, 
-					"Expected ')'"
-				));
-			}
 		}
 
-		return result->failure(new InvalidSyntaxError(
-			current_token->start,
-			current_token->end,
-			"Expected Integer or Float"
-		));
+		return power();
 	}
 
 	return nullptr;
@@ -125,12 +92,70 @@ Parser::Result* Parser::expr()
 	}, { Token::Type::PLUS, Token::Type::MINUS });
 }
 
-Parser::Result* Parser::binary_operation(std::function<Result*()> fn, const std::vector<Token::Type>& operations)
+Parser::Result* Parser::atom()
 {
 	if (current_token != nullptr) {
 
 		Result* result = new Result();
-		Node* left = result->record(fn());
+
+		if (current_token->type == Token::Type::FLOAT ||
+			current_token->type == Token::Type::INT) {
+			Token* token = new Token(current_token);
+
+			result->record(advance());
+
+			return result->success(new NumericNode(token));
+		}
+		else if (current_token->type == Token::Type::LPAREN) {
+			Token* token = new Token(current_token);
+
+			result->record(advance());
+			auto exp = result->record(expr());
+
+			if (result->error != nullptr)
+				return result;
+
+			if (current_token->type == Token::Type::RPAREN) {
+				result->record(advance());
+				return result->success(exp);
+			}
+			else {
+				return result->failure(new InvalidSyntaxError(
+					current_token->start,
+					current_token->end,
+					"Expected ')'"
+				));
+			}
+		}
+
+		return result->failure(new InvalidSyntaxError(
+			current_token->start,
+			current_token->end,
+			"Expected Integer, Float, '+', '-' or '('"
+		));
+	}
+
+	return nullptr;
+}
+
+Parser::Result* Parser::power()
+{
+	return binary_operation([=]() {
+		return atom();
+	}, { Token::Type::POW }, [=]() {
+		return factor();
+	});
+}
+
+Parser::Result* Parser::binary_operation(std::function<Result*()> fna, const std::vector<Token::Type>& operations, std::function<Result* ()> fnb)
+{
+	if (current_token != nullptr) {
+
+		if (fnb == nullptr)
+			fnb = fna;
+
+		Result* result = new Result();
+		Node* left = result->record(fna());
 
 		if (result->error != nullptr)
 			return result;
@@ -139,7 +164,7 @@ Parser::Result* Parser::binary_operation(std::function<Result*()> fn, const std:
 			Token* token = new Token(current_token);
 
  			result->record(advance());
-			Node* right = result->record(fn());
+			Node* right = result->record(fnb());
 
 			if (result->error != nullptr)
 				return result;

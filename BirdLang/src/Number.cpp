@@ -133,3 +133,28 @@ std::pair<Number*, Error*> Number::divide(Number* other)
 
 	return std::make_pair(result, nullptr);
 }
+
+std::pair<Number*, Error*> Number::power(Number* other)
+{
+	Number* result = new Number();
+	result->context = context;
+
+	if (value.index() == 0 && other->value.index() == 0) {
+		try { result->value = pow(std::get<float>(value), std::get<float>(other->value)); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 1 && other->value.index() == 1) {
+		try { result->value = pow((float)std::get<int>(value), std::get<int>(other->value)); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 0 && other->value.index() == 1) {
+		try { result->value = pow(std::get<float>(value), (float)std::get<int>(other->value)); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 1 && other->value.index() == 0) {
+		try { result->value = pow((float)std::get<int>(value), std::get<float>(other->value)); }
+		catch (const std::bad_variant_access&) {}
+	}
+
+	return std::make_pair(result, nullptr);
+}

@@ -84,6 +84,11 @@ Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, Contex
 		number = op_result.first;
 		error = op_result.second;
 	}
+	else if (node->token->type == Token::Type::POW) {
+		auto op_result = left->power(right);
+		number = op_result.first;
+		error = op_result.second;
+	}
 
 	if (error != nullptr) {
 		return result->failure(error);

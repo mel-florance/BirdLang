@@ -40,6 +40,10 @@ std::vector<Token*> Lexer::index_tokens()
 			tokens.push_back(new Token(Token::Type::MINUS, current_char));
 			advance();
 		}
+		else if (current_char == '^') {
+			tokens.push_back(new Token(Token::Type::POW, current_char));
+			advance();
+		}
 		else if (current_char == '*') {
 			tokens.push_back(new Token(Token::Type::MUL, current_char));
 			advance();

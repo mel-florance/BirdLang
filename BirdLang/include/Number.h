@@ -2,6 +2,7 @@
 
 #include <variant>
 #include <iostream>
+#include <cmath>
 
 #include "Cursor.h"
 #include "Error.h"
@@ -15,6 +16,7 @@ public:
 	std::pair<Number*, Error*> subtract(Number* other);
 	std::pair<Number*, Error*> multiply(Number* other);
 	std::pair<Number*, Error*> divide(Number* other);
+	std::pair<Number*, Error*> power(Number* other);
 
 	inline friend std::ostream& operator << (std::ostream& stream, Number* number) {
 

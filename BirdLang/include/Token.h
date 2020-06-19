@@ -15,6 +15,7 @@ public:
 		STRING,
 		PLUS,
 		MINUS,
+		POW,
 		MUL,
 		DIV,
 		LPAREN,
@@ -38,6 +39,7 @@ public:
 		case Type::STRING: return "STRING";
 		case Type::PLUS: return "PLUS";
 		case Type::MINUS: return "MINUS";
+		case Type::POW: return "POW";
 		case Type::MUL: return "MUL";
 		case Type::DIV: return "DIV";
 		case Type::LPAREN: return "LAPREN";
