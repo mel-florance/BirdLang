@@ -160,6 +160,7 @@
     <ClCompile Include="src/Token.cpp" />
     <ClCompile Include="src/Parser.cpp" />
     <ClCompile Include="src/Interpreter.cpp" />
+    <ClCompile Include="src/Context.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include/Cursor.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="include/Parser.h" />
     <ClInclude Include="include/Interpreter.h" />
     <ClInclude Include="include/Number.h" />
+    <ClInclude Include="include/Context.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="grammar.txt" />

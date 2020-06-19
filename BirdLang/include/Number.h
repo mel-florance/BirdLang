@@ -33,4 +33,3 @@ public:
 	Cursor* start;
 	Cursor* end;
 };
-

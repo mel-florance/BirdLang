@@ -20,12 +20,12 @@ int main()
 
 		// Index tokens
 		Lexer lexer("<stdin>", input);
-		lexer.debug = false;
+		lexer.debug = true;
 		auto tokens = lexer.index_tokens();
 
 		// Generate AST
 		Parser parser(tokens);
-		parser.debug = false;
+		parser.debug = true;
 		auto ast = parser.parse();
 
 		if (ast != nullptr) {

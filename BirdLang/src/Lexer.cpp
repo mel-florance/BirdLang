@@ -68,7 +68,7 @@ std::vector<Token*> Lexer::index_tokens()
 		}
 	}
 
-	tokens.push_back(new Token(Token::Type::ENDFILE, 0, &cursor));
+	tokens.push_back(new Token(Token::Type::EOT, 0, &cursor));
 
 	if (debug) {
 		for (auto token : tokens) {

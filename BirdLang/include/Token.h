@@ -19,7 +19,7 @@ public:
 		DIV,
 		LPAREN,
 		RPAREN,
-		ENDFILE,
+		EOT,
 		NONE
 	};
 
@@ -42,7 +42,7 @@ public:
 		case Type::DIV: return "DIV";
 		case Type::LPAREN: return "LAPREN";
 		case Type::RPAREN: return "RPAREN";
-		case Type::ENDFILE: return "ENDFILE";
+		case Type::EOT: return "EOT";
 		}
 
 		return "UNDEFINED";
