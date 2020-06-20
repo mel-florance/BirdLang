@@ -87,6 +87,37 @@ Parser::Result* Parser::term()
 
 Parser::Result* Parser::expr()
 {
+	Result* result = new Result();
+
+	std::string value;
+	try { value = std::get<std::string>(current_token->value); }
+	catch (const std::bad_variant_access&) {}
+
+	if (current_token->type == Token::Type::KEYWORD && value == "var") {
+		result->record(advance());
+
+		if (current_token->type != Token::Type::IDENTIFIER) {
+			return result->failure(new InvalidSyntaxError(current_token->start, current_token->end, "Expected Identifier"));
+		}
+
+		Token* var_name = new Token(current_token);
+		result->record(advance());
+
+		if (current_token->type != Token::Type::EQ) {
+			return result->failure(new InvalidSyntaxError(current_token->start, current_token->end, "Expected '='"));
+		}
+
+		result->record(advance());
+
+		Node* expression = result->record(expr());
+
+		if (result->error != nullptr) {
+			return result;
+		}
+
+		return result->success(new VariableAssignmentNode(var_name, expression));
+	}
+
 	return binary_operation([=]() {
 		return term();
 	}, { Token::Type::PLUS, Token::Type::MINUS });
@@ -105,6 +136,11 @@ Parser::Result* Parser::atom()
 			result->record(advance());
 
 			return result->success(new NumericNode(token));
+		}
+		else if (current_token->type == Token::Type::IDENTIFIER) {
+			Token* token = new Token(current_token);
+			result->record(advance());
+			return result->success(new VariableAccessNode(token));
 		}
 		else if (current_token->type == Token::Type::LPAREN) {
 			Token* token = new Token(current_token);

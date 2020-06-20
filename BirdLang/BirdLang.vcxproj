@@ -161,6 +161,7 @@
     <ClCompile Include="src/Parser.cpp" />
     <ClCompile Include="src/Interpreter.cpp" />
     <ClCompile Include="src/Context.cpp" />
+    <ClCompile Include="src/Symbols.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include/Cursor.h" />
@@ -172,6 +173,7 @@
     <ClInclude Include="include/Interpreter.h" />
     <ClInclude Include="include/Number.h" />
     <ClInclude Include="include/Context.h" />
+    <ClInclude Include="include/Symbols.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="grammar.txt" />

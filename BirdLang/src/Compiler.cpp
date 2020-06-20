@@ -6,12 +6,14 @@
 #include "Parser.h"
 #include "Interpreter.h"
 #include "Context.h"
+#include "Symbols.h"
 
 int main()
 {
 	std::cout << "Bird Lang Interpreter:\n";
 
 	std::string input;
+	Symbols symbols;
 
 	while (true)
 	{
@@ -42,6 +44,7 @@ int main()
 				// Interpret the AST
 				Interpreter interpreter;
 				Context context("<program>");
+				context.symbols = &symbols;
 
 				auto result = interpreter.visit(ast->node, &context);
 

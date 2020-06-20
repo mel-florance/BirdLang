@@ -1,5 +1,9 @@
 #include "Token.h"
 
+std::vector<std::string> Token::keywords = {
+    "var"
+};
+
 Token::Token(const Token::Type& type, const std::variant<float, int, char, std::string>& value, Cursor* start, Cursor* end) :
     type(type), 
     value(value),

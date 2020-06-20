@@ -25,6 +25,9 @@
     <ClCompile Include="src/Context.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src/Symbols.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include/Cursor.h">
@@ -52,6 +55,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include/Context.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include/Symbols.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

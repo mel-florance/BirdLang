@@ -1,6 +1,8 @@
 #include "Lexer.h"
 
 const std::string digits = "0123456789";
+const std::string letters = "abcdefghijklmnopqrstuvwxyz";
+const std::string letters_digits = letters + digits;
 
 Lexer::Lexer(const std::string& filename, const std::string& input) : 
 	filename(filename),
@@ -32,6 +34,9 @@ std::vector<Token*> Lexer::index_tokens()
 		else if (digits.find(current_char) != std::string::npos) {
 			tokens.push_back(create_numeric_token());
 		}
+		else if (letters.find(current_char) != std::string::npos) {
+			tokens.push_back(create_identifier());
+		}
 		else if (current_char == '+') {
 			tokens.push_back(new Token(Token::Type::PLUS, current_char));
 			advance();
@@ -42,6 +47,10 @@ std::vector<Token*> Lexer::index_tokens()
 		}
 		else if (current_char == '^') {
 			tokens.push_back(new Token(Token::Type::POW, current_char));
+			advance();
+		}
+		else if (current_char == '=') {
+			tokens.push_back(new Token(Token::Type::EQ, current_char));
 			advance();
 		}
 		else if (current_char == '*') {
@@ -113,4 +122,26 @@ Token* Lexer::create_numeric_token()
 	else {
 		return new Token(Token::Type::FLOAT, (float)std::atof(str.c_str()), start, &cursor);
 	}
+}
+
+Token* Lexer::create_identifier()
+{
+	std::string id;
+	Cursor* start = new Cursor(cursor);
+
+	auto isLetterOrDigit = [=]() { return (letters_digits + "_").find(current_char) != std::string::npos; };
+
+	while (current_char != NULL && isLetterOrDigit()) {
+		id += current_char;
+		advance();
+	}
+
+	Token::Type type = Token::Type::NONE;
+	std::vector<std::string>::iterator it = std::find(Token::keywords.begin(), Token::keywords.end(), id);
+
+	type = it != Token::keywords.end()
+		? Token::Type::KEYWORD
+		: Token::Type::IDENTIFIER;
+
+	return new Token(type, id, start, &cursor);
 }

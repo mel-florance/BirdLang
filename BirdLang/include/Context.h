@@ -3,6 +3,7 @@
 #include <string>
 
 #include "Cursor.h"
+#include "Symbols.h"
 
 class Context {
 public:
@@ -11,4 +12,5 @@ public:
 	std::string display_name;
 	Context* parent;
 	Cursor* parent_cursor;
+	Symbols* symbols;
 };

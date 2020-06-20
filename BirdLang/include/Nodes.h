@@ -53,3 +53,26 @@ public:
 
 	Node* node;
 };
+
+class VariableAccessNode : public Node {
+public:
+	VariableAccessNode(Token* token) : 
+		Node(token),
+		start(token->start),
+		end(token->end)
+	{}
+
+	Cursor* start;
+	Cursor* end;
+};
+
+class VariableAssignmentNode : public Node {
+public:
+	VariableAssignmentNode(Token* token, Node* node) :
+		Node(token, node),
+		start(token->start),
+		end(token->end) {}
+
+	Cursor* start;
+	Cursor* end;
+};

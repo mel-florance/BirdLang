@@ -18,6 +18,12 @@ Interpreter::Result* Interpreter::visit(Node* node, Context* context)
 	else if (strcmp(type, "class UnaryOperationNode") == 0) {
 		return visit_unary_operation_node(node, context);
 	} 
+	else if (strcmp(type, "class VariableAccessNode") == 0) {
+		return visit_variable_access_node(node, context);
+	}
+	else if (strcmp(type, "class VariableAssignmentNode") == 0) {
+		return visit_variable_assignment_node(node, context);
+	}
 	else {
 		std::cout << "No visit " << type << " method defined" << std::endl;
 	}
@@ -119,6 +125,41 @@ Interpreter::Result* Interpreter::visit_unary_operation_node(Node* node, Context
 
 	if (error != nullptr) {
 		return result->failure(error);
+	}
+
+	return result->success(number);
+}
+
+Interpreter::Result* Interpreter::visit_variable_access_node(Node* node, Context* context)
+{
+	Result* result = new Result();
+	auto n = (VariableAccessNode*)node;
+
+	auto var_name = n->token->value;
+	auto name = std::get<std::string>(var_name);
+	auto value = context->symbols->get(name);
+
+	if (value == context->symbols->symbols.end()) {
+		return result->failure(new RuntimeError(n->start, n->end, "'" + name + "' is not defined", context));
+	}
+
+	return result->success(new Number(value->second));
+}
+
+Interpreter::Result* Interpreter::visit_variable_assignment_node(Node* node, Context* context)
+{
+	Result* result = new Result();
+	auto var_name = node->token->value;
+	Number* number = result->record(visit(node->left, context));
+
+	if (result->error != nullptr)
+		return result;
+
+	if (number->value.index() == 0) {
+		context->symbols->set(std::get<std::string>(var_name), std::get<float>(number->value));
+	}
+	else {
+		context->symbols->set(std::get<std::string>(var_name), std::get<int>(number->value));
 	}
 
 	return result->success(number);
