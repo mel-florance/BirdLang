@@ -1,10 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <variant>
-#include <string>
-#include <vector>
-
 #include "Cursor.h"
 
 class Token

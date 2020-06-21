@@ -1,9 +1,5 @@
 #pragma once
 
-#include <unordered_map>
-#include <variant>
-#include <iostream>
-
 class Symbols {
 public:
 	Symbols();

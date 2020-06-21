@@ -1,9 +1,5 @@
 #pragma once
 
-#include <variant>
-#include <iostream>
-#include <cmath>
-
 #include "Cursor.h"
 #include "Error.h"
 #include "Context.h"

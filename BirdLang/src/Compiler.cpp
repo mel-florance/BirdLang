@@ -1,5 +1,4 @@
-#include <iostream>
-#include <string>
+#include "pch.h"
 
 #include "Token.h"
 #include "Lexer.h"
@@ -14,6 +13,7 @@ int main()
 
 	std::string input;
 	Symbols symbols;
+	symbols.set("null", 0);
 
 	while (true)
 	{

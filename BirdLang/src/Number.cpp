@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Number.h"
 
 Number::Number(const std::variant<float, int>& value) :

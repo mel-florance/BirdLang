@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Lexer.h"
 
 const std::string digits = "0123456789";

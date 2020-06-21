@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Context.h"
 
 Context::Context(const std::string& display_name, Context* parent, Cursor* parent_cursor) :

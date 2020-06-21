@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 #include "Cursor.h"
 #include "Context.h"
 

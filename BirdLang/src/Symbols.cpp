@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Symbols.h"
 
 Symbols::Symbols() :

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Token.h"
 
 std::vector<std::string> Token::keywords = {

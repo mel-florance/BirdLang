@@ -1,9 +1,5 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <memory>
-
 #include "Token.h"
 #include "Error.h"
 #include "Cursor.h"
