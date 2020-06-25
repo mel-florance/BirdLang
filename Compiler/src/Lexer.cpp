@@ -11,7 +11,7 @@ Lexer::Lexer(const std::string& filename) :
 	current_char(NULL),
 	debug(true)
 {
-	advance();
+
 }
 
 void Lexer::advance()
@@ -26,6 +26,7 @@ void Lexer::advance()
 std::vector<Token*> Lexer::index_tokens()
 {
 	std::vector<Token*> tokens;
+	advance();
 
 	while (current_char != NULL) {
 		if (current_char == ' ' || current_char == '\t') {

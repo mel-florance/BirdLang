@@ -1,4 +1,5 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "../BirdLang/include/pch.h"
+#include "../Compiler/include/pch.h"
+#include "../Compiler/include/Lexer.h"

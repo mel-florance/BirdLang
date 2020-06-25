@@ -28,8 +28,10 @@
     <ClCompile Include="src/pch.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src/Main.cpp" />
     <ClCompile Include="src/Compiler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src/Main.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

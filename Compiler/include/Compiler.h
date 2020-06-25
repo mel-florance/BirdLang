@@ -1,5 +1,7 @@
 #pragma once
+
 #include <string>
+
 #include "Token.h"
 #include "Lexer.h"
 #include "Parser.h"

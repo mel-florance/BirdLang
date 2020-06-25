@@ -44,7 +44,7 @@ public:
 		case Type::POW: return "POW";
 		case Type::MUL: return "MUL";
 		case Type::DIV: return "DIV";
-		case Type::LPAREN: return "LAPREN";
+		case Type::LPAREN: return "LPAREN";
 		case Type::RPAREN: return "RPAREN";
 		case Type::IDENTIFIER: return "IDENTIFIER";
 		case Type::KEYWORD: return "KEYWORD";
