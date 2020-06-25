@@ -1,20 +1,19 @@
 #include "pch.h"
 
-#include "Token.h"
-#include "Lexer.h"
-#include "Parser.h"
-#include "Interpreter.h"
-#include "Context.h"
-#include "Symbols.h"
+#include "Compiler.h"
 
-int main()
+Compiler::Compiler()
 {
-	std::cout << "Bird Lang Interpreter:\n";
+	context = new Context("<program>");
+	symbols = new Symbols();
+	symbols->set("null", 0);
+	context->symbols = symbols;
 
-	std::string input;
-	Symbols symbols;
-	symbols.set("null", 0);
+	lexer = new Lexer("<stdin>");
+}
 
+void Compiler::interpret()
+{
 	while (true)
 	{
 		// Get user input
@@ -28,9 +27,9 @@ int main()
 		}
 
 		// Index tokens
-		Lexer lexer("<stdin>", input);
-		lexer.debug = false;
-		auto tokens = lexer.index_tokens();
+		lexer->input = input;
+		lexer->debug = false;
+		auto tokens = lexer->index_tokens();
 
 		// Generate AST
 		Parser parser(tokens);
@@ -43,10 +42,8 @@ int main()
 			else {
 				// Interpret the AST
 				Interpreter interpreter;
-				Context context("<program>");
-				context.symbols = &symbols;
 
-				auto result = interpreter.visit(ast->node, &context);
+				auto result = interpreter.visit(ast->node, context);
 
 				if (result->error != nullptr) {
 					if (strcmp(typeid(*result->error).name(), "class RuntimeError") == 0) {

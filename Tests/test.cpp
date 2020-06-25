@@ -1,6 +1,7 @@
 #include "pch.h"
+#include "../BirdLang/include/Compiler.h"
 
-namespace Compiler {
+namespace CompilerTests {
 
 	TEST(CompilerTest, TestVariableTruc) {
 		EXPECT_EQ(1, 1);

@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src/Compiler.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src/Cursor.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -29,6 +26,10 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src/pch.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src/Main.cpp" />
+    <ClCompile Include="src/Compiler.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -64,6 +65,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include/pch.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include/Compiler.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

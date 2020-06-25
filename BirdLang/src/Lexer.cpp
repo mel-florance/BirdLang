@@ -5,9 +5,8 @@ const std::string digits = "0123456789";
 const std::string letters = "abcdefghijklmnopqrstuvwxyz";
 const std::string letters_digits = letters + digits;
 
-Lexer::Lexer(const std::string& filename, const std::string& input) : 
+Lexer::Lexer(const std::string& filename) : 
 	filename(filename),
-	input(input),
 	cursor(Cursor(-1, 0, -1, filename, input)),
 	current_char(NULL),
 	debug(true)
