@@ -28,7 +28,7 @@ void Compiler::interpret()
 
 		// Index tokens
 		lexer->input = input;
-		lexer->debug = true;
+		lexer->debug = false;
 		auto tokens = lexer->index_tokens();
 
 		// Generate AST
