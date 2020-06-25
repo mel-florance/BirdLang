@@ -6,7 +6,6 @@ TEST(Lexer, ItShouldSetTheLexerFilename) {
 }
 TEST(Lexer, ItShouldRecognizeIntTokenTypes) {
 	Lexer lexer("test");
-	lexer.debug = true;
 	lexer.input = "1";
 	auto tokens = lexer.index_tokens();
 	EXPECT_STREQ("INT", Token::toString(tokens.at(0)->type).c_str());
@@ -14,7 +13,6 @@ TEST(Lexer, ItShouldRecognizeIntTokenTypes) {
 
 TEST(Lexer, ItShouldRecognizeFloatTokenTypes) {
 	Lexer lexer("test");
-	lexer.debug = true;
 	lexer.input = "1.1";
 	auto tokens = lexer.index_tokens();
 	EXPECT_STREQ("FLOAT", Token::toString(tokens.at(0)->type).c_str());
@@ -22,7 +20,6 @@ TEST(Lexer, ItShouldRecognizeFloatTokenTypes) {
 
 TEST(Lexer, ItShouldRecognizePlusTokenTypes) {
 	Lexer lexer("test");
-	lexer.debug = true;
 	lexer.input = "+";
 	auto tokens = lexer.index_tokens();
 	EXPECT_STREQ("PLUS", Token::toString(tokens.at(0)->type).c_str());
@@ -30,7 +27,6 @@ TEST(Lexer, ItShouldRecognizePlusTokenTypes) {
 
 TEST(Lexer, ItShouldRecognizeMinusTokenTypes) {
 	Lexer lexer("test");
-	lexer.debug = true;
 	lexer.input = "-";
 	auto tokens = lexer.index_tokens();
 	EXPECT_STREQ("MINUS", Token::toString(tokens.at(0)->type).c_str());
@@ -38,7 +34,6 @@ TEST(Lexer, ItShouldRecognizeMinusTokenTypes) {
 
 TEST(Lexer, ItShouldRecognizePowTokenTypes) {
 	Lexer lexer("test");
-	lexer.debug = true;
 	lexer.input = "^";
 	auto tokens = lexer.index_tokens();
 	EXPECT_STREQ("POW", Token::toString(tokens.at(0)->type).c_str());
@@ -46,7 +41,6 @@ TEST(Lexer, ItShouldRecognizePowTokenTypes) {
 
 TEST(Lexer, ItShouldRecognizeMultiplyTokenTypes) {
 	Lexer lexer("test");
-	lexer.debug = true;
 	lexer.input = "*";
 	auto tokens = lexer.index_tokens();
 	EXPECT_STREQ("MUL", Token::toString(tokens.at(0)->type).c_str());
@@ -54,7 +48,6 @@ TEST(Lexer, ItShouldRecognizeMultiplyTokenTypes) {
 
 TEST(Lexer, ItShouldRecognizeDivideTokenTypes) {
 	Lexer lexer("test");
-	lexer.debug = true;
 	lexer.input = "/";
 	auto tokens = lexer.index_tokens();
 	EXPECT_STREQ("DIV", Token::toString(tokens.at(0)->type).c_str());
@@ -62,7 +55,6 @@ TEST(Lexer, ItShouldRecognizeDivideTokenTypes) {
 
 TEST(Lexer, ItShouldRecognizeLeftParenthesesTokenTypes) {
 	Lexer lexer("test");
-	lexer.debug = true;
 	lexer.input = "(";
 	auto tokens = lexer.index_tokens();
 	EXPECT_STREQ("LPAREN", Token::toString(tokens.at(0)->type).c_str());
@@ -70,7 +62,6 @@ TEST(Lexer, ItShouldRecognizeLeftParenthesesTokenTypes) {
 
 TEST(Lexer, ItShouldRecognizeRightParenthesesTokenTypes) {
 	Lexer lexer("test");
-	lexer.debug = true;
 	lexer.input = ")";
 	auto tokens = lexer.index_tokens();
 	EXPECT_STREQ("RPAREN", Token::toString(tokens.at(0)->type).c_str());
@@ -78,7 +69,6 @@ TEST(Lexer, ItShouldRecognizeRightParenthesesTokenTypes) {
 
 TEST(Lexer, ItShouldRecognizeIdentifiersTokenTypes) {
 	Lexer lexer("test");
-	lexer.debug = true;
 	lexer.input = "var a = 2";
 	auto tokens = lexer.index_tokens();
 	EXPECT_STREQ("IDENTIFIER", Token::toString(tokens.at(1)->type).c_str());
@@ -86,7 +76,6 @@ TEST(Lexer, ItShouldRecognizeIdentifiersTokenTypes) {
 
 TEST(Lexer, ItShouldRecognizeVarKeyWordTokenTypes) {
 	Lexer lexer("test");
-	lexer.debug = true;
 	lexer.input = "var a = 2";
 	auto tokens = lexer.index_tokens();
 	EXPECT_STREQ("KEYWORD", Token::toString(tokens.at(0)->type).c_str());
@@ -94,7 +83,6 @@ TEST(Lexer, ItShouldRecognizeVarKeyWordTokenTypes) {
 
 TEST(Lexer, ItShouldRecognizeEqualsTokenTypes) {
 	Lexer lexer("test");
-	lexer.debug = true;
 	lexer.input = "var a = 2";
 	auto tokens = lexer.index_tokens();
 	EXPECT_STREQ("EQ", Token::toString(tokens.at(2)->type).c_str());
@@ -102,7 +90,6 @@ TEST(Lexer, ItShouldRecognizeEqualsTokenTypes) {
 
 TEST(Lexer, ItShouldRecognizeEOTTokenTypes) {
 	Lexer lexer("test");
-	lexer.debug = true;
 	lexer.input = "var a = 2";
 	auto tokens = lexer.index_tokens();
 	EXPECT_STREQ("EOT", Token::toString(tokens.at(4)->type).c_str());
