@@ -7,7 +7,7 @@
 class Lexer
 {
 public:
-	Lexer(const std::string& filename);
+	Lexer(const std::string& filename, bool debug = false);
 	
 	void advance();
 	std::vector<Token*> index_tokens();
