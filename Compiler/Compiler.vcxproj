@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{51C7E155-EE0F-4E21-8028-A35C9DDEE8F1}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>BirdLang</RootNamespace>
+    <RootNamespace>Compiler</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
