@@ -23,6 +23,12 @@ public:
 		IDENTIFIER,
 		KEYWORD,
 		EQ,
+		EE,
+		NE,
+		LT,
+		GT,
+		LTE,
+		GTE,
 		EOT,
 		NONE
 	};
@@ -54,6 +60,12 @@ public:
 		case Type::KEYWORD: return "KEYWORD";
 		case Type::EQ: return "EQ";
 		case Type::EOT: return "EOT";
+		case Type::EE: return "EE";
+		case Type::NE: return "NE";
+		case Type::LT: return "LT";
+		case Type::GT: return "GT";
+		case Type::LTE: return "LTE";
+		case Type::GTE: return "GTE";
 		}
 
 		return "UNDEFINED";
