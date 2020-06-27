@@ -3,8 +3,9 @@
 #include "Cursor.h"
 #include "Error.h"
 #include "Context.h"
+#include "Platform.h"
 
-class Number {
+class API Number {
 public:
 	Number(const std::variant<float, int>& value = 0);
 

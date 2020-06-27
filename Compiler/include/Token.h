@@ -1,8 +1,12 @@
 #pragma once
 
 #include "Cursor.h"
+#include "Platform.h"
 
-class Token
+#include <vector>
+#include <variant>
+
+class API Token
 {
 public:
 	enum class Type {

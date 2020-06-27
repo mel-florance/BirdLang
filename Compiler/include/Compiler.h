@@ -8,8 +8,9 @@
 #include "Interpreter.h"
 #include "Context.h"
 #include "Symbols.h"
+#include "Platform.h"
 
-class Compiler {
+class API Compiler {
 public:
 	Compiler();
 

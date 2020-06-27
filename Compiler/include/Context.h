@@ -2,8 +2,9 @@
 
 #include "Cursor.h"
 #include "Symbols.h"
+#include "Platform.h"
 
-class Context {
+class API Context {
 public:
 	Context(const std::string& display_name, Context* parent = nullptr, Cursor* parent_cursor = nullptr);
 

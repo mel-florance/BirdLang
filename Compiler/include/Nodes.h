@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Token.h"
+#include "Platform.h"
 
-class Node {
+class API Node {
 public:
 	Node(Token* token, Node* left = nullptr, Node* right = nullptr) : 
 		token(token),
@@ -21,7 +22,7 @@ public:
 	}
 };
 
-class NumericNode : public Node {
+class API NumericNode : public Node {
 public:
 	NumericNode(Token* token) :
 		Node(token) {}
@@ -31,7 +32,7 @@ public:
 	}
 };
 
-class BinaryOperationNode : public Node {
+class API BinaryOperationNode : public Node {
 public:
 	BinaryOperationNode(Node* left, Token* token, Node* right) :
 		Node(token, left, right) {}
@@ -41,7 +42,7 @@ public:
 	}
 };
 
-class UnaryOperationNode : public Node {
+class API UnaryOperationNode : public Node {
 public:
 	UnaryOperationNode(Node* node, Token* token) :
 		Node(token, nullptr, node),
@@ -54,7 +55,7 @@ public:
 	Node* node;
 };
 
-class VariableAccessNode : public Node {
+class API VariableAccessNode : public Node {
 public:
 	VariableAccessNode(Token* token) : 
 		Node(token),
@@ -66,7 +67,7 @@ public:
 	Cursor* end;
 };
 
-class VariableAssignmentNode : public Node {
+class API VariableAssignmentNode : public Node {
 public:
 	VariableAssignmentNode(Token* token, Node* node) :
 		Node(token, node),

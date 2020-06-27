@@ -1,6 +1,10 @@
 #pragma once
 
-class Symbols {
+#include "Platform.h"
+
+#include <unordered_map>
+
+class API Symbols {
 public:
 	Symbols();
 

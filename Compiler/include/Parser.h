@@ -1,8 +1,11 @@
 #include "Token.h"
 #include "Nodes.h"
 #include "Error.h"
+#include "Platform.h"
 
-class Parser {
+#include <functional>
+
+class API Parser {
 public:
 	Parser(const std::vector<Token*>& tokens);
 

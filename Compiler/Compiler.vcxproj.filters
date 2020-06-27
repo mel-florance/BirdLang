@@ -1,92 +1,90 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src/Cursor.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src/Lexer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src/Token.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src/Parser.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src/Interpreter.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src/Number.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src/Context.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src/Symbols.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src/pch.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src/Compiler.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src/Main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include/Cursor.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include/Error.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include/Lexer.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include/Token.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include/Parser.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include/Nodes.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include/Interpreter.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include/Number.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include/Context.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include/Symbols.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include/pch.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include/Compiler.h">
-      <Filter>include</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="src">
-      <UniqueIdentifier>{7ed1e36e-373c-423d-b6c5-c026251b47c3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include">
-      <UniqueIdentifier>{b2edce0a-170d-4c88-bad7-25c30c204163}</UniqueIdentifier>
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
     </Filter>
-    <Filter Include="resources">
-      <UniqueIdentifier>{970ceb87-cf4c-40cd-9682-0308a4d35a87}</UniqueIdentifier>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="grammar.txt">
-      <Filter>resources</Filter>
-    </Text>
+    <ClInclude Include="include\BirdLang.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Compiler.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Context.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Cursor.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Error.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Interpreter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Lexer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Nodes.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Number.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Parser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Platform.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Symbols.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Token.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pch.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Compiler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Context.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Cursor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Interpreter.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Lexer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Number.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Parser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Symbols.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Token.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pch.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="grammar.txt" />
   </ItemGroup>
 </Project>

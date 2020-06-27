@@ -3,8 +3,9 @@
 #include "Token.h"
 #include "Error.h"
 #include "Cursor.h"
+#include "Platform.h"
 
-class Lexer
+class API Lexer
 {
 public:
 	Lexer(const std::string& filename, bool debug = false);

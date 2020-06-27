@@ -2,8 +2,9 @@
 
 #include "Cursor.h"
 #include "Context.h"
+#include "Platform.h"
 
-class Error
+class API Error
 {
 public:
 	Error(const std::string& name, const Cursor& start, const Cursor& end, const std::string& details) : 
@@ -28,19 +29,19 @@ public:
 };
 
 
-class IllegarCharError : public Error {
+class API IllegarCharError : public Error {
 public:
 	IllegarCharError(const Cursor& start, const Cursor& end, const std::string& details) :
 		Error("Illegal Character", start, end, details) {}
 };
 
-class InvalidSyntaxError : public Error {
+class API InvalidSyntaxError : public Error {
 public:
 	InvalidSyntaxError(const Cursor& start, const Cursor& end, const std::string& details) : 
 		Error("Invalid Syntax", start, end, details) {}
 };
 
-class RuntimeError : public Error {
+class API RuntimeError : public Error {
 public:
 	RuntimeError(const Cursor& start, const Cursor& end, const std::string& details, Context* context) :
 		Error("Runtime Error", start, end, details),

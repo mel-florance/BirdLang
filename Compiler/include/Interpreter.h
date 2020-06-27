@@ -4,8 +4,9 @@
 #include "Number.h"
 #include "Error.h"
 #include "Context.h"
+#include "Platform.h"
 
-class Interpreter {
+class API Interpreter {
 public:
 	Interpreter();
 	
