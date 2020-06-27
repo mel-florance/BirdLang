@@ -6,7 +6,7 @@
 using ConsoleTable = samilton::ConsoleTable;
 
 const std::string digits = "0123456789";
-const std::string letters = "abcdefghijklmnopqrstuvwxyz";
+const std::string letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const std::string letters_digits = letters + digits;
 
 Lexer::Lexer(const std::string& filename, bool debug) : 
