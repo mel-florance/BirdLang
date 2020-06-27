@@ -6,33 +6,35 @@ Interpreter::Interpreter()
 
 }
 
-Interpreter::Result* Interpreter::visit(Node* node, Context* context)
+Interpreter::Result* Interpreter::visit(Node* node, std::shared_ptr<Context> context)
 {
-	auto type = typeid(*node).name();
+	if (node != nullptr && context != nullptr) {
+		auto type = typeid(*node).name();
 
-	if (strcmp(type, "class BinaryOperationNode") == 0) {
-		return visit_binary_operation_node(node, context);
-	}
-	else if (strcmp(type, "class NumericNode") == 0) {
-		return visit_numeric_node(node, context);
-	} 
-	else if (strcmp(type, "class UnaryOperationNode") == 0) {
-		return visit_unary_operation_node(node, context);
-	} 
-	else if (strcmp(type, "class VariableAccessNode") == 0) {
-		return visit_variable_access_node(node, context);
-	}
-	else if (strcmp(type, "class VariableAssignmentNode") == 0) {
-		return visit_variable_assignment_node(node, context);
-	}
-	else {
-		std::cout << "No visit " << type << " method defined" << std::endl;
+		if (strcmp(type, "class BinaryOperationNode") == 0) {
+			return visit_binary_operation_node(node, context);
+		}
+		else if (strcmp(type, "class NumericNode") == 0) {
+			return visit_numeric_node(node, context);
+		}
+		else if (strcmp(type, "class UnaryOperationNode") == 0) {
+			return visit_unary_operation_node(node, context);
+		}
+		else if (strcmp(type, "class VariableAccessNode") == 0) {
+			return visit_variable_access_node(node, context);
+		}
+		else if (strcmp(type, "class VariableAssignmentNode") == 0) {
+			return visit_variable_assignment_node(node, context);
+		}
+		else {
+			std::cout << "No visit " << type << " method defined" << std::endl;
+		}
 	}
 
 	return nullptr;
 }
 
-Interpreter::Result* Interpreter::visit_numeric_node(Node* node, Context* context)
+Interpreter::Result* Interpreter::visit_numeric_node(Node* node, std::shared_ptr<Context> context)
 {
 	Result* result = new Result();
 	Number* number = new Number();
@@ -52,7 +54,7 @@ Interpreter::Result* Interpreter::visit_numeric_node(Node* node, Context* contex
 	return result->success(number);
 }
 
-Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, Context* context)
+Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, std::shared_ptr<Context> context)
 {
 	Result* result = new Result();
 	Number* number = new Number();
@@ -70,6 +72,10 @@ Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, Contex
 		return result;
 
 	Error* error = nullptr;
+
+	std::string value;
+	try { value = std::get<std::string>(node->token->value); }
+	catch (const std::bad_variant_access&) {}
 
 	if (node->token->type == Token::Type::PLUS) {
 		auto op_result = left->add(right);
@@ -96,6 +102,46 @@ Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, Contex
 		number = op_result.first;
 		error = op_result.second;
 	}
+	else if (node->token->type == Token::Type::EE) {
+		auto op_result = left->compare_equal(right);
+		number = op_result.first;
+		error = op_result.second;
+	}
+	else if (node->token->type == Token::Type::NE) {
+		auto op_result = left->compare_not_equal(right);
+		number = op_result.first;
+		error = op_result.second;
+	}
+	else if (node->token->type == Token::Type::LT) {
+		auto op_result = left->compare_less_than(right);
+		number = op_result.first;
+		error = op_result.second;
+	}
+	else if (node->token->type == Token::Type::GT) {
+		auto op_result = left->compare_greater_than(right);
+		number = op_result.first;
+		error = op_result.second;
+	}
+	else if (node->token->type == Token::Type::LTE) {
+		auto op_result = left->compare_less_or_equal(right);
+		number = op_result.first;
+		error = op_result.second;
+	}
+	else if (node->token->type == Token::Type::GTE) {
+		auto op_result = left->compare_greater_or_equal(right);
+		number = op_result.first;
+		error = op_result.second;
+	}
+	else if (node->token->type == Token::Type::KEYWORD && value == "and") {
+		auto op_result = left->compare_and(right);
+		number = op_result.first;
+		error = op_result.second;
+	}
+	else if (node->token->type == Token::Type::KEYWORD && value == "or") {
+		auto op_result = left->compare_or(right);
+		number = op_result.first;
+		error = op_result.second;
+	}
 
 	if (error != nullptr) {
 		return result->failure(error);
@@ -104,7 +150,7 @@ Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, Contex
 	return result->success(number);
 }
 
-Interpreter::Result* Interpreter::visit_unary_operation_node(Node* node, Context* context)
+Interpreter::Result* Interpreter::visit_unary_operation_node(Node* node, std::shared_ptr<Context> context)
 {
 	Result* result = new Result();
 	Number* number = result->record(visit(node->right, context));
@@ -118,8 +164,17 @@ Interpreter::Result* Interpreter::visit_unary_operation_node(Node* node, Context
 
 	Error* error = nullptr;
 
+	std::string value;
+	try { value = std::get<std::string>(node->token->value); }
+	catch (const std::bad_variant_access&) {}
+
 	if (node->token->type == Token::Type::MINUS) {
 		auto op_result = number->multiply(new Number(-1));
+		number = op_result.first;
+		error = op_result.second;
+	}
+	else if (node->token->type == Token::Type::KEYWORD && value == "not") {
+		auto op_result = number->compare_not(nullptr);
 		number = op_result.first;
 		error = op_result.second;
 	}
@@ -131,7 +186,7 @@ Interpreter::Result* Interpreter::visit_unary_operation_node(Node* node, Context
 	return result->success(number);
 }
 
-Interpreter::Result* Interpreter::visit_variable_access_node(Node* node, Context* context)
+Interpreter::Result* Interpreter::visit_variable_access_node(Node* node, std::shared_ptr<Context> context)
 {
 	Result* result = new Result();
 	auto n = (VariableAccessNode*)node;
@@ -147,7 +202,7 @@ Interpreter::Result* Interpreter::visit_variable_access_node(Node* node, Context
 	return result->success(new Number(value->second));
 }
 
-Interpreter::Result* Interpreter::visit_variable_assignment_node(Node* node, Context* context)
+Interpreter::Result* Interpreter::visit_variable_assignment_node(Node* node, std::shared_ptr<Context> context)
 {
 	Result* result = new Result();
 	auto var_name = node->token->value;

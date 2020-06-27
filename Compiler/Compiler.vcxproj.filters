@@ -15,6 +15,9 @@
     <ClInclude Include="include\Compiler.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\ConsoleTable.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="include\Context.h">
       <Filter>include</Filter>
     </ClInclude>

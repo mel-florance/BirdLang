@@ -59,13 +59,14 @@ public:
 		case Type::IDENTIFIER: return "IDENTIFIER";
 		case Type::KEYWORD: return "KEYWORD";
 		case Type::EQ: return "EQ";
-		case Type::EOT: return "EOT";
 		case Type::EE: return "EE";
 		case Type::NE: return "NE";
 		case Type::LT: return "LT";
 		case Type::GT: return "GT";
 		case Type::LTE: return "LTE";
 		case Type::GTE: return "GTE";
+		case Type::EOT: return "EOT";
+		case Type::NONE: return "NONE";
 		}
 
 		return "UNDEFINED";
@@ -75,26 +76,26 @@ public:
 		auto token_type = toString(token->type) + ": ";
 		stream << token_type;
 
-		switch (token->type) {
-		default:
-			try { 
-				stream << std::get<char>(token->value);
-			}
-			catch (const std::bad_variant_access&) {}
-			break;
-		case Type::INT:
-			try {
-				stream << std::get<int>(token->value);
-			}
-			catch (const std::bad_variant_access&) {}
-			break;
-		case Type::FLOAT:
+		switch (token->value.index()) {
+		case 0:
 			try {
 				stream << std::get<float>(token->value);
 			}
 			catch (const std::bad_variant_access&) {}
 			break;
-		case Type::STRING:
+		case 1:
+			try {
+				stream << std::get<int>(token->value);
+			}
+			catch (const std::bad_variant_access&) {}
+			break;
+		case 2:
+			try {
+				stream << std::get<char>(token->value);
+			}
+			catch (const std::bad_variant_access&) {}
+			break;
+		case 3:
 			try {
 				stream << std::get<std::string>(token->value);
 			}

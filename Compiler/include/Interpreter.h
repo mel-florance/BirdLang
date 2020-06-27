@@ -34,10 +34,10 @@ public:
 		Error* error = nullptr;
 	};
 	
-	Result* visit(Node* node, Context* context);
-	Result* visit_numeric_node(Node* node, Context* context);
-	Result* visit_binary_operation_node(Node* node, Context* context);
-	Result* visit_unary_operation_node(Node* node, Context* context);
-	Result* visit_variable_access_node(Node* node, Context* context);
-	Result* visit_variable_assignment_node(Node* node, Context* context);
+	Result* visit(Node* node, std::shared_ptr<Context> context);
+	Result* visit_numeric_node(Node* node, std::shared_ptr<Context> context);
+	Result* visit_binary_operation_node(Node* node, std::shared_ptr<Context> context);
+	Result* visit_unary_operation_node(Node* node, std::shared_ptr<Context> context);
+	Result* visit_variable_access_node(Node* node, std::shared_ptr<Context> context);
+	Result* visit_variable_assignment_node(Node* node, std::shared_ptr<Context> context);
 };

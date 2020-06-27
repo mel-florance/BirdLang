@@ -25,6 +25,7 @@ project "Compiler"
 	files
 	{
 		"%{prj.name}/include/**.h",
+		"%{prj.name}/include/**.hpp",
 		"%{prj.name}/src/**.cpp",
 		"%{prj.name}/grammar.txt"
 	}

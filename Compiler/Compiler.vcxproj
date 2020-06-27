@@ -95,6 +95,7 @@
   <ItemGroup>
     <ClInclude Include="include\BirdLang.h" />
     <ClInclude Include="include\Compiler.h" />
+    <ClInclude Include="include\ConsoleTable.h" />
     <ClInclude Include="include\Context.h" />
     <ClInclude Include="include\Cursor.h" />
     <ClInclude Include="include\Error.h" />

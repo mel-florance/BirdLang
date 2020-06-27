@@ -159,3 +159,109 @@ std::pair<Number*, Error*> Number::power(Number* other)
 
 	return std::make_pair(result, nullptr);
 }
+
+std::pair<Number*, Error*> Number::compare_equal(Number* other)
+{
+	Number* result = new Number();
+	result->value = value == other->value;
+	return std::make_pair(result, nullptr);
+}
+
+std::pair<Number*, Error*> Number::compare_not_equal(Number* other)
+{
+	Number* result = new Number();
+	result->value = value != other->value;
+	return std::make_pair(result, nullptr);
+}
+
+std::pair<Number*, Error*> Number::compare_less_than(Number* other)
+{
+	Number* result = new Number();
+	result->value = value < other->value;
+	return std::make_pair(result, nullptr);
+}
+
+std::pair<Number*, Error*> Number::compare_greater_than(Number* other)
+{
+	Number* result = new Number();
+	result->value = value > other->value;
+	return std::make_pair(result, nullptr);
+}
+
+std::pair<Number*, Error*> Number::compare_less_or_equal(Number* other)
+{
+	Number* result = new Number();
+	result->value = value <= other->value;
+	return std::make_pair(result, nullptr);
+}
+
+std::pair<Number*, Error*> Number::compare_greater_or_equal(Number* other)
+{
+	Number* result = new Number();
+	result->value = value >= other->value;
+	return std::make_pair(result, nullptr);
+}
+
+std::pair<Number*, Error*> Number::compare_and(Number* other)
+{
+	Number* result = new Number();
+
+	if (value.index() == 0 && other->value.index() == 0) {
+		try { result->value = std::get<float>(value) && std::get<float>(other->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 1 && other->value.index() == 1) {
+		try { result->value = (float)std::get<int>(value) && std::get<int>(other->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 0 && other->value.index() == 1) {
+		try { result->value = std::get<float>(value) && (float)std::get<int>(other->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 1 && other->value.index() == 0) {
+		try { result->value = (float)std::get<int>(value) && std::get<float>(other->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+
+	return std::make_pair(result, nullptr);
+}
+
+std::pair<Number*, Error*> Number::compare_or(Number* other)
+{
+	Number* result = new Number();
+
+	if (value.index() == 0 && other->value.index() == 0) {
+		try { result->value = std::get<float>(value) || std::get<float>(other->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 1 && other->value.index() == 1) {
+		try { result->value = (float)std::get<int>(value) || std::get<int>(other->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 0 && other->value.index() == 1) {
+		try { result->value = std::get<float>(value) || (float)std::get<int>(other->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 1 && other->value.index() == 0) {
+		try { result->value = (float)std::get<int>(value) ||  std::get<float>(other->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+
+	return std::make_pair(result, nullptr);
+}
+
+std::pair<Number*, Error*> Number::compare_not(Number* other)
+{
+	Number* result = new Number();
+
+	if (value.index() == 0) {
+		try { result->value = std::get<float>(value) == 0.0f ? 1 : 0; }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 1) {
+		try { result->value = std::get<int>(value) == 0 ? 1 : 0; }
+		catch (const std::bad_variant_access&) {}
+	}
+
+	return std::make_pair(result, nullptr);
+}

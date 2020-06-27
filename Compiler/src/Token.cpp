@@ -2,7 +2,10 @@
 #include "Token.h"
 
 std::vector<std::string> Token::keywords = {
-    "var"
+    "var",
+    "and",
+    "or",
+    "not"
 };
 
 Token::Token(const Token::Type& type, const std::variant<float, int, char, std::string>& value, Cursor* start, Cursor* end) :

@@ -7,10 +7,9 @@
 
 class API Parser {
 public:
-	Parser(const std::vector<Token*>& tokens);
+	Parser();
 
 	struct Result {
-
 		template<typename T>
 		Node* record(T* result) {
 			if (strcmp(typeid(T).name(), "struct Parser::Result") == 0) {
@@ -21,8 +20,12 @@ public:
 
 				return res->node;
 			}
-		
+
 			return (Node*)result;
+		}
+
+		void record_advance() {
+			count++;
 		}
 
 		Result* success(Node* node) {
@@ -37,6 +40,7 @@ public:
 
 		Error* error = nullptr;
 		Node* node = nullptr;
+		unsigned int count = 0;
 	};
 
 	Result* parse();
@@ -46,8 +50,20 @@ public:
 	Result* term();
 	Result* expr();
 	Result* atom();
+	Result* arithm();
 	Result* power();
-	Result* binary_operation(std::function<Result*()> fna, const std::vector<Token::Type>& operations, std::function<Result* ()> fnb = nullptr);
+	Result* compare();
+	
+	Result* binary_operation(
+		std::function<Result*()> fna, 
+		const std::vector<Token::Type>& operations, 
+		const std::vector<std::string>& values, 
+		std::function<Result* ()> fnb = nullptr
+	);
+
+	inline void setTokens(const std::vector<Token*>& tokens) {
+		this->tokens = tokens;
+	}
 
 	std::vector<Token*> tokens;
 	Token* current_token;

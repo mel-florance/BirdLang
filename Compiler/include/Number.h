@@ -14,6 +14,15 @@ public:
 	std::pair<Number*, Error*> multiply(Number* other);
 	std::pair<Number*, Error*> divide(Number* other);
 	std::pair<Number*, Error*> power(Number* other);
+	std::pair<Number*, Error*> compare_equal(Number* other);
+	std::pair<Number*, Error*> compare_not_equal(Number* other);
+	std::pair<Number*, Error*> compare_less_than(Number* other);
+	std::pair<Number*, Error*> compare_greater_than(Number* other);
+	std::pair<Number*, Error*> compare_less_or_equal(Number* other);
+	std::pair<Number*, Error*> compare_greater_or_equal(Number* other);
+	std::pair<Number*, Error*> compare_and(Number* other);
+	std::pair<Number*, Error*> compare_or(Number* other);
+	std::pair<Number*, Error*> compare_not(Number* other);
 
 	inline friend std::ostream& operator << (std::ostream& stream, Number* number) {
 
@@ -32,5 +41,5 @@ public:
 	std::variant<float, int> value;
 	Cursor* start;
 	Cursor* end;
-	Context* context;
+	std::shared_ptr<Context> context;
 };

@@ -1,5 +1,9 @@
 #include "pch.h"
 #include "Lexer.h"
+#include "ConsoleTable.h"
+#include <sstream>
+
+using ConsoleTable = samilton::ConsoleTable;
 
 const std::string digits = "0123456789";
 const std::string letters = "abcdefghijklmnopqrstuvwxyz";
@@ -11,7 +15,6 @@ Lexer::Lexer(const std::string& filename, bool debug) :
 	current_char(NULL),
 	debug(false)
 {
-
 }
 
 void Lexer::advance()
@@ -20,11 +23,12 @@ void Lexer::advance()
 
 	current_char = cursor.index < input.size()
 		? input.at(cursor.index)
-		: NULL;
+		: 0;
 }
 
-std::vector<Token*> Lexer::index_tokens()
+std::vector<Token*> Lexer::index_tokens(const std::string& str)
 {
+	this->input = str;
 	std::vector<Token*> tokens;
 	advance();
 
@@ -46,14 +50,6 @@ std::vector<Token*> Lexer::index_tokens()
 			tokens.push_back(new Token(Token::Type::MINUS, current_char));
 			advance();
 		}
-		else if (current_char == '^') {
-			tokens.push_back(new Token(Token::Type::POW, current_char));
-			advance();
-		}
-		else if (current_char == '=') {
-			tokens.push_back(new Token(Token::Type::EQ, current_char));
-			advance();
-		}
 		else if (current_char == '*') {
 			tokens.push_back(new Token(Token::Type::MUL, current_char));
 			advance();
@@ -62,20 +58,58 @@ std::vector<Token*> Lexer::index_tokens()
 			tokens.push_back(new Token(Token::Type::DIV, current_char));
 			advance();
 		}
+		else if (current_char == '^') {
+			tokens.push_back(new Token(Token::Type::POW, current_char));
+			advance();
+		}
 		else if (current_char == '(') {
 			tokens.push_back(new Token(Token::Type::LPAREN, current_char));
 			advance();
 		}
 		else if (current_char == ')') {
 			tokens.push_back(new Token(Token::Type::RPAREN, current_char));
-			advance();
+			advance();	
+		}
+		else if (current_char == '!') {
+			Token* token = create_not_equals_operator();
+
+			if (token == nullptr) {
+				Cursor start = Cursor(cursor);
+				advance();
+				
+				ExpectedCharacterError* error = new ExpectedCharacterError(
+					start, 
+					cursor, 
+					"'=' (after '!')"
+				);
+				
+				std::cout << error << "\n";
+
+				return std::vector<Token*>();
+			}
+
+			tokens.push_back(token);
+		}
+		else if (current_char == '=') {
+			tokens.push_back(create_equals_operator());
+		}
+		else if (current_char == '<') {
+			tokens.push_back(create_less_operator());
+		}
+		else if (current_char == '>') {
+			tokens.push_back(create_greater_operator());
 		}
 		else {
 			Cursor start = Cursor(cursor);
 			char c = current_char;
 			advance();
 
-			IllegarCharError* error = new IllegarCharError(start, cursor, std::string(1, c));
+			IllegarCharError* error = new IllegarCharError(
+				start, 
+				cursor,
+				std::string(1, c)
+			);
+			
 			std::cout << error << "\n";
 
 			return std::vector<Token*>();
@@ -85,9 +119,64 @@ std::vector<Token*> Lexer::index_tokens()
 	tokens.push_back(new Token(Token::Type::EOT, 0, &cursor));
 
 	if (debug) {
-		for (auto token : tokens) {
-			std::cout << token << "\n";
+		ConsoleTable table(1, 2);
+		ConsoleTable::TableChars chars;
+
+		chars.topDownSimple = '-';
+		chars.leftRightSimple = '|';
+		
+		chars.leftSeparation = '+';
+		chars.rightSeparation= '+';
+		chars.centreSeparation= '+';
+		chars.topSeparation= '+';
+		chars.downSeparation = '+';
+
+		table.setTableChars(chars);
+
+		table[0][0] = "Identifier";
+		table[0][1] = "Character";
+		table[0][2] = "Line";
+		table[0][3] = "Column";
+
+		for (unsigned int i = 0; i < tokens.size(); i++) {
+			auto token = tokens.at(i);
+			std::stringstream str;
+
+			switch (token->value.index()) {
+			case 0:
+				try { str << std::get<float>(token->value); }
+				catch (const std::bad_variant_access&) {}
+				break;
+			case 1:
+				try { str << std::get<int>(token->value); }
+				catch (const std::bad_variant_access&) {}
+				break;
+			case 2:
+				try { str << std::get<char>(token->value); }
+				catch (const std::bad_variant_access&) {}
+				break;
+			case 3:
+				try { str << std::get<std::string>(token->value); }
+				catch (const std::bad_variant_access&) {}
+				break;
+			}
+			
+			table[i + 1][0] = Token::toString(token->type);
+			table[i + 1][1] = str.str();
+
+			int line = 0;
+			int column = 0;
+
+			if (token->start != nullptr) {
+				line = token->start->line;
+				column = token->start->column;
+			}
+				
+			table[i + 1][2] = std::to_string(line);
+			table[i + 1][3] = std::to_string(column);
 		}
+
+		std::cout << "\n" << table << "\n";
 	}
 
 	return tokens;
@@ -98,8 +187,11 @@ Token* Lexer::create_numeric_token()
 	std::string str;
 	unsigned int dots = 0;
 	Cursor* start = new Cursor(cursor);
+	auto numbers = digits + ".";
 
-	auto hasDot = [=]() { return (digits + ".").find(current_char) != std::string::npos; };
+	auto hasDot = [=]() { 
+		return numbers.find(current_char) != std::string::npos; 
+	};
 
 	while (current_char != NULL && hasDot()) {
 		if (current_char == '.') {
@@ -118,10 +210,20 @@ Token* Lexer::create_numeric_token()
 	}
 
 	if (dots == 0) {
-		return new Token(Token::Type::INT, (int)std::atoi(str.c_str()), start, &cursor);
+		return new Token(
+			Token::Type::INT, 
+			(int)std::atoi(str.c_str()), 
+			start,
+			&cursor
+		);
 	}
 	else {
-		return new Token(Token::Type::FLOAT, (float)std::atof(str.c_str()), start, &cursor);
+		return new Token(
+			Token::Type::FLOAT,
+			(float)std::atof(str.c_str()),
+			start, 
+			&cursor
+		);
 	}
 }
 
@@ -129,8 +231,11 @@ Token* Lexer::create_identifier()
 {
 	std::string id;
 	Cursor* start = new Cursor(cursor);
+	auto str = letters_digits + "_";
 
-	auto isLetterOrDigit = [=]() { return (letters_digits + "_").find(current_char) != std::string::npos; };
+	auto isLetterOrDigit = [=]() { 
+		return str.find(current_char) != std::string::npos;
+	};
 
 	while (current_char != NULL && isLetterOrDigit()) {
 		id += current_char;
@@ -138,11 +243,79 @@ Token* Lexer::create_identifier()
 	}
 
 	Token::Type type = Token::Type::NONE;
-	std::vector<std::string>::iterator it = std::find(Token::keywords.begin(), Token::keywords.end(), id);
+
+	std::vector<std::string>::iterator it = std::find(
+		Token::keywords.begin(), 
+		Token::keywords.end(), 
+		id
+	);
 
 	type = it != Token::keywords.end()
 		? Token::Type::KEYWORD
 		: Token::Type::IDENTIFIER;
 
 	return new Token(type, id, start, &cursor);
+}
+
+Token* Lexer::create_equals_operator()
+{
+	Token::Type type = Token::Type::EQ;
+	std::string value = "=";
+	Cursor* start = new Cursor(cursor);
+
+	advance();
+
+	if (current_char == '=') {
+		advance();
+		type = Token::Type::EE;
+		value = "==";
+	}
+
+	return new Token(type, value, start, &cursor);
+}
+
+Token* Lexer::create_not_equals_operator()
+{
+	Cursor* start = new Cursor(cursor);
+	advance();
+
+	if (current_char == '=') {
+		advance();
+		return new Token(Token::Type::NE, "!=", start, &cursor);
+	}
+
+	advance();
+	return nullptr;
+}
+
+Token* Lexer::create_less_operator()
+{
+	Token::Type type = Token::Type::LT;
+	std::string value = "<";
+	Cursor* start = new Cursor(cursor);
+	advance();
+
+	if (current_char == '=') {
+		advance();
+		type = Token::Type::LTE;
+		value = "<=";
+	}
+
+	return new Token(type, value, start, &cursor);
+}
+
+Token* Lexer::create_greater_operator()
+{
+	Token::Type type = Token::Type::GT;
+	std::string value = ">";
+	Cursor* start = new Cursor(cursor);
+	advance();
+
+	if (current_char == '=') {
+		advance();
+		type = Token::Type::GTE;
+		value = ">=";
+	}
+
+	return new Token(type, value, start, &cursor);
 }

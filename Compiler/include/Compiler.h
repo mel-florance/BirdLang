@@ -14,13 +14,8 @@ class API Compiler {
 public:
 	Compiler();
 
-	void interpret();
+	void interpret(const std::string& input);
 
-	std::string input;
-
-	Context* context;
-	Symbols* symbols;
-	Lexer* lexer;
-	Parser* parser;
-	Interpreter* interpreter;
+	std::shared_ptr<Context> context;
+	std::shared_ptr<Symbols> symbols;
 };

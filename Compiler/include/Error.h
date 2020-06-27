@@ -41,9 +41,15 @@ public:
 		Error("Invalid Syntax", start, end, details) {}
 };
 
+class API ExpectedCharacterError : public Error {
+public:
+	ExpectedCharacterError(const Cursor& start, const Cursor& end, const std::string& details) :
+		Error("Expected character", start, end, details) {}
+};
+
 class API RuntimeError : public Error {
 public:
-	RuntimeError(const Cursor& start, const Cursor& end, const std::string& details, Context* context) :
+	RuntimeError(const Cursor& start, const Cursor& end, const std::string& details, std::shared_ptr<Context> context) :
 		Error("Runtime Error", start, end, details),
 		context(context)
 	{}
@@ -51,7 +57,7 @@ public:
 	inline std::string traceback() {
 		std::string result;
 		Cursor* pos = &start;
-		Context* ctx = context;
+		Context* ctx = context.get();
 
 		while (ctx != nullptr) {
 			result = "  File " + start.filename + ", Line " + std::to_string(start.line + 1) + ", in " + ctx->display_name + "\n" + result;
@@ -69,5 +75,5 @@ public:
 			"\033[0m\t\t";
 	}
 
-	Context* context;
+	std::shared_ptr<Context> context;
 };

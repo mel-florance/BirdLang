@@ -1,5 +1,10 @@
 expr	:	KEYWORD:var IDENTIFIER EQ expr
-		:	term ((PLUS|MINUS) term)*
+		:	comp ((KEYWORD:AND|KEYWORD:OR) comp)*
+
+comp	:	NOT comp
+		:	arithm ((EE|LT|GT|LTE|GTE) arithm)*	
+
+arithm	:	term ((PLUS|MINUS) term)*
 
 term	:	factor ((MUL|DIV) factor)*
 
