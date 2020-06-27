@@ -6,9 +6,14 @@ Compiler::Compiler()
 {
 	context = std::make_shared<Context>("<program>");
 	symbols = std::make_shared<Symbols>();
+
 	symbols->set("null", 0);
+	symbols->set("true", 1);
+	symbols->set("false", 0);
+
 	symbols->set("PI", PI);
 	symbols->set("TAU", TAU);
+
 	context->symbols = symbols;
 }
 
