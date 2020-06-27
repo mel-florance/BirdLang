@@ -5,7 +5,11 @@ std::vector<std::string> Token::keywords = {
     "var",
     "and",
     "or",
-    "not"
+    "not",
+    "if",
+    "then",
+    "elseif"
+    "else"
 };
 
 Token::Token(const Token::Type& type, const std::variant<float, int, char, std::string>& value, Cursor* start, Cursor* end) :
