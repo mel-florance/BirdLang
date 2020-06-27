@@ -8,6 +8,7 @@ Compiler::Compiler()
 	symbols = std::make_shared<Symbols>();
 	symbols->set("null", 0);
 	symbols->set("PI", PI);
+	symbols->set("TAU", TAU);
 	context->symbols = symbols;
 }
 
