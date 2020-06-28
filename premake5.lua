@@ -136,7 +136,7 @@ project "Tests"
 	includedirs
 	{
 		"Compiler/src",
-		"Vendor/googletest/googletest/include",
+		"Vendor/googletest/include",
 	}
 
 	links
@@ -155,11 +155,10 @@ project "Tests"
 		}
 
 		libdirs { 
-			"Vendor/googletest/build/lib/Debug"
+			"Vendor/googletest/lib"
 		}
 
 		links {
-			"gtest_maind.lib",
 			"gtestd.lib"
 		}
 
