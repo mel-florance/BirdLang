@@ -1,5 +1,5 @@
 workspace "BirdLang"
-	architecture "x86"
+	architecture "x64"
 	startproject "Compiler"
 
 	configurations
@@ -173,13 +173,15 @@ project "Tests"
 			"PLATFORM_LINUX"
 		}
 
-		libdirs { 
-			"/usr/local/lib"
+		includedirs
+		{
+			"/usr/include/gtest"
 		}
 
 		links {
-			"libgtest_main",
-			"libgtest"
+			"pthread",
+			"gtest_main:static",
+			"gtest:static"
 		}
 
 	filter "configurations:Debug"
