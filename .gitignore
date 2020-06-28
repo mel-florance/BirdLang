@@ -9,6 +9,7 @@ bin-int/
 Compiler/Makefile
 Interpreter/Makefile
 Tests/Makefile
+Makefile
 
 # User-specific files
 *.rsuser
