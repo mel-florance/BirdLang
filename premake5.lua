@@ -155,12 +155,13 @@ project "Tests"
 			"PLATFORM_WINDOWS"
 		}
 
+		libdirs { 
+			"Vendor/googletest/build/lib/Debug"
+		}
+
 		links {
 			"gtest_maind.lib",
 			"gtestd.lib"
-		}
-		libdirs { 
-			"Vendor/googletest/build/lib/Debug"
 		}
 
 	filter "system:linux"
@@ -173,27 +174,13 @@ project "Tests"
 			"PLATFORM_LINUX"
 		}
 
-		links {
-			"libgtest_main.a",
-			"libgtest.a"
-		}
-
-		libdirs { 
-			"Vendor/googletest/lib"
-		}
-
 	filter "configurations:Debug"
 		defines "DEBUG"
 		kind "ConsoleApp"
 		symbols "On"
-		
 		
 	filter "configurations:Release"
 		defines "RELEASE"
 		optimize "On"
 		kind "ConsoleApp"
 		entrypoint "mainCRTStartup" 
-
-		libdirs { 
-			"Vendor/googletest/build/lib/Release"
-		}
