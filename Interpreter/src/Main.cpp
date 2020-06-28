@@ -24,8 +24,6 @@ int main() {
 	Compiler compiler;
 	std::pair<Token::Type, std::string> p = {Token::Type::EQ, ""};
 
-
-
 	while (true)
 	{
 		std::cout << "\n" << "> ";
@@ -33,7 +31,12 @@ int main() {
 		std::getline(std::cin >> std::ws, input);
 
 		if (input == "clear") {
+#ifdef PLATFORM_WINDOWS
 			system("cls");
+#endif
+#ifdef PLATFORM_LINUX
+			system("clear");
+#endif
 			continue;
 		}
 
