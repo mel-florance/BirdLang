@@ -22,43 +22,30 @@
 BirdLang is a simple programming langage for learning.
 
 ## Documentation
+You can access the documentation directly on the wiki page:\
+[BirdLang Wiki](https://github.com/Vyraax/BirdLang/wiki)
 
-Coming soon...
-
-## Setup
+###### Linux build
 
 ```bash
 git clone --recursive https://github.com/Vyraax/BirdLang.git
-```
-
-###### Linux
-
-```bash
+cd BirdLang
 ./setup.sh
-```
-
-###### Windows
-
-```bash
-./setup.bat
-```
-
-## Compilation
-
-###### Linux
-
-```bash
 make
 ```
 
-###### Windows
+###### Windows build
+
 ```bash
-Open the Solution (.sln) file and click on the compile button.
+git clone --recursive https://github.com/Vyraax/BirdLang.git
+cd BirdLang
+./setup.bat
 ```
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Open the generated solution file (.sln), and click on the compile button.
 
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.\
 Please make sure to update tests as appropriate.
 
 ## License
