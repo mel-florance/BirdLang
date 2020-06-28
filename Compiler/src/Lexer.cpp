@@ -12,7 +12,7 @@ const std::string letters_digits = letters + digits;
 Lexer::Lexer(const std::string& filename, bool debug) : 
 	filename(filename),
 	cursor(Cursor(-1, 0, -1, filename, input)),
-	current_char(NULL),
+	current_char('\0'),
 	debug(false)
 {
 }
@@ -23,7 +23,7 @@ void Lexer::advance()
 
 	current_char = cursor.index < input.size()
 		? input.at(cursor.index)
-		: 0;
+		: '\0';
 }
 
 std::vector<Token*> Lexer::index_tokens(const std::string& str)
@@ -32,7 +32,7 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 	std::vector<Token*> tokens;
 	advance();
 
-	while (current_char != NULL) {
+	while (current_char != '\0') {
 		if (current_char == ' ' || current_char == '\t') {
 			advance();
 		}
@@ -193,7 +193,7 @@ Token* Lexer::create_numeric_token()
 		return numbers.find(current_char) != std::string::npos; 
 	};
 
-	while (current_char != NULL && hasDot()) {
+	while (current_char != '\0' && hasDot()) {
 		if (current_char == '.') {
 			
 			if (dots == 1)
@@ -237,7 +237,7 @@ Token* Lexer::create_identifier()
 		return str.find(current_char) != std::string::npos;
 	};
 
-	while (current_char != NULL && isLetterOrDigit()) {
+	while (current_char != '\0' && isLetterOrDigit()) {
 		id += current_char;
 		advance();
 	}
