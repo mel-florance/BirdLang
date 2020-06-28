@@ -6,7 +6,7 @@
 #include "Context.h"
 #include "Platform.h"
 
-class API Interpreter {
+class Interpreter {
 public:
 	Interpreter();
 	

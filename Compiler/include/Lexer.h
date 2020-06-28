@@ -5,7 +5,7 @@
 #include "Cursor.h"
 #include "Platform.h"
 
-class API Lexer
+class Lexer
 {
 public:
 	Lexer(const std::string& filename, bool debug = false);

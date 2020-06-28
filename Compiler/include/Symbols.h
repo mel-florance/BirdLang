@@ -4,7 +4,7 @@
 
 #include <unordered_map>
 
-class API Symbols {
+class Symbols {
 public:
 	Symbols();
 

@@ -6,7 +6,7 @@
 #include <vector>
 #include <variant>
 
-class API Token
+class Token
 {
 public:
 	enum class Type {

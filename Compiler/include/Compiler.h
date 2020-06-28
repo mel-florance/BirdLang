@@ -10,7 +10,7 @@
 #include "Symbols.h"
 #include "Platform.h"
 
-class API Compiler {
+class Compiler {
 public:
 	Compiler();
 

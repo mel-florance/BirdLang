@@ -5,7 +5,7 @@
 
 #include <functional>
 
-class API Parser {
+class Parser {
 public:
 	Parser();
 

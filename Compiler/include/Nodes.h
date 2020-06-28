@@ -3,7 +3,7 @@
 #include "Token.h"
 #include "Platform.h"
 
-class API Node {
+class Node {
 public:
 	Node(Token* token, Node* left = nullptr, Node* right = nullptr) : 
 		token(token),

@@ -5,7 +5,7 @@
 #include "Context.h"
 #include "Platform.h"
 
-class API Number {
+class Number {
 public:
 	Number(const std::variant<float, int, bool>& value = 0);
 

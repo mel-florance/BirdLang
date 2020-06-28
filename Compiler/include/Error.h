@@ -4,7 +4,7 @@
 #include "Context.h"
 #include "Platform.h"
 
-class API Error
+class Error
 {
 public:
 	Error(const std::string& name, const Cursor& start, const Cursor& end, const std::string& details) : 

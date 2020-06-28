@@ -1,7 +1,7 @@
 #pragma once
 #include "Platform.h"
 
-class API Cursor
+class Cursor
 {
 public:
 	Cursor(size_t index = -1, int line = 0, int column = -1, const std::string& filename = "", const std::string& input = "") :
