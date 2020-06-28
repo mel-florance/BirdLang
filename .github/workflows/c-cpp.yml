@@ -15,7 +15,7 @@ jobs:
     - name: Install gcc 32bits support
       run: sudo apt-get install gcc-multilib g++-multilib libgtest-dev
     - name: Install googletest 
-      run: "cd /usr/src/gtest && cmake CMakeLists.txt && make && sudo cp *.a /usr/lib"
+      run: "cd /usr/src/gtest && sudo cmake CMakeLists.txt && sudo make && sudo cp *.a /usr/lib"
     - name: setup
       run: ./setup.sh
     - name: make
