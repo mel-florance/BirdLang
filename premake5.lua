@@ -137,7 +137,6 @@ project "Tests"
 	{
 		"Compiler/src",
 		"Vendor/googletest/googletest/include",
-		"Vendor/googletest/googletest/include",
 	}
 
 	links
@@ -172,6 +171,15 @@ project "Tests"
 		defines
 		{
 			"PLATFORM_LINUX"
+		}
+
+		libdirs { 
+			"/usr/local/lib"
+		}
+
+		links {
+			"libgtest_main",
+			"libgtest"
 		}
 
 	filter "configurations:Debug"
