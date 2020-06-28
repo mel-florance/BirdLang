@@ -57,7 +57,6 @@ project "Compiler"
 
 	filter "configurations:Debug"
 		defines "DEBUG"
-		buildoptions {"/MTd"}
 		symbols "On"
 
 	filter "configurations:Release"
