@@ -1,5 +1,5 @@
 workspace "BirdLang"
-	architecture "x64"
+	architecture "x86"
 	startproject "Compiler"
 
 	configurations
@@ -118,11 +118,9 @@ project "Interpreter"
 		defines "RELEASE"
 		optimize "On"
 		kind "ConsoleApp"
-
-
+        
 project "Tests"
 	location "Tests"
-
 	language "C++"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -131,12 +129,15 @@ project "Tests"
 	files
 	{
 		"%{prj.name}/**.h",
-		"%{prj.name}/**.cpp"
+		"%{prj.name}/**.cpp",
+		"%{prj.name}/**.cc"
 	}
 
 	includedirs
 	{
-		"Compiler/src"
+		"Compiler/src",
+		"Vendor/googletest/googletest/include",
+		"Vendor/googletest/googletest/include",
 	}
 
 	links
@@ -152,6 +153,15 @@ project "Tests"
 		defines
 		{
 			"PLATFORM_WINDOWS"
+		}
+
+		libdirs { 
+			"Vendor/googletest/build/lib/Debug"
+		}
+
+		links {
+			"gtest_maind.lib",
+			"gtestd.lib"
 		}
 
 	filter "system:linux"

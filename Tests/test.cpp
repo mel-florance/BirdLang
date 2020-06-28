@@ -20,92 +20,79 @@ TEST(Lexer, AdvanceCursor) {
 
 TEST(Lexer, RecognizeTokenTypes) {
 	Lexer lexer("test");
-	lexer.input = "1";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens("1");
 	EXPECT_STREQ("INT", Token::toString(tokens.at(0)->type).c_str());
 }
 
 TEST(Lexer, RecognizeFloat) {
 	Lexer lexer("test");
-	lexer.input = "1.1";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens("1.1");
 	EXPECT_STREQ("FLOAT", Token::toString(tokens.at(0)->type).c_str());
 }
 
 TEST(Lexer, RecognizePlus) {
 	Lexer lexer("test");
-	lexer.input = "+";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens("+");
 	EXPECT_STREQ("PLUS", Token::toString(tokens.at(0)->type).c_str());
 }
 
 TEST(Lexer, RecognizeMinus) {
 	Lexer lexer("test");
-	lexer.input = "-";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens("-");
 	EXPECT_STREQ("MINUS", Token::toString(tokens.at(0)->type).c_str());
 }
 
 TEST(Lexer, RecognizePow) {
 	Lexer lexer("test");
-	lexer.input = "^";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens("^");
 	EXPECT_STREQ("POW", Token::toString(tokens.at(0)->type).c_str());
 }
 
 TEST(Lexer, RecognizeMultiply) {
 	Lexer lexer("test");
-	lexer.input = "*";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens("*");
 	EXPECT_STREQ("MUL", Token::toString(tokens.at(0)->type).c_str());
 }
 
 TEST(Lexer, RecognizeDivide) {
 	Lexer lexer("test");
-	lexer.input = "/";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens("/");
 	EXPECT_STREQ("DIV", Token::toString(tokens.at(0)->type).c_str());
 }
 
 TEST(Lexer, RecognizeLeftParenthese) {
 	Lexer lexer("test");
-	lexer.input = "(";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens("(");
 	EXPECT_STREQ("LPAREN", Token::toString(tokens.at(0)->type).c_str());
 }
 
 TEST(Lexer, RecognizeRightParentheses) {
 	Lexer lexer("test");
-	lexer.input = ")";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens(")");
 	EXPECT_STREQ("RPAREN", Token::toString(tokens.at(0)->type).c_str());
 }
 
 TEST(Lexer, RecognizeVarIdentifiers) {
 	Lexer lexer("test");
-	lexer.input = "var a = 2";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens("var a = 2");
 	EXPECT_STREQ("IDENTIFIER", Token::toString(tokens.at(1)->type).c_str());
 }
 
 TEST(Lexer, RecognizeVarKeyWord) {
 	Lexer lexer("test");
-	lexer.input = "var a = 2";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens("var a = 2");
 	EXPECT_STREQ("KEYWORD", Token::toString(tokens.at(0)->type).c_str());
 }
 
 TEST(Lexer, RecognizeEquals) {
 	Lexer lexer("test");
-	lexer.input = "var a = 2";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens("var a = 2");
 	EXPECT_STREQ("EQ", Token::toString(tokens.at(2)->type).c_str());
 }
 
 TEST(Lexer, RecognizeEOT) {
 	Lexer lexer("test");
-	lexer.input = "var a = 2";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens("var a = 2");
 	EXPECT_STREQ("EOT", Token::toString(tokens.at(4)->type).c_str());
 }
 
@@ -118,10 +105,10 @@ TEST(Lexer, RecognizeEOT) {
 
 TEST(Parser, AdvanceCursor) {
 	Lexer lexer("test");
-	lexer.input = "var a = 2";
-	auto tokens = lexer.index_tokens();
+	auto tokens = lexer.index_tokens("var a = 2");
 
-	Parser parser(tokens);
+	Parser parser;
+	parser.setTokens(tokens);
 	parser.advance();
 	EXPECT_STREQ("IDENTIFIER", Token::toString(parser.current_token->type).c_str());
 }
