@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "Cursor.h"
 #include "Symbols.h"
 #include "Platform.h"
