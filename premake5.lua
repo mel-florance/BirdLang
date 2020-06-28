@@ -159,6 +159,9 @@ project "Tests"
 			"gtest_maind.lib",
 			"gtestd.lib"
 		}
+		libdirs { 
+			"Vendor/googletest/build/lib/Debug"
+		}
 
 	filter "system:linux"
 		cppdialect "C++17"
@@ -171,19 +174,19 @@ project "Tests"
 		}
 
 		links {
-			"gtest_maind.a",
-			"gtestd.a"
+			"libgtest_main.a",
+			"libgtest.a"
 		}
 
+		libdirs { 
+			"Vendor/googletest/lib"
+		}
 
 	filter "configurations:Debug"
 		defines "DEBUG"
 		kind "ConsoleApp"
 		symbols "On"
-
-		libdirs { 
-			"Vendor/googletest/build/lib/Debug"
-		}
+		
 		
 	filter "configurations:Release"
 		defines "RELEASE"
