@@ -18,11 +18,11 @@
 [![GitHub license](https://img.shields.io/github/license/Vyraax/BirdLang.svg)](https://github.com/Vyraax/BirdLang/blob/master/LICENSE)&nbsp;
 [![GitHub tag](https://img.shields.io/github/tag/Vyraax/BirdLang.svg)](https://gitHub.com/Vyraax/BirdLang/tags/)&nbsp;
 
-VulkanLab is just a test project to discover Vulkan.
+BirdLang is a simple programming langage for learning.
 
 ## Documentation
 
-You can find the documentation at [https://vyraax.github.io/BirdLang/html](https://vyraax.github.io/BirdLang/html/)
+Coming soon...
 
 ## Setup
 
