@@ -27,7 +27,7 @@ Coming soon...
 ## Setup
 
 ```bash
-git clone https://github.com/Vyraax/BirdLang.git
+git clone --recursive https://github.com/Vyraax/BirdLang.git
 ```
 
 ###### Linux
