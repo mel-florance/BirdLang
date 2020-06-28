@@ -5,6 +5,8 @@
 
 bin/
 bin-int/
+*.sln
+Makefile
 
 # User-specific files
 *.rsuser
