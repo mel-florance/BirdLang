@@ -12,6 +12,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install gcc 32bits support
+      run: sudo apt-get install gcc-multilib g++-multilib
     - name: setup
       run: ./setup.sh
     - name: make
