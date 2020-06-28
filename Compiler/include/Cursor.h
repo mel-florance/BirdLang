@@ -35,6 +35,6 @@ public:
 	std::string filename;
 	std::string input;
 
-	void advance(const char& character = NULL);
+	void advance(const char& character = 0);
 };
 

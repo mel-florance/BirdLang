@@ -7,7 +7,7 @@ Compiler::Compiler()
 	context = std::make_shared<Context>("<program>");
 	symbols = std::make_shared<Symbols>();
 
-	symbols->set("null", NULL);
+	symbols->set("null", 0);
 	symbols->set("true", true);
 	symbols->set("false", false);
 
