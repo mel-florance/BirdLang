@@ -45,6 +45,16 @@ project "Compiler"
 			"PLATFORM_WINDOWS"
 		}
 
+	filter "system:linux"
+		cppdialect "C++17"
+		staticruntime "On"
+		systemversion "latest"
+
+		defines
+		{
+			"PLATFORM_LINUX"
+		}
+
 	filter "configurations:Debug"
 		defines "DEBUG"
 		buildoptions {"/MTd"}
@@ -90,6 +100,16 @@ project "Interpreter"
 			"PLATFORM_WINDOWS"
 		}
 
+	filter "system:linux"
+		cppdialect "C++17"
+		staticruntime "On"
+		systemversion "latest"
+
+		defines
+		{
+			"PLATFORM_LINUX"
+		}
+
 	filter "configurations:Debug"
 		defines "DEBUG"
 		kind "ConsoleApp"
@@ -133,6 +153,16 @@ project "Tests"
 		defines
 		{
 			"PLATFORM_WINDOWS"
+		}
+
+	filter "system:linux"
+		cppdialect "C++17"
+		staticruntime "On"
+		systemversion "latest"
+
+		defines
+		{
+			"PLATFORM_LINUX"
 		}
 
 	filter "configurations:Debug"

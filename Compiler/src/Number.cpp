@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Number.h"
 
-Number::Number(const std::variant<float, int>& value) :
+Number::Number(const std::variant<float, int, bool>& value) :
     value(value),
     start(nullptr),
     end(nullptr) {
@@ -105,7 +105,7 @@ std::pair<Number*, Error*> Number::divide(Number* other)
 			if (rhs == 0)
 				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero", context));
 			else
-				result->value = std::get<int>(value) / rhs;
+				result->value = (float)std::get<int>(value) / (float)rhs;
 		}
 		catch (const std::bad_variant_access&) {}
 	}
@@ -163,7 +163,7 @@ std::pair<Number*, Error*> Number::power(Number* other)
 std::pair<Number*, Error*> Number::compare_equal(Number* other)
 {
 	Number* result = new Number();
-	result->value = value == other->value;
+	result->value = (bool)(value == other->value);
 	return std::make_pair(result, nullptr);
 }
 
@@ -260,6 +260,22 @@ std::pair<Number*, Error*> Number::compare_not(Number* other)
 	}
 	else if (value.index() == 1) {
 		try { result->value = std::get<int>(value) == 0 ? 1 : 0; }
+		catch (const std::bad_variant_access&) {}
+	}
+
+	return std::make_pair(result, nullptr);
+}
+
+std::pair<Number*, Error*> Number::is_true()
+{
+	Number* result = new Number();
+
+	if (value.index() == 0) {
+		try { result->value = std::get<float>(value) != 0.0f; }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 1) {
+		try { result->value = std::get<int>(value) != 0; }
 		catch (const std::bad_variant_access&) {}
 	}
 

@@ -6,7 +6,6 @@ Parser::Parser() :
 	index(-1),
 	debug(true)
 {
-
 }
 
 Parser::Result* Parser::parse()
@@ -108,64 +107,182 @@ Parser::Result* Parser::power()
 
 Parser::Result* Parser::expr()
 {
-	Result* result = new Result();
+	if (current_token != nullptr) {
+		Result* result = new Result();
 
-	std::string value;
-	try { value = std::get<std::string>(current_token->value); }
-	catch (const std::bad_variant_access&) {}
+		std::string value;
+		try { value = std::get<std::string>(current_token->value); }
+		catch (const std::bad_variant_access&) {}
 
-	if (current_token->type == Token::Type::KEYWORD && value == "var") {
-		result->record_advance();
-		advance();
+		if (current_token->type == Token::Type::KEYWORD && value == "var") {
+			result->record_advance();
+			advance();
 
-		if (current_token->type != Token::Type::IDENTIFIER) {
-			return result->failure(new InvalidSyntaxError(
-				current_token->start,
-				current_token->end, 
-				"Expected Identifier"
-			));
+			if (current_token->type != Token::Type::IDENTIFIER) {
+				return result->failure(new InvalidSyntaxError(
+					current_token->start,
+					current_token->end,
+					"Expected Identifier"
+				));
+			}
+
+			Token* var_name = new Token(current_token);
+			result->record_advance();
+			advance();
+
+			if (current_token->type != Token::Type::EQ) {
+				return result->failure(new InvalidSyntaxError(
+					current_token->start,
+					current_token->end,
+					"Expected '='"
+				));
+			}
+
+			result->record_advance();
+			advance();
+
+			Node* expression = result->record(expr());
+
+			if (result->error != nullptr) {
+				return result;
+			}
+
+			return result->success(new VariableAssignmentNode(var_name, expression));
 		}
 
-		Token* var_name = new Token(current_token);
-		result->record_advance();
-		advance();
-
-		if (current_token->type != Token::Type::EQ) {
-			return result->failure(new InvalidSyntaxError(
-				current_token->start,
-				current_token->end, 
-				"Expected '='"
-			));
-		}
-
-		result->record_advance();
-		advance();
-
-		Node* expression = result->record(expr());
+		auto node = result->record(binary_operation([=]() {
+			return compare();
+		}, {
+			Token::Type::KEYWORD,
+			Token::Type::KEYWORD
+		}, { "and", "or" }));
 
 		if (result->error != nullptr) {
-			return result;
+			return result->failure(new InvalidSyntaxError(
+				current_token->start,
+				current_token->end,
+				"Expected 'var', int, float, identifier, '+', '-', '(' or 'not'"
+			));
 		}
 
-		return result->success(new VariableAssignmentNode(var_name, expression));
+		return result->success(node);
 	}
+	
+	return nullptr;
+}
 
-	auto node = result->record(binary_operation([=]() {
-		return compare();
-	}, { 
-		Token::Type::KEYWORD,
-		Token::Type::KEYWORD 
-	}, { "and", "or" }));
+Parser::Result* Parser::if_expr()
+{
+	if (current_token != nullptr) {
+		Result* result = new Result();
+		Node* else_expr = nullptr;
+		Node* condition = nullptr;
+		std::vector<std::pair<Node*, Node*>> cases;
 
-	if (result->error != nullptr) {
-		return result->failure(new InvalidSyntaxError(
-			current_token->start,
-			current_token->end,
-			"Expected 'var', int, float, identifier, '+', '-', '(' or 'not'"
-		));
+		std::string if_value;
+		try { if_value = std::get<std::string>(current_token->value); }
+		catch (const std::bad_variant_access&) {}
+
+		if (if_value != "if") {
+			return result->failure(new InvalidSyntaxError(
+				current_token->start,
+				current_token->end,
+				"Expected 'if'"
+			));
+		}
+
+		result->record_advance();
+		advance();
+
+		condition = result->record(expr());
+
+		if (result->error != nullptr)
+			return result;
+
+		std::cout << current_token << std::endl;
+
+		std::string then_value;
+		try { then_value = std::get<std::string>(current_token->value); }
+		catch (const std::bad_variant_access&) {}
+
+		if (then_value != "then") {
+			return result->failure(new InvalidSyntaxError(
+				current_token->start,
+				current_token->end,
+				"Expected 'then'"
+			));
+		}
+
+		result->record_advance();
+		advance();
+
+		auto exp = result->record(expr());
+
+		if (result->error != nullptr)
+			return result;
+
+		cases.push_back(std::make_pair(condition, exp));
+
+		auto is_elsif = [=]() {
+			std::string val;
+			try { val = std::get<std::string>(current_token->value); }
+			catch (const std::bad_variant_access&) {}
+
+			return val == "elseif";
+		};
+
+		while (current_token->type == Token::Type::KEYWORD && is_elsif()) {
+			result->record_advance();
+			advance();
+
+			condition = result->record(expr());
+
+			if (result->error != nullptr)
+				return result;
+
+			std::string elseif_then;
+			try { elseif_then = std::get<std::string>(current_token->value); }
+			catch (const std::bad_variant_access&) {}
+
+			if (current_token->type != Token::Type::KEYWORD || elseif_then != "then") {
+				return result->failure(new InvalidSyntaxError(
+					current_token->start,
+					current_token->end,
+					"Expected 'then'"
+				));
+			}
+
+			result->record_advance();
+			advance();
+
+			auto then_expr = result->record(expr());
+
+			if (result->error != nullptr)
+				return result;
+
+			cases.push_back(std::make_pair(condition, then_expr));
+		}
+
+		std::string else_value;
+		try { else_value = std::get<std::string>(current_token->value); }
+		catch (const std::bad_variant_access&) {}
+
+		if (current_token->type == Token::Type::KEYWORD && else_value != "else") {
+			result->record_advance();
+			advance();
+
+			else_expr = result->record(expr());
+
+			if (result->error != nullptr)
+				return result;
+		}
+
+		Token* token = new Token(current_token);
+
+		return result->success(new IfStatementNode(token, cases, else_expr));
 	}
-
-	return result->success(node);
+	
+	return nullptr;
 }
 
 Parser::Result* Parser::atom()
@@ -214,6 +331,21 @@ Parser::Result* Parser::atom()
 				current_token->end,
 				"Expected ')'"
 			));
+		}
+		else {
+			std::string value;
+			try { value = std::get<std::string>(current_token->value); }
+			catch (const std::bad_variant_access&) {}
+
+			if (current_token->type == Token::Type::KEYWORD && value == "if") {
+
+				auto exp = result->record(if_expr());
+
+				if (result->error != nullptr)
+					return result;
+
+				return result->success(exp);
+			}
 		}
 
 		return result->failure(new InvalidSyntaxError(
@@ -289,14 +421,19 @@ Parser::Result* Parser::binary_operation(
 		if (result->error != nullptr)
 			return result;
 
-		std::string value;
-		try { value = std::get<std::string>(current_token->value); }
-		catch (const std::bad_variant_access&) {}
+		auto type_exists = [=]() {
+			return std::find(operations.begin(), operations.end(), current_token->type) != operations.end();
+		};
 
-		while (std::find(operations.begin(), operations.end(), current_token->type) != operations.end() || 
-			(std::find(operations.begin(), operations.end(), current_token->type) != operations.end() &&
-				std::find(values.begin(), values.end(), value) != values.end())) {
+		auto value_exists = [=]() {
+			std::string value;
+			try { value = std::get<std::string>(current_token->value); }
+			catch (const std::bad_variant_access&) {}
 
+			return std::find(values.begin(), values.end(), value) != values.end() && type_exists();
+		};
+
+		while (type_exists() || value_exists()) {
 			Token* token = new Token(current_token);
 
 			result->record_advance();

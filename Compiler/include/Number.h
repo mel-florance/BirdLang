@@ -7,7 +7,7 @@
 
 class API Number {
 public:
-	Number(const std::variant<float, int>& value = 0);
+	Number(const std::variant<float, int, bool>& value = 0);
 
 	std::pair<Number*, Error*> add(Number* other);
 	std::pair<Number*, Error*> subtract(Number* other);
@@ -23,6 +23,7 @@ public:
 	std::pair<Number*, Error*> compare_and(Number* other);
 	std::pair<Number*, Error*> compare_or(Number* other);
 	std::pair<Number*, Error*> compare_not(Number* other);
+	std::pair<Number*, Error*> is_true();
 
 	inline friend std::ostream& operator << (std::ostream& stream, Number* number) {
 
@@ -30,15 +31,19 @@ public:
 			try { stream << std::to_string(std::get<float>(number->value)); }
 			catch (const std::bad_variant_access&) {}
 		}
-		else {
+		else if (number->value.index() == 1) {
 			try { stream << std::to_string(std::get<int>(number->value)); }
+			catch (const std::bad_variant_access&) {}
+		}
+		else if (number->value.index() == 2) {
+			try { stream << (std::get<bool>(number->value) == 1 ? "true" : "false"); }
 			catch (const std::bad_variant_access&) {}
 		}
 
 		return stream;
 	}
 
-	std::variant<float, int> value;
+	std::variant<float, int, bool> value;
 	Cursor* start;
 	Cursor* end;
 	std::shared_ptr<Context> context;

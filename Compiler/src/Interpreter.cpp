@@ -26,6 +26,9 @@ Interpreter::Result* Interpreter::visit(Node* node, std::shared_ptr<Context> con
 		else if (strcmp(type, "class VariableAssignmentNode") == 0) {
 			return visit_variable_assignment_node(node, context);
 		}
+		else if (strcmp(type, "class IfStatementNode") == 0) {
+			return visit_if_statement_node(node, context);
+		}
 		else {
 			std::cout << "No visit " << type << " method defined" << std::endl;
 		}
@@ -219,4 +222,35 @@ Interpreter::Result* Interpreter::visit_variable_assignment_node(Node* node, std
 	}
 
 	return result->success(number);
+}
+
+Interpreter::Result* Interpreter::visit_if_statement_node(Node* node, std::shared_ptr<Context> context)
+{
+	Result* result = new Result();
+	std::cout << "ok" << std::endl;
+	auto if_node = (IfStatementNode*)node;
+
+	for (auto if_case : if_node->cases) {
+		auto left = result->record(visit(if_case.first, context));
+
+		if (result->error != nullptr)
+			return result;
+
+		auto op_result = left->is_true();
+
+		int value;
+		try { value = std::get<int>(op_result.first->value); }
+		catch (const std::bad_variant_access&) {}
+
+		if (value == 0) {
+			auto else_value = result->record(visit(if_node->else_case, context));
+
+			if (result->error != nullptr)
+				return result;
+
+			return result->success(else_value);
+		}
+
+		return result->success(nullptr);
+	}
 }

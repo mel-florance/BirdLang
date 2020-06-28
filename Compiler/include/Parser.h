@@ -12,16 +12,11 @@ public:
 	struct Result {
 		template<typename T>
 		Node* record(T* result) {
-			if (strcmp(typeid(T).name(), "struct Parser::Result") == 0) {
-				Result* res = (Result*)result;
-				if (res->error != nullptr) {
-					error = res->error;
-				}
-
-				return res->node;
+			if (result->error != nullptr) {
+				error = result->error;
 			}
 
-			return (Node*)result;
+			return result->node;
 		}
 
 		void record_advance() {
@@ -49,6 +44,7 @@ public:
 	Result* factor();
 	Result* term();
 	Result* expr();
+	Result* if_expr();
 	Result* atom();
 	Result* arithm();
 	Result* power();

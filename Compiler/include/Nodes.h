@@ -77,3 +77,18 @@ public:
 	Cursor* start;
 	Cursor* end;
 };
+
+class API IfStatementNode : public Node {
+public:
+	IfStatementNode(Token* token, const std::vector<std::pair<Node*, Node*>>& cases, Node* else_case) :
+		Node(token),
+		start(token->start),
+		end(token->end),
+		cases(cases),
+		else_case(else_case) {}
+
+	Cursor* start;
+	Cursor* end;
+	std::vector<std::pair<Node*, Node*>> cases;
+	Node* else_case;
+};

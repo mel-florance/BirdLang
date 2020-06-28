@@ -7,8 +7,8 @@ int main() {
 	std::cout << R"(
        _________
       /_  ___   \
-     /@ \/@  \   \
-     \__/\___/   /
+     /  \/   \   \
+     \@_/\@__/   /
       \_\/______/
       /     /\\\\\
      |     |\\\\\\
@@ -22,6 +22,9 @@ int main() {
 |_____________________|
 )";
 	Compiler compiler;
+	std::pair<Token::Type, std::string> p = {Token::Type::EQ, ""};
+
+
 
 	while (true)
 	{
