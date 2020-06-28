@@ -257,4 +257,15 @@ Interpreter::Result* Interpreter::visit_if_statement_node(Node* node, std::share
 
 		return result->success(nullptr);
 	}
+
+	if (if_node->else_case != nullptr) {
+		auto else_value = result->record(visit(if_node->else_case, context));
+
+		if (result->error != nullptr)
+			return result;
+
+		return result->success(else_value);
+	}
+
+	return result->success(nullptr);
 }
