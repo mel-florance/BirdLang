@@ -18,4 +18,7 @@ public:
 
 	std::shared_ptr<Context> context;
 	std::shared_ptr<Symbols> symbols;
+
+	bool debug_lexer;
+	bool debug_parser;
 };

@@ -2,7 +2,9 @@
 
 #include "Compiler.h"
 
-Compiler::Compiler()
+Compiler::Compiler() :
+	debug_lexer(false),
+	debug_parser(false)
 {
 	context = std::make_shared<Context>("<program>");
 	symbols = std::make_shared<Symbols>();
@@ -20,11 +22,11 @@ Compiler::Compiler()
 void Compiler::interpret(const std::string& input)
 {
 	Lexer lexer("<stdin>");
-	lexer.debug = false;
+	lexer.debug = debug_lexer;
 	auto tokens = lexer.index_tokens(input);
 
 	Parser parser;
-	parser.debug = false;
+	parser.debug = debug_parser;
 	parser.setTokens(tokens);
 	auto ast = parser.parse();
 

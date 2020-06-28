@@ -3,7 +3,7 @@
 
 #include <BirdLang.h>
 
-int main() {
+int main(int argc, char** argv) {
 	std::cout << R"(
        _________
       /_  ___   \
@@ -21,8 +21,21 @@ int main() {
 |     INTERPRETER     |
 |_____________________|
 )";
+
 	Compiler compiler;
-	std::pair<Token::Type, std::string> p = {Token::Type::EQ, ""};
+
+	for (int i = 0; i < argc; ++i) {
+		if (strstr(argv[i], "-") == argv[i]) {
+			for (unsigned int j = 1; j < strlen(argv[i]); j++) {
+				if (argv[i][j] == 'l') {
+					compiler.debug_lexer = true;
+				}
+				else if (argv[i][j] == 'p') {
+					compiler.debug_parser = true;
+				}
+			}
+		}
+	}
 
 	while (true)
 	{
