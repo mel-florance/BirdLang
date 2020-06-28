@@ -22,7 +22,7 @@ public:
 	}
 };
 
-class API NumericNode : public Node {
+class NumericNode : public Node {
 public:
 	NumericNode(Token* token) :
 		Node(token) {}
@@ -32,7 +32,7 @@ public:
 	}
 };
 
-class API BinaryOperationNode : public Node {
+class BinaryOperationNode : public Node {
 public:
 	BinaryOperationNode(Node* left, Token* token, Node* right) :
 		Node(token, left, right) {}
@@ -42,7 +42,7 @@ public:
 	}
 };
 
-class API UnaryOperationNode : public Node {
+class UnaryOperationNode : public Node {
 public:
 	UnaryOperationNode(Node* node, Token* token) :
 		Node(token, nullptr, node),
@@ -55,7 +55,7 @@ public:
 	Node* node;
 };
 
-class API VariableAccessNode : public Node {
+class VariableAccessNode : public Node {
 public:
 	VariableAccessNode(Token* token) : 
 		Node(token),
@@ -67,7 +67,7 @@ public:
 	Cursor* end;
 };
 
-class API VariableAssignmentNode : public Node {
+class VariableAssignmentNode : public Node {
 public:
 	VariableAssignmentNode(Token* token, Node* node) :
 		Node(token, node),
@@ -78,7 +78,7 @@ public:
 	Cursor* end;
 };
 
-class API IfStatementNode : public Node {
+class IfStatementNode : public Node {
 public:
 	IfStatementNode(Token* token, const std::vector<std::pair<Node*, Node*>>& cases, Node* else_case) :
 		Node(token),
