@@ -6,10 +6,7 @@
 bin/
 bin-int/
 *.sln
-Compiler/Makefile
-Interpreter/Makefile
-Tests/Makefile
-Makefile
+/Makefile
 
 # User-specific files
 *.rsuser
