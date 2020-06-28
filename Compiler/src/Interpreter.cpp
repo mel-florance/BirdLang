@@ -9,29 +9,33 @@ Interpreter::Interpreter()
 Interpreter::Result* Interpreter::visit(Node* node, std::shared_ptr<Context> context)
 {
 	if (node != nullptr && context != nullptr) {
-		auto type = typeid(*node).name();
 
-		if (strcmp(type, "class BinaryOperationNode") == 0) {
-			return visit_binary_operation_node(node, context);
-		}
-		else if (strcmp(type, "class NumericNode") == 0) {
-			return visit_numeric_node(node, context);
-		}
-		else if (strcmp(type, "class UnaryOperationNode") == 0) {
-			return visit_unary_operation_node(node, context);
-		}
-		else if (strcmp(type, "class VariableAccessNode") == 0) {
-			return visit_variable_access_node(node, context);
-		}
-		else if (strcmp(type, "class VariableAssignmentNode") == 0) {
-			return visit_variable_assignment_node(node, context);
-		}
-		else if (strcmp(type, "class IfStatementNode") == 0) {
-			return visit_if_statement_node(node, context);
-		}
-		else {
-			std::cout << "No visit " << type << " method defined" << std::endl;
-		}
+		BinaryOperationNode* binary_operation_node = dynamic_cast<BinaryOperationNode*>(node);
+		if (binary_operation_node)
+			return visit_binary_operation_node(binary_operation_node, context);
+
+		NumericNode* numeric_node = dynamic_cast<NumericNode*>(node);
+		if (numeric_node)
+			return visit_numeric_node(numeric_node, context);
+
+		UnaryOperationNode* unary_operation_node = dynamic_cast<UnaryOperationNode*>(node);
+		if (unary_operation_node)
+			return visit_unary_operation_node(unary_operation_node, context);
+
+		VariableAccessNode* variable_access_node = dynamic_cast<VariableAccessNode*>(node);
+	    if (variable_access_node)
+			return visit_variable_access_node(variable_access_node, context);
+
+		VariableAssignmentNode* variable_assignment_node = dynamic_cast<VariableAssignmentNode*>(node);
+		if (variable_assignment_node)
+			return visit_variable_assignment_node(variable_assignment_node, context);
+
+		IfStatementNode* if_statement_node = dynamic_cast<IfStatementNode*>(node);
+		if (if_statement_node)
+			return visit_if_statement_node(if_statement_node, context);
+		
+		auto type = typeid(*node).name();
+		std::cout << "No visit " << type << " method defined" << std::endl;
 	}
 
 	return nullptr;
