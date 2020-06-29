@@ -221,8 +221,11 @@ Interpreter::Result* Interpreter::visit_variable_assignment_node(Node* node, std
 	if (number->value.index() == 0) {
 		context->symbols->set(std::get<std::string>(var_name), std::get<float>(number->value));
 	}
-	else {
+	else if (number->value.index() == 1) {
 		context->symbols->set(std::get<std::string>(var_name), std::get<int>(number->value));
+	}
+	else if (number->value.index() == 2) {
+		context->symbols->set(std::get<std::string>(var_name), std::get<bool>(number->value));
 	}
 
 	return result->success(number);
