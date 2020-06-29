@@ -99,7 +99,8 @@ Parser::Result* Parser::power()
 	return binary_operation([=]() {
 		return atom();
 	}, {
-		Token::Type::POW
+		Token::Type::POW,
+		Token::Type::MOD
 	}, {}, [=]() {
 		return factor();
 	});

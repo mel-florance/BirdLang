@@ -82,6 +82,21 @@ std::pair<Number*, Error*> Number::multiply(Number* other)
 	return std::make_pair(result, nullptr);
 }
 
+std::pair<Number*, Error*> Number::modulus(Number* other)
+{
+	Number* result = new Number();
+	result->context = context;
+
+	if (value.index() == 1 && other->value.index() == 1) {
+		try { result->value = std::get<int>(value) % std::get<int>(other->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else
+		return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Modulus supports only integers.", context));
+
+	return std::make_pair(result, nullptr);
+}
+
 std::pair<Number*, Error*> Number::divide(Number* other)
 {
 	Number* result = new Number();

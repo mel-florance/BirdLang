@@ -18,6 +18,7 @@ public:
 		POW,
 		MUL,
 		DIV,
+		MOD,
 		LPAREN,
 		RPAREN,
 		IDENTIFIER,
@@ -53,6 +54,7 @@ public:
 		case Type::MINUS: return "MINUS";
 		case Type::POW: return "POW";
 		case Type::MUL: return "MUL";
+		case Type::MOD: return "MOD";
 		case Type::DIV: return "DIV";
 		case Type::LPAREN: return "LPAREN";
 		case Type::RPAREN: return "RPAREN";
