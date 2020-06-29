@@ -99,6 +99,11 @@ Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, std::s
 		number = op_result.first;
 		error = op_result.second;
 	}
+	else if (node->token->type == Token::Type::MOD) {
+		auto op_result = left->modulus(right);
+		number = op_result.first;
+		error = op_result.second;
+	}
 	else if (node->token->type == Token::Type::DIV) {
 		auto op_result = left->divide(right);
 		number = op_result.first;
