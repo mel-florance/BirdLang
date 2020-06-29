@@ -54,6 +54,10 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 			tokens.push_back(new Token(Token::Type::MUL, current_char));
 			advance();
 		}
+		else if (current_char == '%') {
+			tokens.push_back(new Token(Token::Type::MOD, current_char));
+			advance();
+		}
 		else if (current_char == '/') {
 			tokens.push_back(new Token(Token::Type::DIV, current_char));
 			advance();
