@@ -15,6 +15,10 @@ Compiler::Compiler() :
 
 	symbols->set("PI", PI);
 	symbols->set("TAU", TAU);
+	symbols->set("PHI", 1.618033988749895f);
+	symbols->set("EULER", 2.718281828459045f);
+	symbols->set("SQRT1_2", 0.7071067811865476f);
+	symbols->set("SQRT2", 1.4142135623730951f);
 
 	context->symbols = symbols;
 }
