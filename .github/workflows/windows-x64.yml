@@ -15,6 +15,6 @@ jobs:
     - name: Setup MSBuild
       uses: warrenbuckley/Setup-MSBuild@v1
     - name: setup
-      run: "./setup.sh && ls -l"
+      run: "./setup.sh && ls"
     - name: MSBuild
       run: msbuild BirdLang.sln
