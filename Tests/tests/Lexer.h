@@ -1,7 +1,5 @@
 #pragma once
 
-#include "pch.h"
-
 TEST(Lexer, SetLexerFilename) {
 	Lexer lexer("test");
 	EXPECT_STREQ("test", lexer.filename.c_str());
