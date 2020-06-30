@@ -138,10 +138,6 @@ project "Tests"
 		"Compiler/src",
 		"Vendor/googletest/include",
 	}
-	
-	libdirs { 
-		"Vendor/googletest/lib"
-	}
 
 	links
 	{
@@ -157,7 +153,10 @@ project "Tests"
 		{
 			"PLATFORM_WINDOWS"
 		}
-
+			
+		libdirs { 
+			"Vendor/googletest/lib"
+		}
 
 		links {
 			"gtestd.lib"
@@ -171,6 +170,11 @@ project "Tests"
 		defines
 		{
 			"PLATFORM_LINUX"
+		}
+
+		libdirs { 
+			"Vendor/googletest/lib",
+			"/usr/lib"
 		}
 
 		links {
