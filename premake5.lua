@@ -172,15 +172,9 @@ project "Tests"
 			"PLATFORM_LINUX"
 		}
 
-		includedirs
-		{
-			"/usr/include/gtest"
-		}
-
 		links {
 			"pthread",
-			"gtest_main:static",
-			"gtest:static"
+			"gtest.a"
 		}
 
 	filter "configurations:Debug"
