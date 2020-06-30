@@ -178,7 +178,7 @@ project "Tests"
 
 		links {
 			"pthread",
-			"gtest:static"
+			"gtest.a"
 		}
 
 	filter "configurations:Debug"
