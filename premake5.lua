@@ -172,9 +172,13 @@ project "Tests"
 			"PLATFORM_LINUX"
 		}
 
+		libdirs { 
+			"Vendor/googletest/lib"
+		}
+
 		links {
 			"pthread",
-			"gtest.a"
+			"gtest:static"
 		}
 
 	filter "configurations:Debug"
