@@ -26,6 +26,8 @@ BirdLang is a simple programming langage for learning.
 You can access the documentation directly on the wiki page:\
 [BirdLang Wiki](https://github.com/Vyraax/BirdLang/wiki)
 
+## Compile from sources
+
 ###### Linux build
 
 ```bash

@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: setup
+    - name: Setup Project
       run: ./setup.sh
-    - name: make
+    - name: Compile Project
       run: make
