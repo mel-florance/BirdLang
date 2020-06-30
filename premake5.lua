@@ -174,6 +174,7 @@ project "Tests"
 		}
 
 		links {
+			"pthread",
 			"gtest:static"
 		}
 
