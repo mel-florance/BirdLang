@@ -10,6 +10,9 @@ Parser::Parser() :
 
 Parser::Result* Parser::parse()
 {
+	if (tokens.size() == 0)
+		return nullptr;
+
 	advance();
 	Result* result = expr();
 
