@@ -4,7 +4,7 @@
 Parser::Parser() :
 	current_token(nullptr),
 	index(-1),
-	debug(true)
+	debug(false)
 {
 }
 
@@ -84,7 +84,7 @@ Parser::Result* Parser::term()
 	}, { 
 		Token::Type::MUL,
 		Token::Type::DIV
-	}, {});
+	});
 }
 
 Parser::Result* Parser::arithm()
@@ -94,7 +94,7 @@ Parser::Result* Parser::arithm()
 	}, {
 		Token::Type::PLUS,
 		Token::Type::MINUS
-	}, {});
+	});
 }
 
 Parser::Result* Parser::power()
@@ -104,7 +104,7 @@ Parser::Result* Parser::power()
 	}, {
 		Token::Type::POW,
 		Token::Type::MOD
-	}, {}, [=]() {
+	}, [=]() {
 		return factor();
 	});
 }
@@ -157,9 +157,9 @@ Parser::Result* Parser::expr()
 		auto node = result->record(binary_operation([=]() {
 			return compare();
 		}, {
-			Token::Type::KEYWORD,
-			Token::Type::KEYWORD
-		}, { "and", "or" }));
+			std::make_pair(Token::Type::KEYWORD, "and"),
+			std::make_pair(Token::Type::KEYWORD, "or")
+		}));
 
 		if (result->error != nullptr) {
 			return result->failure(new InvalidSyntaxError(
@@ -203,8 +203,6 @@ Parser::Result* Parser::if_expr()
 		if (result->error != nullptr)
 			return result;
 
-		std::cout << current_token << std::endl;
-
 		std::string then_value;
 		try { then_value = std::get<std::string>(current_token->value); }
 		catch (const std::bad_variant_access&) {}
@@ -227,19 +225,15 @@ Parser::Result* Parser::if_expr()
 
 		cases.push_back(std::make_pair(condition, exp));
 
-		auto is_elsif = [=]() {
-			std::string val;
-			try { val = std::get<std::string>(current_token->value); }
-			catch (const std::bad_variant_access&) {}
+		std::string val;
+		try { val = std::get<std::string>(current_token->value); }
+		catch (const std::bad_variant_access&) {}
 
-			return val == "elseif";
-		};
-
-		while (current_token->type == Token::Type::KEYWORD && is_elsif()) {
+		while (current_token->type == Token::Type::KEYWORD && val == "elseif") {
 			result->record_advance();
 			advance();
 
-			condition = result->record(expr());
+			auto condition = result->record(expr());
 
 			if (result->error != nullptr)
 				return result;
@@ -271,7 +265,7 @@ Parser::Result* Parser::if_expr()
 		try { else_value = std::get<std::string>(current_token->value); }
 		catch (const std::bad_variant_access&) {}
 
-		if (current_token->type == Token::Type::KEYWORD && else_value != "else") {
+		if (current_token->type == Token::Type::KEYWORD && else_value == "else") {
 			result->record_advance();
 			advance();
 
@@ -281,9 +275,7 @@ Parser::Result* Parser::if_expr()
 				return result;
 		}
 
-		Token* token = new Token(current_token);
-
-		return result->success(new IfStatementNode(token, cases, else_expr));
+		return result->success(new IfStatementNode(current_token, cases, else_expr));
 	}
 	
 	return nullptr;
@@ -394,7 +386,7 @@ Parser::Result* Parser::compare()
 		Token::Type::GT,
 		Token::Type::LTE,
 		Token::Type::GTE
-	}, {}));
+	}));
 
 	if (result->error != nullptr) {
 		return result->failure(new InvalidSyntaxError(
@@ -409,8 +401,7 @@ Parser::Result* Parser::compare()
 
 Parser::Result* Parser::binary_operation(
 	std::function<Result*()> fna, 
-	const std::vector<Token::Type>& operations, 
-	const std::vector<std::string>& values, 
+	const std::vector<std::variant<Token::Type, std::pair<Token::Type, std::string>>>& operations, 
 	std::function<Result*()> fnb
 )
 {
@@ -426,20 +417,35 @@ Parser::Result* Parser::binary_operation(
 			return result;
 
 		auto type_exists = [=]() {
-			return std::find(operations.begin(), operations.end(), current_token->type) != operations.end();
+			bool found_type = false;
+			bool found_value = false;
+
+			for (const auto& var : operations) {
+				Token::Type type = Token::Type::NONE;
+				try {type = std::get<Token::Type>(var); }
+				catch (const std::bad_variant_access&) {}
+
+				if (type == current_token->type)
+					found_type = true;
+
+				std::pair<Token::Type, std::string> pair;
+				try { pair = std::get<std::pair<Token::Type, std::string>>(var); }
+				catch (const std::bad_variant_access&) {}
+
+				std::string value;
+				try { value = std::get<std::string>(current_token->value); }
+				catch (const std::bad_variant_access&) {}
+
+				if (pair.first == current_token->type && pair.second == value)
+					found_value = true;
+			}
+
+			return found_type || found_value;
 		};
 
-		auto value_exists = [=]() {
-			std::string value;
-			try { value = std::get<std::string>(current_token->value); }
-			catch (const std::bad_variant_access&) {}
-
-			return std::find(values.begin(), values.end(), value) != values.end() && type_exists();
-		};
-
-		while (type_exists() || value_exists()) {
+		while (type_exists()) {
 			Token* token = new Token(current_token);
-
+			
 			result->record_advance();
 			advance();
 			Node* right = result->record(fnb());

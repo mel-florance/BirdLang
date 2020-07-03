@@ -239,10 +239,9 @@ Interpreter::Result* Interpreter::visit_variable_assignment_node(Node* node, std
 Interpreter::Result* Interpreter::visit_if_statement_node(Node* node, std::shared_ptr<Context> context)
 {
 	Result* result = new Result();
-	std::cout << "ok" << std::endl;
 	auto if_node = (IfStatementNode*)node;
 
-	for (auto if_case : if_node->cases) {
+	for (auto& if_case : if_node->cases) {
 		auto left = result->record(visit(if_case.first, context));
 
 		if (result->error != nullptr)
@@ -250,12 +249,12 @@ Interpreter::Result* Interpreter::visit_if_statement_node(Node* node, std::share
 
 		auto op_result = left->is_true();
 
-		int value;
-		try { value = std::get<int>(op_result.first->value); }
+		bool value;
+		try { value = std::get<bool>(op_result.first->value); }
 		catch (const std::bad_variant_access&) {}
 
-		if (value == 0) {
-			auto else_value = result->record(visit(if_node->else_case, context));
+		if (value == true) {
+			auto else_value = result->record(visit(if_case.second, context));
 
 			if (result->error != nullptr)
 				return result;

@@ -28,19 +28,21 @@ public:
 
 	inline friend std::ostream& operator << (std::ostream& stream, Number* number) {
 
-		if (number->value.index() == 0) {
-			try { stream << std::to_string(std::get<float>(number->value)); }
-			catch (const std::bad_variant_access&) {}
+		if (number != nullptr) {
+			if (number->value.index() == 0) {
+				try { stream << std::to_string(std::get<float>(number->value)); }
+				catch (const std::bad_variant_access&) {}
+			}
+			else if (number->value.index() == 1) {
+				try { stream << std::to_string(std::get<int>(number->value)); }
+				catch (const std::bad_variant_access&) {}
+			}
+			else if (number->value.index() == 2) {
+				try { stream << (std::get<bool>(number->value) == true ? "true" : "false"); }
+				catch (const std::bad_variant_access&) {}
+			}
 		}
-		else if (number->value.index() == 1) {
-			try { stream << std::to_string(std::get<int>(number->value)); }
-			catch (const std::bad_variant_access&) {}
-		}
-		else if (number->value.index() == 2) {
-			try { stream << (std::get<bool>(number->value) == 1 ? "true" : "false"); }
-			catch (const std::bad_variant_access&) {}
-		}
-
+		
 		return stream;
 	}
 

@@ -52,8 +52,7 @@ public:
 	
 	Result* binary_operation(
 		std::function<Result*()> fna, 
-		const std::vector<Token::Type>& operations, 
-		const std::vector<std::string>& values, 
+		const std::vector<std::variant<Token::Type, std::pair<Token::Type, std::string>>>& operations,
 		std::function<Result* ()> fnb = nullptr
 	);
 
