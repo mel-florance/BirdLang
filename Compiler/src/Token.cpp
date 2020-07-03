@@ -8,7 +8,6 @@ std::vector<std::string> Token::keywords = {
     "not",
     "if",
     "then",
-    "elseif"
     "else"
 };
 
