@@ -19,3 +19,8 @@ atom	:	INT|FLOAT|IDENTIFIER
 if		:	KEYWORD:if expr KEYWORD:then expr
 		:	(KEYWORD:elseif expr KEYWORD:then expr)*
 		:	(KEYWORD:else expr)?
+
+for		:	KEYWORD:for IDENTIFIER EQ expr KEYWORD:TO expr
+		:	(KEYWORD: STEP expr)? KEYWORD:THEN expr
+
+while	:	KEYWORD:while expr KEYWORD:THEN expr
