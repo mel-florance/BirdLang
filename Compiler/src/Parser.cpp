@@ -225,15 +225,19 @@ Parser::Result* Parser::if_expr()
 
 		cases.push_back(std::make_pair(condition, exp));
 
-		std::string val;
-		try { val = std::get<std::string>(current_token->value); }
-		catch (const std::bad_variant_access&) {}
+		auto isElseIf = [=]() {
+			std::string val;
+			try { val = std::get<std::string>(current_token->value); }
+			catch (const std::bad_variant_access&) {}
 
-		while (current_token->type == Token::Type::KEYWORD && val == "elseif") {
+			return current_token->type == Token::Type::KEYWORD && val == "elseif";
+		};
+
+		while (isElseIf()) {
 			result->record_advance();
 			advance();
 
-			auto condition = result->record(expr());
+			auto cond = result->record(expr());
 
 			if (result->error != nullptr)
 				return result;
@@ -258,7 +262,7 @@ Parser::Result* Parser::if_expr()
 			if (result->error != nullptr)
 				return result;
 
-			cases.push_back(std::make_pair(condition, then_expr));
+			cases.push_back(std::make_pair(cond, then_expr));
 		}
 
 		std::string else_value;
