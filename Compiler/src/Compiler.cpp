@@ -30,7 +30,7 @@ void Compiler::interpret(const std::string& input)
 	auto tokens = lexer.index_tokens(input);
 
 	Parser parser;
-	parser.debug = debug_parser;e
+	parser.debug = debug_parser;
 	parser.setTokens(tokens);
 	auto ast = parser.parse();
 
