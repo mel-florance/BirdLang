@@ -92,3 +92,38 @@ public:
 	std::vector<std::pair<Node*, Node*>> cases;
 	Node* else_case;
 };
+
+class ForStatementNode : public Node {
+public:
+	ForStatementNode(Token* token, Node* start_value, Node* end_value, Node* step, Node* body) : 
+		Node(token),
+		start(token->start),
+		end(token->end),
+		start_value(start_value),
+		end_value(end_value),
+		step(step),
+		body(body)
+	{}
+
+	Cursor* start;
+	Cursor* end;
+	Node* start_value;
+	Node* end_value;
+	Node* step;
+	Node* body;
+};
+
+class WhileStatementNode : public Node {
+public:
+	WhileStatementNode(Token* token, Node* condition, Node* body) : 
+		Node(token),
+		start(token->start),
+		end(token->end),
+		condition(condition),
+		body(body) {}
+
+	Cursor* start;
+	Cursor* end;
+	Node* condition;
+	Node* body;
+};
