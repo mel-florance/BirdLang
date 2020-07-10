@@ -45,6 +45,8 @@ public:
 	Result* term();
 	Result* expr();
 	Result* if_expr();
+	Result* for_expr();
+	Result* while_expr();
 	Result* atom();
 	Result* arithm();
 	Result* power();
@@ -64,4 +66,5 @@ public:
 	Token* current_token;
 	size_t index;
 	bool debug;
+	double parsing_time;
 };

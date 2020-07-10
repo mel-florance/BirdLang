@@ -24,5 +24,6 @@ public:
 	Cursor cursor;
 	char current_char;
 	bool debug;
+	double lexing_time;
 };
 
