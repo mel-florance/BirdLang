@@ -25,7 +25,8 @@ public:
 class NumericNode : public Node {
 public:
 	NumericNode(Token* token) :
-		Node(token) {}
+		Node(token) 
+	{}
 
 	inline friend std::ostream& operator << (std::ostream& stream, NumericNode* node) {
 		return stream << "NumericNode, Token:" << node->token;
@@ -35,7 +36,8 @@ public:
 class BinaryOperationNode : public Node {
 public:
 	BinaryOperationNode(Node* left, Token* token, Node* right) :
-		Node(token, left, right) {}
+		Node(token, left, right)
+	{}
 
 	inline friend std::ostream& operator << (std::ostream& stream, BinaryOperationNode* node) {
 		return stream << "BinaryOperationNode, Token:" << node->token;
@@ -46,7 +48,8 @@ class UnaryOperationNode : public Node {
 public:
 	UnaryOperationNode(Node* node, Token* token) :
 		Node(token, nullptr, node),
-		node(node) {}
+		node(node)
+	{}
 
 	inline friend std::ostream& operator << (std::ostream& stream, UnaryOperationNode* node) {
 		return stream << "UnaryOperationNode, Token:" << node->token;
@@ -72,7 +75,8 @@ public:
 	VariableAssignmentNode(Token* token, Node* node) :
 		Node(token, node),
 		start(token->start),
-		end(token->end) {}
+		end(token->end)
+	{}
 
 	Cursor* start;
 	Cursor* end;
@@ -98,7 +102,7 @@ public:
 	ForStatementNode(Token* token, Node* start_value, Node* end_value, Node* step, Node* body) : 
 		Node(token),
 		start(token->start),
-		end(token->end),
+		end(body->token->end),
 		start_value(start_value),
 		end_value(end_value),
 		step(step),
@@ -117,10 +121,11 @@ class WhileStatementNode : public Node {
 public:
 	WhileStatementNode(Token* token, Node* condition, Node* body) : 
 		Node(token),
-		start(token->start),
-		end(token->end),
+		start(condition->token->start),
+		end(body->token->end),
 		condition(condition),
-		body(body) {}
+		body(body)
+	{}
 
 	Cursor* start;
 	Cursor* end;

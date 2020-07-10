@@ -3,7 +3,7 @@ expr	:	KEYWORD:var IDENTIFIER EQ expr
 
 comp	:	NOT comp
 		:	arithm ((EE|LT|GT|LTE|GTE) arithm)*	
-
+		s
 arithm	:	term ((PLUS|MINUS) term)*
 
 term	:	factor ((MUL|DIV) factor)*

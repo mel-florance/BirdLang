@@ -49,5 +49,5 @@ public:
 	std::variant<float, int, bool> value;
 	Cursor* start;
 	Cursor* end;
-	std::shared_ptr<Context> context;
+	Context* context;
 };
