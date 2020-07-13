@@ -1,6 +1,6 @@
 workspace "BirdLang"
 	architecture "x64"
-	startproject "Compiler"
+	startproject "Interpreter"
 
 	configurations
 	{

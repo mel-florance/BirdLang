@@ -31,7 +31,7 @@ You can access the documentation directly on the wiki page:\
 ###### Linux build
 
 ```bash
-git clone --recursive https://github.com/Vyraax/BirdLang.git
+git clone https://github.com/Vyraax/BirdLang.git
 cd BirdLang
 ./setup.sh
 make
@@ -40,7 +40,7 @@ make
 ###### Windows build
 
 ```bash
-git clone --recursive https://github.com/Vyraax/BirdLang.git
+git clone https://github.com/Vyraax/BirdLang.git
 cd BirdLang
 ./setup.bat
 ```
