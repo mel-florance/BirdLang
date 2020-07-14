@@ -1,15 +1,23 @@
 #include "pch.h"
 #include "Parser.h"
+#include "Profiler.h"
 
 Parser::Parser() :
 	current_token(nullptr),
 	index(-1),
-	debug(true)
+	debug(false),
+	parsing_time(0.0)
 {
 }
 
 Parser::Result* Parser::parse()
 {
+	if (tokens.size() == 0)
+		return nullptr;
+
+	Profiler profiler;
+	profiler.start = clock();
+
 	advance();
 	Result* result = expr();
 
@@ -26,6 +34,9 @@ Parser::Result* Parser::parse()
 			traverse(result->node, 0);
 		}
 	}
+
+	profiler.end = clock();
+	parsing_time = profiler.getReport();
 
 	return result;
 }
@@ -81,7 +92,7 @@ Parser::Result* Parser::term()
 	}, { 
 		Token::Type::MUL,
 		Token::Type::DIV
-	}, {});
+	});
 }
 
 Parser::Result* Parser::arithm()
@@ -91,7 +102,7 @@ Parser::Result* Parser::arithm()
 	}, {
 		Token::Type::PLUS,
 		Token::Type::MINUS
-	}, {});
+	});
 }
 
 Parser::Result* Parser::power()
@@ -101,7 +112,7 @@ Parser::Result* Parser::power()
 	}, {
 		Token::Type::POW,
 		Token::Type::MOD
-	}, {}, [=]() {
+	}, [=]() {
 		return factor();
 	});
 }
@@ -154,9 +165,9 @@ Parser::Result* Parser::expr()
 		auto node = result->record(binary_operation([=]() {
 			return compare();
 		}, {
-			Token::Type::KEYWORD,
-			Token::Type::KEYWORD
-		}, { "and", "or" }));
+			std::make_pair(Token::Type::KEYWORD, "and"),
+			std::make_pair(Token::Type::KEYWORD, "or")
+		}));
 
 		if (result->error != nullptr) {
 			return result->failure(new InvalidSyntaxError(
@@ -200,8 +211,6 @@ Parser::Result* Parser::if_expr()
 		if (result->error != nullptr)
 			return result;
 
-		std::cout << current_token << std::endl;
-
 		std::string then_value;
 		try { then_value = std::get<std::string>(current_token->value); }
 		catch (const std::bad_variant_access&) {}
@@ -224,19 +233,19 @@ Parser::Result* Parser::if_expr()
 
 		cases.push_back(std::make_pair(condition, exp));
 
-		auto is_elsif = [=]() {
+		auto isElseIf = [=]() {
 			std::string val;
 			try { val = std::get<std::string>(current_token->value); }
 			catch (const std::bad_variant_access&) {}
 
-			return val == "elseif";
+			return current_token->type == Token::Type::KEYWORD && val == "elseif";
 		};
 
-		while (current_token->type == Token::Type::KEYWORD && is_elsif()) {
+		while (isElseIf()) {
 			result->record_advance();
 			advance();
 
-			condition = result->record(expr());
+			auto cond = result->record(expr());
 
 			if (result->error != nullptr)
 				return result;
@@ -261,14 +270,14 @@ Parser::Result* Parser::if_expr()
 			if (result->error != nullptr)
 				return result;
 
-			cases.push_back(std::make_pair(condition, then_expr));
+			cases.push_back(std::make_pair(cond, then_expr));
 		}
 
 		std::string else_value;
 		try { else_value = std::get<std::string>(current_token->value); }
 		catch (const std::bad_variant_access&) {}
 
-		if (current_token->type == Token::Type::KEYWORD && else_value != "else") {
+		if (current_token->type == Token::Type::KEYWORD && else_value == "else") {
 			result->record_advance();
 			advance();
 
@@ -278,12 +287,162 @@ Parser::Result* Parser::if_expr()
 				return result;
 		}
 
-		Token* token = new Token(current_token);
-
-		return result->success(new IfStatementNode(token, cases, else_expr));
+		return result->success(new IfStatementNode(current_token, cases, else_expr));
 	}
 	
 	return nullptr;
+}
+
+Parser::Result* Parser::for_expr()
+{
+	Result* result = new Result();
+
+	std::string for_value;
+	try { for_value = std::get<std::string>(current_token->value); }
+	catch (const std::bad_variant_access&) {}
+
+	if (for_value != "for") {
+		return result->failure(new InvalidSyntaxError(
+			current_token->start,
+			current_token->end,
+			"Expected 'for'"
+		));
+	}
+
+	result->record_advance();
+	advance();
+
+	if (current_token->type != Token::Type::IDENTIFIER) {
+		return result->failure(new InvalidSyntaxError(
+			current_token->start,
+			current_token->end,
+			"Expected identifier"	
+		));
+	}
+
+	auto var_name = new Token(current_token);
+	result->record_advance();
+	advance();
+
+	if (current_token->type != Token::Type::EQ) {
+		return result->failure(new InvalidSyntaxError(
+			current_token->start,
+			current_token->end,
+			"Expected '='"
+		));
+	}
+
+	result->record_advance();
+	advance();
+
+	auto start_value = result->record(expr());
+
+	if (result->error != nullptr)
+		return result;
+
+	std::string to_value;
+	try { to_value = std::get<std::string>(current_token->value); }
+	catch (const std::bad_variant_access&) {}
+
+	if (current_token->type != Token::Type::KEYWORD || to_value != "to") {
+		return result->failure(new InvalidSyntaxError(
+			current_token->start,
+			current_token->end,
+			"Expected 'to'"
+		));
+	}
+
+	result->record_advance();
+	advance();
+
+	auto end_value = result->record(expr());
+	Node* step = nullptr;
+
+	if (result->error != nullptr)
+		return result;
+
+	std::string step_value;
+	try { step_value = std::get<std::string>(current_token->value); }
+	catch (const std::bad_variant_access&) {}
+
+	if (current_token->type == Token::Type::KEYWORD && step_value == "step") {
+		result->record_advance();
+		advance();
+
+		step = result->record(expr());
+
+		if (result->error != nullptr)
+			return result;
+	}
+
+	std::string then_value;
+	try { then_value = std::get<std::string>(current_token->value); }
+	catch (const std::bad_variant_access&) {}
+
+	if (current_token->type != Token::Type::KEYWORD || then_value != "then") {
+		return result->failure(new InvalidSyntaxError(
+			current_token->start,
+			current_token->end,
+			"Expected 'then'"
+		));
+	}
+
+	result->record_advance();
+	advance();
+
+	auto body = result->record(expr());
+
+	if (result->error != nullptr)
+		return result;
+
+	return result->success(new ForStatementNode(var_name, start_value, end_value, step, body));
+}
+
+Parser::Result* Parser::while_expr()
+{
+	Result* result = new Result();
+
+	std::string while_value;
+	try { while_value = std::get<std::string>(current_token->value); }
+	catch (const std::bad_variant_access&) {}
+
+	if (while_value != "while") {
+		return result->failure(new InvalidSyntaxError(
+			current_token->start,
+			current_token->end,
+			"Expected 'while'"
+		));
+	}
+
+	result->record_advance();
+	advance();
+
+	auto condition = result->record(expr());
+
+	if (result->error != nullptr)
+		return result;
+
+	std::string then_value;
+	try { then_value = std::get<std::string>(current_token->value); }
+	catch (const std::bad_variant_access&) {}
+
+	if (then_value != "then") {
+		return result->failure(new InvalidSyntaxError(
+			current_token->start,
+			current_token->end,
+			"Expected 'then'"
+		));
+	}
+
+	result->record_advance();
+	advance();
+
+	auto body = result->record(expr());
+
+	if (result->error != nullptr)
+		return result;
+
+	return result->success(new WhileStatementNode(current_token, condition, body));
 }
 
 Parser::Result* Parser::atom()
@@ -339,8 +498,23 @@ Parser::Result* Parser::atom()
 			catch (const std::bad_variant_access&) {}
 
 			if (current_token->type == Token::Type::KEYWORD && value == "if") {
-
 				auto exp = result->record(if_expr());
+
+				if (result->error != nullptr)
+					return result;
+
+				return result->success(exp);
+			}
+			else if (current_token->type == Token::Type::KEYWORD && value == "for") {
+				auto exp = result->record(for_expr());
+
+				if (result->error != nullptr)
+					return result;
+
+				return result->success(exp);
+			}
+			else if (current_token->type == Token::Type::KEYWORD && value == "while") {
+				auto exp = result->record(while_expr());
 
 				if (result->error != nullptr)
 					return result;
@@ -391,7 +565,7 @@ Parser::Result* Parser::compare()
 		Token::Type::GT,
 		Token::Type::LTE,
 		Token::Type::GTE
-	}, {}));
+	}));
 
 	if (result->error != nullptr) {
 		return result->failure(new InvalidSyntaxError(
@@ -406,8 +580,7 @@ Parser::Result* Parser::compare()
 
 Parser::Result* Parser::binary_operation(
 	std::function<Result*()> fna, 
-	const std::vector<Token::Type>& operations, 
-	const std::vector<std::string>& values, 
+	const std::vector<std::variant<Token::Type, std::pair<Token::Type, std::string>>>& operations, 
 	std::function<Result*()> fnb
 )
 {
@@ -423,20 +596,35 @@ Parser::Result* Parser::binary_operation(
 			return result;
 
 		auto type_exists = [=]() {
-			return std::find(operations.begin(), operations.end(), current_token->type) != operations.end();
+			bool found_type = false;
+			bool found_value = false;
+
+			for (const auto& var : operations) {
+				Token::Type type = Token::Type::NONE;
+				try {type = std::get<Token::Type>(var); }
+				catch (const std::bad_variant_access&) {}
+
+				if (type == current_token->type)
+					found_type = true;
+
+				std::pair<Token::Type, std::string> pair;
+				try { pair = std::get<std::pair<Token::Type, std::string>>(var); }
+				catch (const std::bad_variant_access&) {}
+
+				std::string value;
+				try { value = std::get<std::string>(current_token->value); }
+				catch (const std::bad_variant_access&) {}
+
+				if (pair.first == current_token->type && pair.second == value)
+					found_value = true;
+			}
+
+			return found_type || found_value;
 		};
 
-		auto value_exists = [=]() {
-			std::string value;
-			try { value = std::get<std::string>(current_token->value); }
-			catch (const std::bad_variant_access&) {}
-
-			return std::find(values.begin(), values.end(), value) != values.end() && type_exists();
-		};
-
-		while (type_exists() || value_exists()) {
+		while (type_exists()) {
 			Token* token = new Token(current_token);
-
+			
 			result->record_advance();
 			advance();
 			Node* right = result->record(fnb());

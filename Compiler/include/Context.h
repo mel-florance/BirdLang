@@ -13,5 +13,5 @@ public:
 	std::string display_name;
 	Context* parent;
 	Cursor* parent_cursor;
-	std::shared_ptr<Symbols> symbols;
+	Symbols* symbols;
 };

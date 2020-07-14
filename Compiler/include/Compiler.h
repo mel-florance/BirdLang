@@ -16,9 +16,10 @@ public:
 
 	void interpret(const std::string& input);
 
-	std::shared_ptr<Context> context;
-	std::shared_ptr<Symbols> symbols;
+	Context* context;
+	Symbols* symbols;
 
 	bool debug_lexer;
 	bool debug_parser;
+	bool profiling;
 };

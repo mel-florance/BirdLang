@@ -1,13 +1,15 @@
 #include "pch.h"
 
 #include "Compiler.h"
+#include "Profiler.h"
 
 Compiler::Compiler() :
 	debug_lexer(false),
-	debug_parser(false)
+	debug_parser(false),
+	profiling(false)
 {
-	context = std::make_shared<Context>("<program>");
-	symbols = std::make_shared<Symbols>();
+	context = new Context("<program>");
+	symbols = new Symbols();
 
 	symbols->set("null", 0);
 	symbols->set("true", true);
@@ -25,22 +27,42 @@ Compiler::Compiler() :
 
 void Compiler::interpret(const std::string& input)
 {
-	Lexer lexer("<stdin>");
-	lexer.debug = debug_lexer;
-	auto tokens = lexer.index_tokens(input);
+	Lexer* lexer = new Lexer("<stdin>");
+	lexer->debug = debug_lexer;
+	auto tokens = lexer->index_tokens(input);
 
-	Parser parser;
-	parser.debug = debug_parser;
-	parser.setTokens(tokens);
-	auto ast = parser.parse();
+	Parser* parser = new Parser();
+	parser->debug = debug_parser;
+	parser->setTokens(tokens);
+	auto ast = parser->parse();
+
+	Profiler profiler;
+	double interpreting_time = 0.0;
 
 	if (ast != nullptr) {
 		if (ast->error != nullptr) {
 			std::cout << ast->error << std::endl;
 		}
 		else {
-			Interpreter interpreter;
-			auto result = interpreter.visit(ast->node, context);
+			Interpreter* interpreter = new Interpreter();
+
+			if (profiling) {
+				profiler.start = clock();
+			}
+
+			auto result = interpreter->visit(ast->node, context);
+
+			if (profiling) {
+				profiler.end = clock();
+				interpreting_time = profiler.getReport();
+
+				std::cout << "===================================\n";
+				std::cout << "Tokenization: " << lexer->lexing_time << "s\n";
+				std::cout << "Parsing: " << parser->parsing_time << "s\n";
+				std::cout << "Evaluation: " << interpreting_time << "s\n";
+				std::cout << "TOTAL: " << (lexer->lexing_time + interpreting_time + parser->parsing_time) << "s\n";
+				std::cout << "===================================\n";
+			}
 
 			if (result->error != nullptr) {
 				if (strcmp(typeid(*result->error).name(), "class RuntimeError") == 0) {
