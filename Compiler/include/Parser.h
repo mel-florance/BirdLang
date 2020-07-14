@@ -39,7 +39,7 @@ public:
 	};
 
 	Result* parse();
-	void traverse(Node* node, unsigned int depth);
+	void traverse(Node* node, const std::string& prefix = "", bool isLeft = false);
 	Token* advance();
 	Result* factor();
 	Result* term();

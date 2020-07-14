@@ -1,7 +1,8 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "Lexer.h"
 #include "Profiler.h"
 #include "ConsoleTable.h"
+#include "Utils.h"
 #include <sstream>
 
 using ConsoleTable = samilton::ConsoleTable;
@@ -186,7 +187,8 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 			table[i + 1][3] = std::to_string(column);
 		}
 
-		std::cout << "\n" << table << "\n";
+		Utils::title("TOKENS");
+		std::cout << table << "\n";
 	}
 
 	return tokens;

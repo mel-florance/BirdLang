@@ -17,9 +17,7 @@ public:
 	Node* left;
 	Node* right;
 
-	inline friend std::ostream& operator << (std::ostream& stream, Node* node) {
-		return stream << "Node, Token:" << node->token;
-	}
+	friend std::ostream& operator << (std::ostream& stream, Node* node);
 };
 
 class NumericNode : public Node {
@@ -27,10 +25,6 @@ public:
 	NumericNode(Token* token) :
 		Node(token) 
 	{}
-
-	inline friend std::ostream& operator << (std::ostream& stream, NumericNode* node) {
-		return stream << "NumericNode, Token:" << node->token;
-	}
 };
 
 class BinaryOperationNode : public Node {
@@ -38,10 +32,6 @@ public:
 	BinaryOperationNode(Node* left, Token* token, Node* right) :
 		Node(token, left, right)
 	{}
-
-	inline friend std::ostream& operator << (std::ostream& stream, BinaryOperationNode* node) {
-		return stream << "BinaryOperationNode, Token:" << node->token;
-	}
 };
 
 class UnaryOperationNode : public Node {
@@ -50,10 +40,6 @@ public:
 		Node(token, nullptr, node),
 		node(node)
 	{}
-
-	inline friend std::ostream& operator << (std::ostream& stream, UnaryOperationNode* node) {
-		return stream << "UnaryOperationNode, Token:" << node->token;
-	}
 
 	Node* node;
 };
