@@ -15,6 +15,7 @@ project "Compiler"
 	kind "StaticLib"
 	staticruntime "on"
 	language "C++"
+	buildoptions{"/utf-8"}
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")

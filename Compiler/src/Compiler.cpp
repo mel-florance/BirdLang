@@ -2,6 +2,7 @@
 
 #include "Compiler.h"
 #include "Profiler.h"
+#include "Utils.h"
 
 Compiler::Compiler() :
 	debug_lexer(false),
@@ -56,12 +57,12 @@ void Compiler::interpret(const std::string& input)
 				profiler.end = clock();
 				interpreting_time = profiler.getReport();
 
-				std::cout << "===================================\n";
+				std::cout << '\n';
+				Utils::title("TIMING");
 				std::cout << "Tokenization: " << lexer->lexing_time << "s\n";
 				std::cout << "Parsing: " << parser->parsing_time << "s\n";
 				std::cout << "Evaluation: " << interpreting_time << "s\n";
 				std::cout << "TOTAL: " << (lexer->lexing_time + interpreting_time + parser->parsing_time) << "s\n";
-				std::cout << "===================================\n";
 			}
 
 			if (result->error != nullptr) {
