@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Parser.h"
 #include "Profiler.h"
+#include "Utils.h"
 
 Parser::Parser() :
 	current_token(nullptr),
@@ -31,7 +32,8 @@ Parser::Result* Parser::parse()
 		}
 
 		if (debug) {
-			traverse(result->node, 0);
+			Utils::title("ABSTRACT SYNTAX TREE", 4);
+			traverse(result->node);
 		}
 	}
 
@@ -41,16 +43,17 @@ Parser::Result* Parser::parse()
 	return result;
 }
 
-void Parser::traverse(Node* node, unsigned int depth)
+void Parser::traverse(Node* node, const std::string& prefix, bool isLeft)
 {
 	if (node == nullptr)
 		return;
-	
-	++depth;
 
-	traverse(node->left, depth);
-	std::cout << std::string(depth, '\t') << node << std::endl;
-	traverse(node->right, depth);
+	std::cout << prefix;
+	std::cout << (isLeft ? "├──" : "└──");
+	std::cout << node << '\n';
+
+	traverse(node->left, prefix + (isLeft ? "│   " : "    "), true);
+	traverse(node->right, prefix + (isLeft ? "│   " : "    "), false);
 }
 
 Token* Parser::advance()
