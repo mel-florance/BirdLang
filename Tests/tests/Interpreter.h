@@ -5,7 +5,19 @@ TEST(Interpreter, VisitNumericNode) {
 }
 
 TEST(Interpreter, VisitBinaryNode) {
-	EXPECT_EQ(0, 1);
+	Token a(Token::Type::INT, 5);
+	Token b(Token::Type::INT, 3);
+	NumericNode first(&a);
+	NumericNode second(&b);
+
+	Token c(Token::Type::PLUS, '+');
+	BinaryOperationNode add(&first, &c,&second);
+	Interpreter interp;
+	Context ctx("<test>");
+	auto result = interp.visit_binary_operation_node(&add, &ctx);
+	auto value = std::get<int>(result->value->value);
+	
+	EXPECT_EQ(value, 8);
 }
 
 TEST(Interpreter, VisitUnaryNode) {
