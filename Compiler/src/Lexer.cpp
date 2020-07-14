@@ -1,9 +1,9 @@
 #include "pch.h"
+#include <sstream>
 #include "Lexer.h"
 #include "Profiler.h"
 #include "ConsoleTable.h"
 #include "Utils.h"
-#include <sstream>
 
 using ConsoleTable = samilton::ConsoleTable;
 

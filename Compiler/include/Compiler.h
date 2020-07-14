@@ -15,6 +15,7 @@ public:
 	Compiler();
 
 	void interpret(const std::string& input);
+	void printStatistics(Lexer* lexer, Parser* parser);
 
 	Context* context;
 	Symbols* symbols;
@@ -22,4 +23,6 @@ public:
 	bool debug_lexer;
 	bool debug_parser;
 	bool profiling;
+
+	double interpreting_time;
 };

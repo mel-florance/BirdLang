@@ -3,11 +3,15 @@
 #include "Compiler.h"
 #include "Profiler.h"
 #include "Utils.h"
+#include "ConsoleTable.h"
+
+using ConsoleTable = samilton::ConsoleTable;
 
 Compiler::Compiler() :
 	debug_lexer(false),
 	debug_parser(false),
-	profiling(false)
+	profiling(false),
+	interpreting_time(0.0)
 {
 	context = new Context("<program>");
 	symbols = new Symbols();
@@ -38,7 +42,6 @@ void Compiler::interpret(const std::string& input)
 	auto ast = parser->parse();
 
 	Profiler profiler;
-	double interpreting_time = 0.0;
 
 	if (ast != nullptr) {
 		if (ast->error != nullptr) {
@@ -56,13 +59,7 @@ void Compiler::interpret(const std::string& input)
 			if (profiling) {
 				profiler.end = clock();
 				interpreting_time = profiler.getReport();
-
-				std::cout << '\n';
-				Utils::title("TIMING");
-				std::cout << "Tokenization: " << lexer->lexing_time << "s\n";
-				std::cout << "Parsing: " << parser->parsing_time << "s\n";
-				std::cout << "Evaluation: " << interpreting_time << "s\n";
-				std::cout << "TOTAL: " << (lexer->lexing_time + interpreting_time + parser->parsing_time) << "s\n";
+				printStatistics(lexer, parser);
 			}
 
 			if (result->error != nullptr) {
@@ -79,6 +76,48 @@ void Compiler::interpret(const std::string& input)
 			else {
 				std::cout << result->value << std::endl;
 			}
+
+			delete interpreter;
 		}
 	}
+
+	delete lexer;
+	delete parser;
+}
+
+void Compiler::printStatistics(Lexer* lexer, Parser* parser)
+{
+	std::cout << '\n';
+	Utils::title("TIMING");
+
+	ConsoleTable table(1, 2);
+	ConsoleTable::TableChars chars;
+
+	chars.topDownSimple = '-';
+	chars.leftRightSimple = '|';
+
+	chars.leftSeparation = '+';
+	chars.rightSeparation = '+';
+	chars.centreSeparation = '+';
+	chars.topSeparation = '+';
+	chars.downSeparation = '+';
+
+	table.setTableChars(chars);
+
+	table[0][0] = "Step";
+	table[0][1] = "Time";
+
+	table[1][0] = "Tokenization";
+	table[1][1] = lexer->lexing_time;
+
+	table[2][0] = "Parsing";
+	table[2][1] = parser->parsing_time;
+
+	table[3][0] = "Evaluation";
+	table[3][1] = interpreting_time;
+
+	table[4][0] = "TOTAL";
+	table[4][1] = lexer->lexing_time + interpreting_time + parser->parsing_time;
+
+	std::cout << table << '\n';
 }
