@@ -8,8 +8,12 @@ std::vector<std::string> Token::keywords = {
     "not",
     "if",
     "then",
-    "elseif"
-    "else"
+    "else",
+    "elseif",
+    "for",
+    "while",
+    "to",
+    "step"
 };
 
 Token::Token(const Token::Type& type, const std::variant<float, int, char, std::string>& value, Cursor* start, Cursor* end) :

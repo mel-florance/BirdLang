@@ -1,5 +1,6 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Lexer.h"
+#include "Profiler.h"
 #include "ConsoleTable.h"
 #include <sstream>
 
@@ -13,7 +14,8 @@ Lexer::Lexer(const std::string& filename, bool debug) :
 	filename(filename),
 	cursor(Cursor(-1, 0, -1, filename, input)),
 	current_char('\0'),
-	debug(false)
+	debug(false),
+	lexing_time(0.0)
 {
 }
 
@@ -28,6 +30,8 @@ void Lexer::advance()
 
 std::vector<Token*> Lexer::index_tokens(const std::string& str)
 {
+	Profiler profiler;
+	profiler.start = clock();
 	this->input = str;
 	std::vector<Token*> tokens;
 	advance();
@@ -120,7 +124,9 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 		}
 	}
 
-	tokens.push_back(new Token(Token::Type::EOT, 0, &cursor));
+	tokens.push_back(new Token(Token::Type::EOT, char(0x04), &cursor));
+	profiler.end = clock();
+	lexing_time = profiler.getReport();
 
 	if (debug) {
 		ConsoleTable table(1, 2);

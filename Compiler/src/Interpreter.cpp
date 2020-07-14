@@ -6,7 +6,7 @@ Interpreter::Interpreter()
 
 }
 
-Interpreter::Result* Interpreter::visit(Node* node, std::shared_ptr<Context> context)
+Interpreter::Result* Interpreter::visit(Node* node, Context* context)
 {
 	if (node != nullptr && context != nullptr) {
 
@@ -34,6 +34,14 @@ Interpreter::Result* Interpreter::visit(Node* node, std::shared_ptr<Context> con
 		if (if_statement_node)
 			return visit_if_statement_node(if_statement_node, context);
 		
+		ForStatementNode* for_statement_node = dynamic_cast<ForStatementNode*>(node);
+		if (for_statement_node)
+			return visit_for_statement_node(for_statement_node, context);
+
+		WhileStatementNode* while_statement_node = dynamic_cast<WhileStatementNode*>(node);
+		if (while_statement_node)
+			return visit_while_statement_node(while_statement_node, context);
+
 		auto type = typeid(*node).name();
 		std::cout << "No visit " << type << " method defined" << std::endl;
 	}
@@ -41,7 +49,7 @@ Interpreter::Result* Interpreter::visit(Node* node, std::shared_ptr<Context> con
 	return nullptr;
 }
 
-Interpreter::Result* Interpreter::visit_numeric_node(Node* node, std::shared_ptr<Context> context)
+Interpreter::Result* Interpreter::visit_numeric_node(Node* node, Context* context)
 {
 	Result* result = new Result();
 	Number* number = new Number();
@@ -61,7 +69,7 @@ Interpreter::Result* Interpreter::visit_numeric_node(Node* node, std::shared_ptr
 	return result->success(number);
 }
 
-Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, std::shared_ptr<Context> context)
+Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, Context* context)
 {
 	Result* result = new Result();
 	Number* number = new Number();
@@ -162,7 +170,7 @@ Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, std::s
 	return result->success(number);
 }
 
-Interpreter::Result* Interpreter::visit_unary_operation_node(Node* node, std::shared_ptr<Context> context)
+Interpreter::Result* Interpreter::visit_unary_operation_node(Node* node, Context* context)
 {
 	Result* result = new Result();
 	Number* number = result->record(visit(node->right, context));
@@ -198,7 +206,7 @@ Interpreter::Result* Interpreter::visit_unary_operation_node(Node* node, std::sh
 	return result->success(number);
 }
 
-Interpreter::Result* Interpreter::visit_variable_access_node(Node* node, std::shared_ptr<Context> context)
+Interpreter::Result* Interpreter::visit_variable_access_node(Node* node, Context* context)
 {
 	Result* result = new Result();
 	auto n = (VariableAccessNode*)node;
@@ -214,7 +222,7 @@ Interpreter::Result* Interpreter::visit_variable_access_node(Node* node, std::sh
 	return result->success(new Number(value->second));
 }
 
-Interpreter::Result* Interpreter::visit_variable_assignment_node(Node* node, std::shared_ptr<Context> context)
+Interpreter::Result* Interpreter::visit_variable_assignment_node(Node* node, Context* context)
 {
 	Result* result = new Result();
 	auto var_name = node->token->value;
@@ -236,13 +244,12 @@ Interpreter::Result* Interpreter::visit_variable_assignment_node(Node* node, std
 	return result->success(number);
 }
 
-Interpreter::Result* Interpreter::visit_if_statement_node(Node* node, std::shared_ptr<Context> context)
+Interpreter::Result* Interpreter::visit_if_statement_node(Node* node, Context* context)
 {
 	Result* result = new Result();
-	std::cout << "ok" << std::endl;
 	auto if_node = (IfStatementNode*)node;
 
-	for (auto if_case : if_node->cases) {
+	for (auto& if_case : if_node->cases) {
 		auto left = result->record(visit(if_case.first, context));
 
 		if (result->error != nullptr)
@@ -250,12 +257,12 @@ Interpreter::Result* Interpreter::visit_if_statement_node(Node* node, std::share
 
 		auto op_result = left->is_true();
 
-		int value;
-		try { value = std::get<int>(op_result.first->value); }
+		bool value;
+		try { value = std::get<bool>(op_result.first->value); }
 		catch (const std::bad_variant_access&) {}
 
-		if (value == 0) {
-			auto else_value = result->record(visit(if_node->else_case, context));
+		if (value == true) {
+			auto else_value = result->record(visit(if_case.second, context));
 
 			if (result->error != nullptr)
 				return result;
@@ -271,6 +278,109 @@ Interpreter::Result* Interpreter::visit_if_statement_node(Node* node, std::share
 			return result;
 
 		return result->success(else_value);
+	}
+
+	return result->success(nullptr);
+}
+
+Interpreter::Result* Interpreter::visit_for_statement_node(Node* node, Context* context)
+{
+	Result* result = new Result();
+	auto for_node = (ForStatementNode*)node;
+
+	auto start_value = result->record(visit(for_node->start_value, context));
+
+	if (result->error != nullptr)
+		return result;
+
+	auto end_value = result->record(visit(for_node->end_value, context));
+
+	if (result->error != nullptr)
+		return result;
+
+	Number* step = new Number(1);
+
+	if (for_node->step != nullptr) {
+		step = result->record(visit(for_node->step, context));
+
+		if (result->error != nullptr)
+			return result;
+	}
+
+	int increment = 0;
+	try { increment = std::get<int>(start_value->value); }
+	catch (const std::bad_variant_access&) {}
+
+	int step_value = -1;
+	try { step_value = std::get<int>(step->value); }
+	catch (const std::bad_variant_access&) {}
+
+	std::function<bool(int)> condition;
+
+	if (step_value > 0) {
+		condition = [=](int i) {
+			int end_val = 0;
+			try { end_val = std::get<int>(end_value->value); }
+			catch (const std::bad_variant_access&) {}
+			return (bool)(i < end_val);
+		};
+	}
+	else {
+		condition = [=](int i) {
+			int end_val = 0;
+			try { end_val = std::get<int>(end_value->value); }
+			catch (const std::bad_variant_access&) {}
+			return (bool)(i > end_val); 
+		};
+	}
+
+	std::string var_name;
+	try { var_name = std::get<std::string>(for_node->token->value); }
+	catch (const std::bad_variant_access&) {}
+
+	while (condition(increment)) {
+		auto num = Number(increment);
+		int num_value;
+
+		try { num_value = std::get<int>(num.value); }
+		catch (const std::bad_variant_access&) {}
+
+		context->symbols->set(var_name, num_value);
+		increment += step_value;
+
+		std::cout << result->record(visit(for_node->body, context)) << std::endl;
+
+		if (result->error != nullptr)
+			return result;
+	}
+
+	return result->success(nullptr);
+}
+
+Interpreter::Result* Interpreter::visit_while_statement_node(Node* node, Context* context)
+{
+	Result* result = new Result();
+	auto while_node = (WhileStatementNode*)node;
+
+	while (true) {
+		auto condition = result->record(visit(while_node->condition, context));
+
+		if (result->error != nullptr)
+			return result;
+
+		auto op_result = condition->is_true();
+
+		bool value = false;
+		try { value = std::get<bool>(op_result.first->value); }
+		catch (const std::bad_variant_access&) {}
+
+		if (!value)
+			break;
+
+		std::cout << result->record(visit(while_node->body, context)) << std::endl;
+
+		if (result->error != nullptr)
+			return result;
 	}
 
 	return result->success(nullptr);

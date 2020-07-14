@@ -293,6 +293,10 @@ std::pair<Number*, Error*> Number::is_true()
 		try { result->value = std::get<int>(value) != 0; }
 		catch (const std::bad_variant_access&) {}
 	}
+	else if (value.index() == 2) {
+		try { result->value = std::get<bool>(value) != false; }
+		catch (const std::bad_variant_access&) {}
+	}
 
 	return std::make_pair(result, nullptr);
 }
