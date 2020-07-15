@@ -21,8 +21,8 @@ Compiler::Compiler(
 	symbols = new Symbols();
 
 	symbols->set("null", 0);
-	symbols->set("true", true);
-	symbols->set("false", false);
+	symbols->set("true", 1);
+	symbols->set("false", 0);
 
 	symbols->set("PI", PI);
 	symbols->set("TAU", TAU);
