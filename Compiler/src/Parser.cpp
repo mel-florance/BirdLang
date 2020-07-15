@@ -21,6 +21,7 @@ Parser::Result* Parser::parse()
 	index = -1;
 
 	advance();
+
 	Result* result = expr();
 
 	if (result != nullptr) {
@@ -125,7 +126,7 @@ Parser::Result* Parser::expr()
 {
 	if (current_token != nullptr) {
 		Result* result = new Result();
-
+	
 		std::string value;
 		try { value = std::get<std::string>(current_token->value); }
 		catch (const std::bad_variant_access&) {}
@@ -148,8 +149,8 @@ Parser::Result* Parser::expr()
 
 			if (current_token->type != Token::Type::EQ) {
 				return result->failure(new InvalidSyntaxError(
-					current_token->start,
-					current_token->end,
+					var_name->start,
+					var_name->end,
 					"Expected '='"
 				));
 			}
@@ -329,6 +330,7 @@ Parser::Result* Parser::for_expr()
 	advance();
 
 	if (current_token->type != Token::Type::EQ) {
+
 		return result->failure(new InvalidSyntaxError(
 			current_token->start,
 			current_token->end,
