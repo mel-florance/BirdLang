@@ -237,6 +237,10 @@ std::pair<Number*, Error*> Number::compare_and(Number* other)
 		try { result->value = (float)std::get<int>(value) && std::get<float>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
+	else if (value.index() == 2 && other->value.index() == 2) {
+		try { result->value = (bool)std::get<bool>(value) && std::get<bool>(other->value); }
+		catch (const std::bad_variant_access&) {}
+	}
 
 	return std::make_pair(result, nullptr);
 }
@@ -259,6 +263,10 @@ std::pair<Number*, Error*> Number::compare_or(Number* other)
 	}
 	else if (value.index() == 1 && other->value.index() == 0) {
 		try { result->value = (float)std::get<int>(value) ||  std::get<float>(other->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 2 && other->value.index() == 2) {
+		try { result->value = (bool)std::get<bool>(value) || std::get<bool>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 
