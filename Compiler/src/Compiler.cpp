@@ -7,10 +7,14 @@
 
 using ConsoleTable = samilton::ConsoleTable;
 
-Compiler::Compiler() :
-	debug_lexer(false),
-	debug_parser(false),
-	profiling(false),
+Compiler::Compiler(
+	bool debug_lexer,
+	bool debug_parser,
+	bool profiling
+) :
+	debug_lexer(debug_lexer),
+	debug_parser(debug_parser),
+	profiling(profiling),
 	interpreting_time(0.0)
 {
 	context = new Context("<program>");

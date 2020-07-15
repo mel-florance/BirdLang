@@ -31,23 +31,28 @@ int main(int argc, char** argv) {
 |_____________________|
 )";
 
-	std::unique_ptr<Compiler> compiler = std::make_unique<Compiler>();
+	bool debug_lexer = false;
+	bool debug_parser = false;
+	bool profiling = false;
 
 	for (int i = 0; i < argc; ++i) {
 		if (strstr(argv[i], "-") == argv[i]) {
 			for (unsigned int j = 1; j < strlen(argv[i]); j++) {
-				if (argv[i][j] == 'l') {
-					compiler->debug_lexer = true;
-				}
-				else if (argv[i][j] == 'p') {
-					compiler->debug_parser = true;
-				}
-				else if (argv[i][j] == 's') {
-					compiler->profiling = true;
-				}
+				if (argv[i][j] == 'l')
+					debug_lexer = true;
+				else if (argv[i][j] == 'p')
+					debug_parser = true;
+				else if (argv[i][j] == 's')
+					profiling = true;
 			}
 		}
 	}
+
+	std::unique_ptr<Compiler> compiler = std::make_unique<Compiler>(
+		debug_lexer,
+		debug_parser,
+		profiling
+	);
 
 	while (true)
 	{
