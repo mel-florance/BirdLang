@@ -13,7 +13,11 @@
 
 class Compiler {
 public:
-	Compiler();
+	Compiler(
+		bool debug_lexer = false,
+		bool debug_parser = false,
+		bool profiling = false
+	);
 
 	void interpret(const std::string& input);
 	void printStatistics();
