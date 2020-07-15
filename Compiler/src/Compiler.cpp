@@ -28,16 +28,19 @@ Compiler::Compiler() :
 	symbols->set("SQRT2", 1.4142135623730951f);
 
 	context->symbols = symbols;
+
+	lexer = std::make_unique<Lexer>("<stdin>");
+	lexer->debug = debug_lexer;
+
+	parser = std::make_unique<Parser>();
+	parser->debug = debug_parser;
+
+	interpreter = std::make_unique<Interpreter>();
 }
 
 void Compiler::interpret(const std::string& input)
 {
-	Lexer* lexer = new Lexer("<stdin>");
-	lexer->debug = debug_lexer;
 	auto tokens = lexer->index_tokens(input);
-
-	Parser* parser = new Parser();
-	parser->debug = debug_parser;
 	parser->setTokens(tokens);
 	auto ast = parser->parse();
 
@@ -48,8 +51,6 @@ void Compiler::interpret(const std::string& input)
 			std::cout << ast->error << std::endl;
 		}
 		else {
-			Interpreter* interpreter = new Interpreter();
-
 			if (profiling) {
 				profiler.start = clock();
 			}
@@ -59,7 +60,7 @@ void Compiler::interpret(const std::string& input)
 			if (profiling) {
 				profiler.end = clock();
 				interpreting_time = profiler.getReport();
-				printStatistics(lexer, parser);
+				printStatistics();
 			}
 
 			if (result->error != nullptr) {
@@ -76,16 +77,11 @@ void Compiler::interpret(const std::string& input)
 			else {
 				std::cout << result->value << std::endl;
 			}
-
-			delete interpreter;
 		}
 	}
-
-	delete lexer;
-	delete parser;
 }
 
-void Compiler::printStatistics(Lexer* lexer, Parser* parser)
+void Compiler::printStatistics()
 {
 	std::cout << '\n';
 	Utils::title("TIMING");

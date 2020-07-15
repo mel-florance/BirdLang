@@ -11,7 +11,11 @@ public:
 		right(right)
 	{}
 
-	virtual ~Node() {}
+	virtual ~Node() {
+		delete token;
+		delete left;
+		delete right;
+	}
 
 	Token* token;
 	Node* left;
@@ -52,8 +56,8 @@ public:
 		end(token->end)
 	{}
 
-	Cursor* start;
-	Cursor* end;
+	std::shared_ptr<Cursor> start;
+	std::shared_ptr<Cursor> end;
 };
 
 class VariableAssignmentNode : public Node {
@@ -64,8 +68,8 @@ public:
 		end(token->end)
 	{}
 
-	Cursor* start;
-	Cursor* end;
+	std::shared_ptr<Cursor> start;
+	std::shared_ptr<Cursor> end;
 };
 
 class IfStatementNode : public Node {
@@ -77,8 +81,8 @@ public:
 		cases(cases),
 		else_case(else_case) {}
 
-	Cursor* start;
-	Cursor* end;
+	std::shared_ptr<Cursor> start;
+	std::shared_ptr<Cursor> end;
 	std::vector<std::pair<Node*, Node*>> cases;
 	Node* else_case;
 };
@@ -95,8 +99,8 @@ public:
 		body(body)
 	{}
 
-	Cursor* start;
-	Cursor* end;
+	std::shared_ptr<Cursor> start;
+	std::shared_ptr<Cursor> end;
 	Node* start_value;
 	Node* end_value;
 	Node* step;
@@ -113,8 +117,13 @@ public:
 		body(body)
 	{}
 
-	Cursor* start;
-	Cursor* end;
+	~WhileStatementNode() {
+		delete condition;
+		delete body;
+	}
+
+	std::shared_ptr<Cursor> start;
+	std::shared_ptr<Cursor> end;
 	Node* condition;
 	Node* body;
 };

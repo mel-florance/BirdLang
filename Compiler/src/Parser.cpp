@@ -18,6 +18,7 @@ Parser::Result* Parser::parse()
 
 	Profiler profiler;
 	profiler.start = clock();
+	index = -1;
 
 	advance();
 	Result* result = expr();
@@ -27,7 +28,7 @@ Parser::Result* Parser::parse()
 			return result->failure(new InvalidSyntaxError(
 				current_token->start,
 				current_token->end,
-				"Expected '+', '-', '*', '/', '^', '==', '!=', '<', '>', '<=', '>= 'and' or 'or'"
+				"Expected '+', '-', '*', '/', '^', '==', '!=', '<', '>', '<=', '>=', 'and' or 'or'"
 			));
 		}
 

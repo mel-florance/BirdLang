@@ -7,7 +7,12 @@
 class Error
 {
 public:
-	Error(const std::string& name, const Cursor& start, const Cursor& end, const std::string& details) : 
+	Error(
+		const std::string& name,
+		std::shared_ptr<Cursor> start,
+		std::shared_ptr<Cursor> end,
+		const std::string& details
+	) :
 		name(name),
 		start(start),
 		end(end),
@@ -18,49 +23,49 @@ public:
 	inline friend std::ostream& operator << (std::ostream& stream, Error* error) {
 		return stream << "\n\x1B[31m" <<
 			error->name << ": " << error->details << "\n" <<
-			"File " << error->start.filename << ", line " << std::to_string(error->start.line + 1) <<
+			"File " << error->start->filename << ", line " << std::to_string(error->start->line + 1) <<
 			"\033[0m\t\t";
 	}
 	
 	std::string name;
-	Cursor start;
-	Cursor end;
+	std::shared_ptr<Cursor> start;
+	std::shared_ptr<Cursor> end;
 	std::string details;
 };
 
 
 class IllegarCharError : public Error {
 public:
-	IllegarCharError(const Cursor& start, const Cursor& end, const std::string& details) :
+	IllegarCharError(std::shared_ptr<Cursor> start, std::shared_ptr<Cursor> end, const std::string& details) :
 		Error("Illegal Character", start, end, details) {}
 };
 
 class InvalidSyntaxError : public Error {
 public:
-	InvalidSyntaxError(const Cursor& start, const Cursor& end, const std::string& details) : 
+	InvalidSyntaxError(std::shared_ptr<Cursor> start, std::shared_ptr<Cursor> end, const std::string& details) : 
 		Error("Invalid Syntax", start, end, details) {}
 };
 
 class ExpectedCharacterError : public Error {
 public:
-	ExpectedCharacterError(const Cursor& start, const Cursor& end, const std::string& details) :
+	ExpectedCharacterError(std::shared_ptr<Cursor> start, std::shared_ptr<Cursor> end, const std::string& details) :
 		Error("Expected character", start, end, details) {}
 };
 
 class RuntimeError : public Error {
 public:
-	RuntimeError(const Cursor& start, const Cursor& end, const std::string& details, Context* context) :
+	RuntimeError(std::shared_ptr<Cursor> start, std::shared_ptr<Cursor> end, const std::string& details, Context* context) :
 		Error("Runtime Error", start, end, details),
 		context(context)
 	{}
 
 	inline std::string traceback() {
 		std::string result;
-		Cursor* pos = &start;
+		std::shared_ptr<Cursor> pos = start;
 		Context* ctx = context;
 
 		while (ctx != nullptr) {
-			result = "  File " + start.filename + ", Line " + std::to_string(start.line + 1) + ", in " + ctx->display_name + "\n" + result;
+			result = "  File " + start->filename + ", Line " + std::to_string(start->line + 1) + ", in " + ctx->display_name + "\n" + result;
 			pos = ctx->parent_cursor;
 			ctx = ctx->parent;
 		}

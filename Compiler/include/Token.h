@@ -43,7 +43,12 @@ public:
 		end = token->end;
 	}
 
-	Token(const Type& type = Type::NONE, const std::variant<float, int, char, std::string>& value = '0', Cursor* start = nullptr, Cursor* end = nullptr);
+	Token(
+		const Type& type = Type::NONE,
+		const std::variant<float, int, char, std::string>& value = '0',
+		std::shared_ptr<Cursor> start = nullptr,
+		std::shared_ptr<Cursor> end = nullptr
+	);
 
 	static inline std::string toString(Type type) {
 		switch (type) {
@@ -109,7 +114,7 @@ public:
 	}
 
 	Type type;
-	Cursor* start;
-	Cursor* end;
+	std::shared_ptr<Cursor> start;
+	std::shared_ptr<Cursor> end;
 	std::variant<float, int, char, std::string> value;
 };

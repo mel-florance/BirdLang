@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <string>
 #include <cstring>
 
@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 |_____________________|
 )";
 
-	Compiler* compiler = new Compiler();
+	std::unique_ptr<Compiler> compiler = std::make_unique<Compiler>();
 
 	for (int i = 0; i < argc; ++i) {
 		if (strstr(argv[i], "-") == argv[i]) {

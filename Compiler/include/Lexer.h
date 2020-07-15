@@ -21,7 +21,7 @@ public:
 
 	std::string filename;
 	std::string input;
-	Cursor cursor;
+	std::shared_ptr<Cursor> cursor;
 	char current_char;
 	bool debug;
 	double lexing_time;
