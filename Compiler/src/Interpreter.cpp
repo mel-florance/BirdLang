@@ -72,16 +72,16 @@ Interpreter::Result* Interpreter::visit_numeric_node(Node* node, Context* contex
 Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, Context* context)
 {
 	Result* result = new Result();
-	Number* number = new Number();
-	number->start = node->token->start;
-	number->end = node->token->end;
+	Number* number = nullptr;
 
-	Number* left = result->record(visit(node->left, context));
+	auto left_visit = visit(node->left, context);
+	Number* left = result->record(left_visit);
 
 	if (result->error != nullptr)
 		return result;
 
-	Number* right = result->record(visit(node->right, context));
+	auto right_visit = visit(node->right, context);
+	Number* right = result->record(right_visit);
 
 	if (result->error != nullptr)
 		return result;
@@ -167,6 +167,16 @@ Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, Contex
 		return result->failure(error);
 	}
 
+	delete left_visit;
+	delete right_visit;
+	delete left;
+	delete right;
+
+	if (number != nullptr) {
+		number->start = node->token->start;
+		number->end = node->token->end;
+	}
+
 	return result->success(number);
 }
 
@@ -226,7 +236,8 @@ Interpreter::Result* Interpreter::visit_variable_assignment_node(Node* node, Con
 {
 	Result* result = new Result();
 	auto var_name = node->token->value;
-	Number* number = result->record(visit(node->left, context));
+	auto number_visit = visit(node->left, context);
+	Number* number = result->record(number_visit);
 
 	if (result->error != nullptr)
 		return result;
@@ -240,6 +251,8 @@ Interpreter::Result* Interpreter::visit_variable_assignment_node(Node* node, Con
 	else if (number->value.index() == 2) {
 		context->symbols->set(std::get<std::string>(var_name), std::get<bool>(number->value));
 	}
+
+	delete number_visit;
 
 	return result->success(number);
 }
@@ -348,7 +361,7 @@ Interpreter::Result* Interpreter::visit_for_statement_node(Node* node, Context* 
 		context->symbols->set(var_name, num_value);
 		increment += step_value;
 
-		std::cout << result->record(visit(for_node->body, context)) << std::endl;
+		std::cout << result->record(visit(for_node->body, context)) << '\n';
 
 		if (result->error != nullptr)
 			return result;
@@ -363,7 +376,8 @@ Interpreter::Result* Interpreter::visit_while_statement_node(Node* node, Context
 	auto while_node = (WhileStatementNode*)node;
 
 	while (true) {
-		auto condition = result->record(visit(while_node->condition, context));
+		auto res = visit(while_node->condition, context);
+		auto condition = result->record(res);
 
 		if (result->error != nullptr)
 			return result;
@@ -377,11 +391,22 @@ Interpreter::Result* Interpreter::visit_while_statement_node(Node* node, Context
 		if (!value)
 			break;
 
-		std::cout << result->record(visit(while_node->body, context)) << std::endl;
+		auto body_visit = visit(while_node->body, context);
+		auto body_value = result->record(body_visit);
+
+		//std::cout << body_value << '\n';
 
 		if (result->error != nullptr)
 			return result;
+
+		delete op_result.first;
+		delete res;
+		delete condition;
+		delete body_visit->value;
+		delete body_visit;
 	}
+
+	delete while_node;
 
 	return result->success(nullptr);
 }

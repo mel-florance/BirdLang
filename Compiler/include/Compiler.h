@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include "Token.h"
 #include "Lexer.h"
@@ -12,13 +13,21 @@
 
 class Compiler {
 public:
-	Compiler();
+	Compiler(
+		bool debug_lexer = false,
+		bool debug_parser = false,
+		bool profiling = false
+	);
 
 	void interpret(const std::string& input);
-	void printStatistics(Lexer* lexer, Parser* parser);
+	void printStatistics();
 
 	Context* context;
 	Symbols* symbols;
+
+	std::unique_ptr<Lexer> lexer;
+	std::unique_ptr<Parser> parser;
+	std::unique_ptr<Interpreter> interpreter;
 
 	bool debug_lexer;
 	bool debug_parser;

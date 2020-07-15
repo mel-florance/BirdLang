@@ -13,19 +13,19 @@ const std::string letters_digits = letters + digits;
 
 Lexer::Lexer(const std::string& filename, bool debug) : 
 	filename(filename),
-	cursor(Cursor(-1, 0, -1, filename, input)),
 	current_char('\0'),
 	debug(false),
 	lexing_time(0.0)
 {
+	cursor = std::make_shared<Cursor>(-1, 0, -1, filename, input);
 }
 
 void Lexer::advance()
 {
-	cursor.advance(current_char);
+	cursor->advance(current_char);
 
-	current_char = cursor.index < input.size()
-		? input.at(cursor.index)
+	current_char = cursor->index < input.size()
+		? input.at(cursor->index)
 		: '\0';
 }
 
@@ -34,7 +34,8 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 	Profiler profiler;
 	profiler.start = clock();
 	this->input = str;
-	std::vector<Token*> tokens;
+	std::vector<Token*> tokens = {};
+	cursor->index = -1;
 	advance();
 
 	while (current_char != '\0') {
@@ -83,7 +84,7 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 			Token* token = create_not_equals_operator();
 
 			if (token == nullptr) {
-				Cursor start = Cursor(cursor);
+				std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*cursor);
 				advance();
 				
 				ExpectedCharacterError* error = new ExpectedCharacterError(
@@ -109,7 +110,7 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 			tokens.push_back(create_greater_operator());
 		}
 		else {
-			Cursor start = Cursor(cursor);
+			std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*cursor);
 			char c = current_char;
 			advance();
 
@@ -125,7 +126,7 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 		}
 	}
 
-	tokens.push_back(new Token(Token::Type::EOT, char(0x04), &cursor));
+	tokens.push_back(new Token(Token::Type::EOT, char(0x04), cursor));
 	profiler.end = clock();
 	lexing_time = profiler.getReport();
 
@@ -198,7 +199,7 @@ Token* Lexer::create_numeric_token()
 {
 	std::string str;
 	unsigned int dots = 0;
-	Cursor* start = new Cursor(cursor);
+	std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*cursor);
 	auto numbers = digits + ".";
 
 	auto hasDot = [=]() { 
@@ -226,7 +227,7 @@ Token* Lexer::create_numeric_token()
 			Token::Type::INT, 
 			(int)std::atoi(str.c_str()), 
 			start,
-			&cursor
+			cursor
 		);
 	}
 	else {
@@ -234,7 +235,7 @@ Token* Lexer::create_numeric_token()
 			Token::Type::FLOAT,
 			(float)std::atof(str.c_str()),
 			start, 
-			&cursor
+			cursor
 		);
 	}
 }
@@ -242,7 +243,7 @@ Token* Lexer::create_numeric_token()
 Token* Lexer::create_identifier()
 {
 	std::string id;
-	Cursor* start = new Cursor(cursor);
+	std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*cursor);
 	auto str = letters_digits + "_";
 
 	auto isLetterOrDigit = [=]() { 
@@ -266,14 +267,14 @@ Token* Lexer::create_identifier()
 		? Token::Type::KEYWORD
 		: Token::Type::IDENTIFIER;
 
-	return new Token(type, id, start, &cursor);
+	return new Token(type, id, start, cursor);
 }
 
 Token* Lexer::create_equals_operator()
 {
 	Token::Type type = Token::Type::EQ;
 	std::string value = "=";
-	Cursor* start = new Cursor(cursor);
+	std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*cursor);
 
 	advance();
 
@@ -283,17 +284,17 @@ Token* Lexer::create_equals_operator()
 		value = "==";
 	}
 
-	return new Token(type, value, start, &cursor);
+	return new Token(type, value, start, cursor);
 }
 
 Token* Lexer::create_not_equals_operator()
 {
-	Cursor* start = new Cursor(cursor);
+	std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*cursor);
 	advance();
 
 	if (current_char == '=') {
 		advance();
-		return new Token(Token::Type::NE, "!=", start, &cursor);
+		return new Token(Token::Type::NE, "!=", start, cursor);
 	}
 
 	advance();
@@ -304,7 +305,7 @@ Token* Lexer::create_less_operator()
 {
 	Token::Type type = Token::Type::LT;
 	std::string value = "<";
-	Cursor* start = new Cursor(cursor);
+	std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*cursor);
 	advance();
 
 	if (current_char == '=') {
@@ -313,14 +314,14 @@ Token* Lexer::create_less_operator()
 		value = "<=";
 	}
 
-	return new Token(type, value, start, &cursor);
+	return new Token(type, value, start, cursor);
 }
 
 Token* Lexer::create_greater_operator()
 {
 	Token::Type type = Token::Type::GT;
 	std::string value = ">";
-	Cursor* start = new Cursor(cursor);
+	std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*cursor);
 	advance();
 
 	if (current_char == '=') {
@@ -329,5 +330,5 @@ Token* Lexer::create_greater_operator()
 		value = ">=";
 	}
 
-	return new Token(type, value, start, &cursor);
+	return new Token(type, value, start, cursor);
 }
