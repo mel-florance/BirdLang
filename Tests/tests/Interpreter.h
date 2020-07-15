@@ -5,18 +5,18 @@ TEST(Interpreter, VisitNumericNode) {
 }
 
 TEST(Interpreter, VisitBinaryNode) {
-	Token a(Token::Type::INT, 5);
-	Token b(Token::Type::INT, 3);
-	NumericNode first(&a);
-	NumericNode second(&b);
+	auto a = new Token(Token::Type::INT, 5);
+	auto b = new Token(Token::Type::INT, 3);
+	auto first = new NumericNode(a);
+	auto second = new NumericNode(b);
 
-	Token c(Token::Type::PLUS, '+');
-	BinaryOperationNode add(&first, &c,&second);
-	Interpreter interp;
-	Context ctx("<test>");
-	auto result = interp.visit_binary_operation_node(&add, &ctx);
+	auto c = new Token(Token::Type::PLUS, '+');
+	auto add = new BinaryOperationNode(first, c,second);
+	auto interp = new Interpreter();
+	auto ctx = new Context("<test>");
+	auto result = interp->visit_binary_operation_node(add, ctx);
 	auto value = std::get<int>(result->value->value);
-	
+
 	EXPECT_EQ(value, 8);
 }
 
