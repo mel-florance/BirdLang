@@ -301,12 +301,14 @@ Interpreter::Result* Interpreter::visit_for_statement_node(Node* node, Context* 
 	Result* result = new Result();
 	auto for_node = (ForStatementNode*)node;
 
-	auto start_value = result->record(visit(for_node->start_value, context));
+	auto visit_start = visit(for_node->start_value, context);
+	auto start_value = result->record(visit_start);
 
 	if (result->error != nullptr)
 		return result;
 
-	auto end_value = result->record(visit(for_node->end_value, context));
+	auto visit_end = visit(for_node->end_value, context);
+	auto end_value = result->record(visit_end);
 
 	if (result->error != nullptr)
 		return result;
@@ -314,7 +316,8 @@ Interpreter::Result* Interpreter::visit_for_statement_node(Node* node, Context* 
 	Number* step = new Number(1);
 
 	if (for_node->step != nullptr) {
-		step = result->record(visit(for_node->step, context));
+		auto visit_step = visit(for_node->step, context);
+		step = result->record(visit_step);
 
 		if (result->error != nullptr)
 			return result;
@@ -361,7 +364,12 @@ Interpreter::Result* Interpreter::visit_for_statement_node(Node* node, Context* 
 		context->symbols->set(var_name, num_value);
 		increment += step_value;
 
-		std::cout << result->record(visit(for_node->body, context)) << '\n';
+		auto visit_body = visit(for_node->body, context);
+		auto body_result = result->record(visit_body);
+		std::cout << body_result << '\n';
+
+		delete visit_body;
+		delete body_result;
 
 		if (result->error != nullptr)
 			return result;
