@@ -7,6 +7,7 @@ TEST(Parser, AdvanceCursor) {
 	Parser parser;
 	parser.setTokens(tokens);
 	parser.advance();
+	parser.advance();
 	EXPECT_STREQ("IDENTIFIER", Token::toString(parser.current_token->type).c_str());
 }
 
