@@ -20,7 +20,7 @@
 ![build](https://github.com/Vyraax/BirdLang/workflows/Linux%20x64/badge.svg?branch=master)&nbsp;
 ![build](https://github.com/Vyraax/BirdLang/workflows/Windows%20x64/badge.svg?branch=master)
 
-BirdLang is a simple programming langage for learning.
+BirdLang is a simple programming language for learning.
 
 ## Documentation
 You can access the documentation directly on the wiki page:\
@@ -30,7 +30,7 @@ You can access the documentation directly on the wiki page:\
 
 ###### Linux build
 
-```bash
+```console
 git clone https://github.com/Vyraax/BirdLang.git
 cd BirdLang
 ./setup.sh
@@ -39,7 +39,7 @@ make
 
 ###### Windows build
 
-```bash
+```console
 git clone https://github.com/Vyraax/BirdLang.git
 cd BirdLang
 ./setup.bat
