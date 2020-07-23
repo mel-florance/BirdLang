@@ -88,14 +88,17 @@ void Compiler::interpret(const std::string& input)
 void Compiler::printStatistics()
 {
 	std::cout << '\n';
-	Utils::title("TIMING");
+	Utils::title("TIMING", 15, false);
 
 	ConsoleTable table(1, 2);
 	ConsoleTable::TableChars chars;
 
+	chars.topLeft = '+';
+	chars.topRight = '+';
+	chars.downLeft = '+';
+	chars.downRight = '+';
 	chars.topDownSimple = '-';
 	chars.leftRightSimple = '|';
-
 	chars.leftSeparation = '+';
 	chars.rightSeparation = '+';
 	chars.centreSeparation = '+';
