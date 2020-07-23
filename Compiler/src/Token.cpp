@@ -9,7 +9,7 @@ std::vector<std::string> Token::keywords = {
     "if",
     "then",
     "else",
-    "elseif",
+    "else if",
     "for",
     "while",
     "to",

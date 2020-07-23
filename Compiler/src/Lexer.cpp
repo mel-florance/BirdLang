@@ -13,6 +13,7 @@ const std::string letters_digits = letters + digits;
 
 Lexer::Lexer(const std::string& filename, bool debug) : 
 	filename(filename),
+	tokens({}),
 	current_char('\0'),
 	debug(false),
 	lexing_time(0.0)
@@ -29,13 +30,20 @@ void Lexer::advance()
 		: '\0';
 }
 
+void Lexer::create_token(const Token::Type& type, char value)
+{
+	std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*cursor);
+	advance();
+	tokens.push_back(new Token(type, value, start, cursor));
+}
+
 std::vector<Token*> Lexer::index_tokens(const std::string& str)
 {
 	Profiler profiler;
 	profiler.start = clock();
 	this->input = str;
-	std::vector<Token*> tokens = {};
-	cursor->index = -1;
+	tokens.clear();
+	cursor.reset(new Cursor(-1, 0, -1, filename, input));
 	advance();
 
 	while (current_char != '\0') {
@@ -49,36 +57,28 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 			tokens.push_back(create_identifier());
 		}
 		else if (current_char == '+') {
-			tokens.push_back(new Token(Token::Type::PLUS, current_char));
-			advance();
+			create_token(Token::Type::PLUS, current_char);
 		}
 		else if (current_char == '-') {
-			tokens.push_back(new Token(Token::Type::MINUS, current_char));
-			advance();
+			create_token(Token::Type::MINUS, current_char);
 		}
 		else if (current_char == '*') {
-			tokens.push_back(new Token(Token::Type::MUL, current_char));
-			advance();
+			create_token(Token::Type::MUL, current_char);
 		}
 		else if (current_char == '%') {
-			tokens.push_back(new Token(Token::Type::MOD, current_char));
-			advance();
+			create_token(Token::Type::MOD, current_char);
 		}
 		else if (current_char == '/') {
-			tokens.push_back(new Token(Token::Type::DIV, current_char));
-			advance();
+			create_token(Token::Type::DIV, current_char);
 		}
 		else if (current_char == '^') {
-			tokens.push_back(new Token(Token::Type::POW, current_char));
-			advance();
+			create_token(Token::Type::POW, current_char);
 		}
 		else if (current_char == '(') {
-			tokens.push_back(new Token(Token::Type::LPAREN, current_char));
-			advance();
+			create_token(Token::Type::LPAREN, current_char);
 		}
 		else if (current_char == ')') {
-			tokens.push_back(new Token(Token::Type::RPAREN, current_char));
-			advance();	
+			create_token(Token::Type::RPAREN, current_char);
 		}
 		else if (current_char == '!') {
 			Token* token = create_not_equals_operator();
@@ -126,7 +126,7 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 		}
 	}
 
-	tokens.push_back(new Token(Token::Type::EOT, char(0x04), cursor));
+	tokens.push_back(new Token(Token::Type::EOT, char(0x04)));
 	profiler.end = clock();
 	lexing_time = profiler.getReport();
 
@@ -134,13 +134,16 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 		ConsoleTable table(1, 2);
 		ConsoleTable::TableChars chars;
 
+		chars.topLeft = '+';
+		chars.topRight = '+';
+		chars.downLeft = '+';
+		chars.downRight = '+';
 		chars.topDownSimple = '-';
 		chars.leftRightSimple = '|';
-		
 		chars.leftSeparation = '+';
-		chars.rightSeparation= '+';
-		chars.centreSeparation= '+';
-		chars.topSeparation= '+';
+		chars.rightSeparation = '+';
+		chars.centreSeparation = '+';
+		chars.topSeparation = '+';
 		chars.downSeparation = '+';
 
 		table.setTableChars(chars);
@@ -176,19 +179,19 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 			table[i + 1][0] = Token::toString(token->type);
 			table[i + 1][1] = str.str();
 
-			int line = 0;
-			int column = 0;
+			size_t line = 0;
+			size_t column = tokens.size();
 
 			if (token->start != nullptr) {
 				line = token->start->line;
 				column = token->start->column;
 			}
-				
+
 			table[i + 1][2] = std::to_string(line);
 			table[i + 1][3] = std::to_string(column);
 		}
 
-		Utils::title("TOKENS");
+		Utils::title("TOKENS", 32, false);
 		std::cout << table << "\n";
 	}
 
