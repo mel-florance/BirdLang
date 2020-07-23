@@ -11,6 +11,7 @@ public:
 	Lexer(const std::string& filename, bool debug = false);
 	
 	void advance();
+	void create_token(const Token::Type& type, char value = '\0');
 	std::vector<Token*> index_tokens(const std::string& str);
 	Token* create_numeric_token();
 	Token* create_identifier();
@@ -22,6 +23,7 @@ public:
 	std::string filename;
 	std::string input;
 	std::shared_ptr<Cursor> cursor;
+	std::vector<Token*> tokens;
 	char current_char;
 	bool debug;
 	double lexing_time;
