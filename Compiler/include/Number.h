@@ -7,7 +7,7 @@
 
 class Number {
 public:
-	Number(const std::variant<float, int, bool>& value = 0);
+	Number(const std::variant<double, int, bool>& value = 0);
 
 	std::pair<Number*, Error*> add(Number* other);
 	std::pair<Number*, Error*> subtract(Number* other);
@@ -30,11 +30,11 @@ public:
 
 		if (number != nullptr) {
 			if (number->value.index() == 0) {
-				try { stream << std::to_string(std::get<float>(number->value)); }
+				try { stream << std::get<double>(number->value); }
 				catch (const std::bad_variant_access&) {}
 			}
 			else if (number->value.index() == 1) {
-				try { stream << std::to_string(std::get<int>(number->value)); }
+				try { stream << std::get<int>(number->value); }
 				catch (const std::bad_variant_access&) {}
 			}
 			else if (number->value.index() == 2) {
@@ -46,7 +46,7 @@ public:
 		return stream;
 	}
 
-	std::variant<float, int, bool> value;
+	std::variant<double, int, bool> value;
 	std::shared_ptr<Cursor> start;
 	std::shared_ptr<Cursor> end;
 	Context* context;

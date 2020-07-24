@@ -178,7 +178,7 @@ Parser::Result* Parser::expr()
 			return result->failure(new InvalidSyntaxError(
 				current_token->start,
 				current_token->end,
-				"Expected 'var', int, float, identifier, '+', '-', '(' or 'not'"
+				"Expected 'var', int, double, identifier, '+', '-', '(' or 'not'"
 			));
 		}
 
@@ -243,7 +243,7 @@ Parser::Result* Parser::if_expr()
 			try { val = std::get<std::string>(current_token->value); }
 			catch (const std::bad_variant_access&) {}
 
-			return current_token->type == Token::Type::KEYWORD && val == "elseif";
+			return current_token->type == Token::Type::KEYWORD && val == "else if";
 		};
 
 		while (isElseIf()) {
@@ -457,7 +457,7 @@ Parser::Result* Parser::atom()
 
 		Result* result = new Result();
 
-		if (current_token->type == Token::Type::FLOAT ||
+		if (current_token->type == Token::Type::DOUBLE ||
 			current_token->type == Token::Type::INT) {
 			Token* token = new Token(current_token);
 

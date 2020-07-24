@@ -18,7 +18,7 @@ Symbols::SymbolsMap::iterator Symbols::get(const std::string& name)
 	return it;
 }
 
-void Symbols::set(const std::string& name, std::variant<float, int, bool> value)
+void Symbols::set(const std::string& name, std::variant<double, int, bool> value)
 {
 	symbols[name] = value;
 }
