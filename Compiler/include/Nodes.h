@@ -3,12 +3,32 @@
 #include "Token.h"
 #include "Platform.h"
 
+
+
 class Node {
 public:
-	Node(Token* token, Node* left = nullptr, Node* right = nullptr) : 
+	enum Type {
+		NONE,
+		NUMERIC,
+		BINARY,
+		UNARY,
+		VARIABLE_ACCESS,
+		VARIABLE_ASSIGN,
+		IF_STATEMENT,
+		FOR_STATEMENT,
+		WHILE_STATEMENT
+	};
+
+	Node(
+		Token* token,
+		Node* left = nullptr,
+		Node* right = nullptr,
+		Type type = Type::NONE
+	) : 
 		token(token),
 		left(left),
-		right(right)
+		right(right),
+		type(type)
 	{}
 
 	virtual ~Node() {
@@ -20,6 +40,22 @@ public:
 	Token* token;
 	Node* left;
 	Node* right;
+	Type type;
+
+	inline std::string typeToStr() {
+		switch (type) {
+		default:
+		case Type::NONE:			return "NONE";
+		case Type::NUMERIC:			return "NUMERIC";
+		case Type::BINARY:			return "BINARY";
+		case Type::UNARY:			return "UNARY";
+		case Type::VARIABLE_ACCESS: return "VARIABLE_ACCESS";
+		case Type::VARIABLE_ASSIGN: return "VARIABLE_ASSIGN";
+		case Type::IF_STATEMENT:	return "IF_STATEMENT";
+		case Type::FOR_STATEMENT:	return "FOR_STATEMENT";
+		case Type::WHILE_STATEMENT: return "WHILE_STATEMENT";
+		}
+	}
 
 	friend std::ostream& operator << (std::ostream& stream, Node* node);
 };
@@ -27,21 +63,21 @@ public:
 class NumericNode : public Node {
 public:
 	NumericNode(Token* token) :
-		Node(token) 
+		Node(token, nullptr, nullptr, Type::NUMERIC)
 	{}
 };
 
 class BinaryOperationNode : public Node {
 public:
 	BinaryOperationNode(Node* left, Token* token, Node* right) :
-		Node(token, left, right)
+		Node(token, left, right, Type::BINARY)
 	{}
 };
 
 class UnaryOperationNode : public Node {
 public:
 	UnaryOperationNode(Node* node, Token* token) :
-		Node(token, nullptr, node),
+		Node(token, nullptr, node, Type::UNARY),
 		node(node)
 	{}
 
@@ -51,7 +87,7 @@ public:
 class VariableAccessNode : public Node {
 public:
 	VariableAccessNode(Token* token) : 
-		Node(token),
+		Node(token, nullptr, nullptr, Type::VARIABLE_ACCESS),
 		start(token->start),
 		end(token->end)
 	{}
@@ -63,7 +99,7 @@ public:
 class VariableAssignmentNode : public Node {
 public:
 	VariableAssignmentNode(Token* token, Node* node) :
-		Node(token, node),
+		Node(token, node, nullptr, Type::VARIABLE_ASSIGN),
 		start(token->start),
 		end(token->end)
 	{}
@@ -74,8 +110,12 @@ public:
 
 class IfStatementNode : public Node {
 public:
-	IfStatementNode(Token* token, const std::vector<std::pair<Node*, Node*>>& cases, Node* else_case) :
-		Node(token),
+	IfStatementNode(
+		Token* token,
+		const std::vector<std::pair<Node*, Node*>>& cases,
+		Node* else_case
+	) :
+		Node(token, nullptr, nullptr, Type::IF_STATEMENT),
 		start(token->start),
 		end(token->end),
 		cases(cases),
@@ -89,8 +129,14 @@ public:
 
 class ForStatementNode : public Node {
 public:
-	ForStatementNode(Token* token, Node* start_value, Node* end_value, Node* step, Node* body) : 
-		Node(token),
+	ForStatementNode(
+		Token* token,
+		Node* start_value,
+		Node* end_value,
+		Node* step,
+		Node* body
+	) : 
+		Node(token, nullptr, nullptr, Type::FOR_STATEMENT),
 		start(token->start),
 		end(body->token->end),
 		start_value(start_value),
@@ -110,7 +156,7 @@ public:
 class WhileStatementNode : public Node {
 public:
 	WhileStatementNode(Token* token, Node* condition, Node* body) : 
-		Node(token),
+		Node(token, nullptr, nullptr, Type::WHILE_STATEMENT),
 		start(condition->token->start),
 		end(body->token->end),
 		condition(condition),
