@@ -23,6 +23,8 @@ public:
 		RPAREN,
 		IDENTIFIER,
 		KEYWORD,
+		COMMA,
+		ARROW,
 		EQ,
 		EE,
 		NE,
@@ -30,7 +32,7 @@ public:
 		GT,
 		LTE,
 		GTE,
-		EOT,
+		EOL,
 		NONE
 	};
 
@@ -65,6 +67,8 @@ public:
 		case Type::RPAREN: return "RPAREN";
 		case Type::IDENTIFIER: return "IDENTIFIER";
 		case Type::KEYWORD: return "KEYWORD";
+		case Type::COMMA: return "COMMA";
+		case Type::ARROW: return "ARROW";
 		case Type::EQ: return "EQ";
 		case Type::EE: return "EE";
 		case Type::NE: return "NE";
@@ -72,7 +76,7 @@ public:
 		case Type::GT: return "GT";
 		case Type::LTE: return "LTE";
 		case Type::GTE: return "GTE";
-		case Type::EOT: return "EOT";
+		case Type::EOL: return "EOL";
 		case Type::NONE: return "NONE";
 		}
 

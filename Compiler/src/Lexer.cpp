@@ -60,7 +60,7 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 			create_token(Token::Type::PLUS, current_char);
 		}
 		else if (current_char == '-') {
-			create_token(Token::Type::MINUS, current_char);
+			tokens.push_back(create_minus_arrow_operator());
 		}
 		else if (current_char == '*') {
 			create_token(Token::Type::MUL, current_char);
@@ -109,6 +109,9 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 		else if (current_char == '>') {
 			tokens.push_back(create_greater_operator());
 		}
+		else if (current_char == ',') {
+			create_token(Token::Type::COMMA, current_char);
+		}
 		else {
 			std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*cursor);
 			char c = current_char;
@@ -126,7 +129,8 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 		}
 	}
 
-	tokens.push_back(new Token(Token::Type::EOT, char(0x04)));
+	cursor->column = tokens.size();
+	tokens.push_back(new Token(Token::Type::EOL, char(0x04)));
 	profiler.end = clock();
 	lexing_time = profiler.getReport();
 
@@ -331,6 +335,22 @@ Token* Lexer::create_greater_operator()
 		advance();
 		type = Token::Type::GTE;
 		value = ">=";
+	}
+
+	return new Token(type, value, start, cursor);
+}
+
+Token* Lexer::create_minus_arrow_operator()
+{
+	Token::Type type = Token::Type::MINUS;
+	std::string value = "-";
+	std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*cursor);
+	advance();
+
+	if (current_char == '>') {
+		advance();
+		type = Token::Type::ARROW;
+		value = "->";
 	}
 
 	return new Token(type, value, start, cursor);

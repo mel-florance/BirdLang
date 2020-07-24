@@ -3,5 +3,5 @@
 
 std::ostream& operator << (std::ostream& stream, Node* node)
 {
-	return stream << node->typeToStr() << ":" << node->token;
+	return stream << node->typeToStr() << ':' << node->token;
 }

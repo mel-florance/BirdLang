@@ -3,8 +3,6 @@
 #include "Token.h"
 #include "Platform.h"
 
-
-
 class Node {
 public:
 	enum Type {
@@ -37,11 +35,6 @@ public:
 		delete right;
 	}
 
-	Token* token;
-	Node* left;
-	Node* right;
-	Type type;
-
 	inline std::string typeToStr() {
 		switch (type) {
 		default:
@@ -58,6 +51,11 @@ public:
 	}
 
 	friend std::ostream& operator << (std::ostream& stream, Node* node);
+
+	Token* token;
+	Node* left;
+	Node* right;
+	Type type;
 };
 
 class NumericNode : public Node {

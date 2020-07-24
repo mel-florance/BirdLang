@@ -25,7 +25,7 @@ Parser::Result* Parser::parse()
 	Result* result = expr();
 
 	if (result != nullptr) {
-		if (result->error == nullptr && current_token->type != Token::Type::EOT) {
+		if (result->error == nullptr && current_token->type != Token::Type::EOL) {
 			return result->failure(new InvalidSyntaxError(
 				current_token->start,
 				current_token->end,
