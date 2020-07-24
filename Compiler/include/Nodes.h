@@ -14,19 +14,25 @@ public:
 		VARIABLE_ASSIGN,
 		IF_STATEMENT,
 		FOR_STATEMENT,
-		WHILE_STATEMENT
+		WHILE_STATEMENT,
+		FN_DEFINITION,
+		FN_CALL
 	};
 
 	Node(
 		Token* token,
 		Node* left = nullptr,
 		Node* right = nullptr,
-		Type type = Type::NONE
+		Type type = Type::NONE,
+		std::shared_ptr<Cursor> start = nullptr,
+		std::shared_ptr<Cursor> end = nullptr
 	) : 
 		token(token),
 		left(left),
 		right(right),
-		type(type)
+		type(type),
+		start(start),
+		end(end)
 	{}
 
 	virtual ~Node() {
@@ -47,6 +53,8 @@ public:
 		case Type::IF_STATEMENT:	return "IF_STATEMENT";
 		case Type::FOR_STATEMENT:	return "FOR_STATEMENT";
 		case Type::WHILE_STATEMENT: return "WHILE_STATEMENT";
+		case Type::FN_DEFINITION:	return "FN_DEFINITION";
+		case Type::FN_CALL:			return "FN_CALL";
 		}
 	}
 
@@ -56,6 +64,8 @@ public:
 	Node* left;
 	Node* right;
 	Type type;
+	std::shared_ptr<Cursor> start;
+	std::shared_ptr<Cursor> end;
 };
 
 class NumericNode : public Node {
@@ -85,13 +95,15 @@ public:
 class VariableAccessNode : public Node {
 public:
 	VariableAccessNode(Token* token) : 
-		Node(token, nullptr, nullptr, Type::VARIABLE_ACCESS),
-		start(token->start),
-		end(token->end)
+		Node(
+			token,
+			nullptr,
+			nullptr,
+			Type::VARIABLE_ACCESS,
+			token->start,
+			token->end
+		)
 	{}
-
-	std::shared_ptr<Cursor> start;
-	std::shared_ptr<Cursor> end;
 };
 
 class VariableAssignmentNode : public Node {
@@ -113,14 +125,17 @@ public:
 		const std::vector<std::pair<Node*, Node*>>& cases,
 		Node* else_case
 	) :
-		Node(token, nullptr, nullptr, Type::IF_STATEMENT),
-		start(token->start),
-		end(token->end),
+		Node(
+			token,
+			nullptr,
+			nullptr,
+			Type::IF_STATEMENT,
+			token->start,
+			token->end
+		),
 		cases(cases),
 		else_case(else_case) {}
 
-	std::shared_ptr<Cursor> start;
-	std::shared_ptr<Cursor> end;
 	std::vector<std::pair<Node*, Node*>> cases;
 	Node* else_case;
 };
@@ -134,17 +149,20 @@ public:
 		Node* step,
 		Node* body
 	) : 
-		Node(token, nullptr, nullptr, Type::FOR_STATEMENT),
-		start(token->start),
-		end(body->token->end),
+		Node(
+			token,
+			nullptr,
+			nullptr,
+			Type::FOR_STATEMENT,
+			token->start,
+			body->token->end
+		),
 		start_value(start_value),
 		end_value(end_value),
 		step(step),
 		body(body)
 	{}
 
-	std::shared_ptr<Cursor> start;
-	std::shared_ptr<Cursor> end;
 	Node* start_value;
 	Node* end_value;
 	Node* step;
@@ -154,9 +172,14 @@ public:
 class WhileStatementNode : public Node {
 public:
 	WhileStatementNode(Token* token, Node* condition, Node* body) : 
-		Node(token, nullptr, nullptr, Type::WHILE_STATEMENT),
-		start(condition->token->start),
-		end(body->token->end),
+		Node(
+			token,
+			nullptr,
+			nullptr,
+			Type::WHILE_STATEMENT,
+			condition->token->start,
+			body->token->end
+		),
 		condition(condition),
 		body(body)
 	{}
@@ -166,8 +189,52 @@ public:
 		delete body;
 	}
 
-	std::shared_ptr<Cursor> start;
-	std::shared_ptr<Cursor> end;
 	Node* condition;
 	Node* body;
+};
+
+class FunctionDefinitionNode : public Node {
+public:
+	FunctionDefinitionNode(
+		const std::vector<Token*>& args_names,
+		Node* body,
+		Token* token = nullptr
+	) :
+		Node(token, nullptr, nullptr, Type::FN_DEFINITION),
+		args_names(args_names),
+		body(body)
+	{
+		if (token != nullptr)
+			start = token->start;
+		else if (args_names.size() > 0)
+			start = args_names.at(0)->start;
+		else
+			start = body->start;
+
+		end = body->end;
+	}
+
+	std::vector<Token*> args_names;
+	Node* body;
+};
+
+class FunctionCallNode : public Node {
+public:
+	FunctionCallNode(
+		Token* token,
+		Node* callee,
+		const std::vector<Node*>& args_nodes
+	) :
+		Node(token, nullptr, nullptr, Type::FN_CALL),
+		callee(callee),
+		args_nodes(args_nodes)
+	{
+		if (args_nodes.size() > 0)
+			end = args_nodes.at(args_nodes.size() - 1)->end;
+		else
+			end = callee->end;
+	}
+
+	Node* callee;
+	std::vector<Node*> args_nodes;
 };
