@@ -17,4 +17,14 @@ public:
 		if (drawLastLine)
 			std::cout << '+' << std::string(size + title.size() * 2, '-') << "+\n";
 	}
+
+	template<typename T>
+	inline static T getVariantValue(const std::variant<float, int, bool>& variant) {
+		T result = T();
+
+		try { result = std::get<T>(variant); }
+		catch (const std::bad_variant_access&) {}
+
+		return result;
+	}
 };
