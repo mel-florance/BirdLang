@@ -1,9 +1,10 @@
 #include "pch.h"
 #include "Symbols.h"
+#include "Function.h"
 
-Symbols::Symbols() :
+Symbols::Symbols(Symbols* parent) :
 	symbols({}),
-	parent(nullptr)
+	parent(parent)
 {
 
 }
@@ -18,7 +19,7 @@ Symbols::SymbolsMap::iterator Symbols::get(const std::string& name)
 	return it;
 }
 
-void Symbols::set(const std::string& name, std::variant<float, int, bool> value)
+void Symbols::set(const std::string& name, std::variant<float, int, bool, Function*> value)
 {
 	symbols[name] = value;
 }

@@ -19,6 +19,7 @@ public:
 	Token* create_not_equals_operator();
 	Token* create_less_operator();
 	Token* create_greater_operator();
+	Token* create_minus_arrow_operator();
 
 	std::string filename;
 	std::string input;

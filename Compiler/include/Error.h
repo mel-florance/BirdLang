@@ -61,13 +61,16 @@ public:
 
 	inline std::string traceback() {
 		std::string result;
-		std::shared_ptr<Cursor> pos = start;
-		Context* ctx = context;
 
-		while (ctx != nullptr) {
-			result = "  File " + start->filename + ", Line " + std::to_string(start->line + 1) + ", in " + ctx->display_name + "\n" + result;
-			pos = ctx->parent_cursor;
-			ctx = ctx->parent;
+		if (start != nullptr) {
+			std::shared_ptr<Cursor> pos = start;
+			Context* ctx = context;
+
+			while (ctx != nullptr) {
+				result = "  File " + start->filename + ", Line " + std::to_string(start->line + 1) + ", in " + ctx->display_name + "\n" + result;
+				pos = ctx->parent_cursor;
+				ctx = ctx->parent;
+			}
 		}
 
 		return "Traceback: (Most recent calls):\n" + result;

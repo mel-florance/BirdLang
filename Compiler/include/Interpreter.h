@@ -1,46 +1,51 @@
 #pragma once
 
 #include "Nodes.h"
+#include "Type.h"
 #include "Number.h"
 #include "Error.h"
 #include "Context.h"
 #include "Platform.h"
 
+class RuntimeResult {
+public:
+	RuntimeResult() = default;
+
+	Type* record(RuntimeResult* result) {
+		if (result->error != nullptr) {
+			error = result->error;
+		}
+
+		return result->value;
+	}
+
+	RuntimeResult* success(Type* value) {
+		this->value = value;
+		return this;
+	}
+
+	RuntimeResult* failure(Error* error) {
+		this->error = error;
+		return this;
+	}
+
+	Type* value = nullptr;
+	Error* error = nullptr;
+};
+
 class Interpreter {
 public:
 	Interpreter();
 	
-	struct Result {
-
-		Number* record(Result* result) {
-			if (result->error != nullptr) {
-				error = result->error;
-			}
-
-			return result->value;
-		}
-
-		Result* success(Number* value) {
-			this->value = value;
-			return this;
-		}
-
-		Result* failure(Error* error) {
-			this->error = error;
-			return this;
-		}
-
-		Number* value = nullptr;
-		Error* error = nullptr;
-	};
-	
-	Result* visit(Node* node, Context* context);
-	Result* visit_numeric_node(Node* node, Context* context);
-	Result* visit_binary_operation_node(Node* node, Context* context);
-	Result* visit_unary_operation_node(Node* node, Context* context);
-	Result* visit_variable_access_node(Node* node, Context* context);
-	Result* visit_variable_assignment_node(Node* node, Context* context);
-	Result* visit_if_statement_node(Node* node, Context* context);
-	Result* visit_for_statement_node(Node* node, Context* context);
-	Result* visit_while_statement_node(Node* node, Context* context);
+	RuntimeResult* visit(Node* node, Context* context);
+	RuntimeResult* visit_numeric_node(Node* node, Context* context);
+	RuntimeResult* visit_binary_operation_node(Node* node, Context* context);
+	RuntimeResult* visit_unary_operation_node(Node* node, Context* context);
+	RuntimeResult* visit_variable_access_node(Node* node, Context* context);
+	RuntimeResult* visit_variable_assignment_node(Node* node, Context* context);
+	RuntimeResult* visit_if_statement_node(Node* node, Context* context);
+	RuntimeResult* visit_for_statement_node(Node* node, Context* context);
+	RuntimeResult* visit_while_statement_node(Node* node, Context* context);
+	RuntimeResult* visit_function_definition_node(Node* node, Context* context);
+	RuntimeResult* visit_function_call_node(Node* node, Context* context);
 };

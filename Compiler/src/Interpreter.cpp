@@ -1,15 +1,14 @@
 #include "pch.h"
 #include "Interpreter.h"
+#include "Function.h"
 
 Interpreter::Interpreter()
 {
-
 }
 
-Interpreter::Result* Interpreter::visit(Node* node, Context* context)
+RuntimeResult* Interpreter::visit(Node* node, Context* context)
 {
 	if (node != nullptr && context != nullptr) {
-
 		BinaryOperationNode* binary_operation_node = dynamic_cast<BinaryOperationNode*>(node);
 		if (binary_operation_node)
 			return visit_binary_operation_node(binary_operation_node, context);
@@ -42,6 +41,14 @@ Interpreter::Result* Interpreter::visit(Node* node, Context* context)
 		if (while_statement_node)
 			return visit_while_statement_node(while_statement_node, context);
 
+		FunctionDefinitionNode* function_definition_node = dynamic_cast<FunctionDefinitionNode*>(node);
+		if (function_definition_node)
+			return visit_function_definition_node(function_definition_node, context);
+
+		FunctionCallNode* function_call_node = dynamic_cast<FunctionCallNode*>(node);
+		if (function_call_node)
+			return visit_function_call_node(function_call_node, context);
+
 		auto type = typeid(*node).name();
 		std::cout << "No visit " << type << " method defined" << std::endl;
 	}
@@ -49,9 +56,9 @@ Interpreter::Result* Interpreter::visit(Node* node, Context* context)
 	return nullptr;
 }
 
-Interpreter::Result* Interpreter::visit_numeric_node(Node* node, Context* context)
+RuntimeResult* Interpreter::visit_numeric_node(Node* node, Context* context)
 {
-	Result* result = new Result();
+	RuntimeResult* result = new RuntimeResult();
 	Number* number = new Number();
 	number->context = context;
 	number->start = node->token->start;
@@ -69,19 +76,19 @@ Interpreter::Result* Interpreter::visit_numeric_node(Node* node, Context* contex
 	return result->success(number);
 }
 
-Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, Context* context)
+RuntimeResult* Interpreter::visit_binary_operation_node(Node* node, Context* context)
 {
-	Result* result = new Result();
+	RuntimeResult* result = new RuntimeResult();
 	Number* number = nullptr;
 
 	auto left_visit = visit(node->left, context);
-	Number* left = result->record(left_visit);
+	Number* left = (Number*)result->record(left_visit);
 
 	if (result->error != nullptr)
 		return result;
 
 	auto right_visit = visit(node->right, context);
-	Number* right = result->record(right_visit);
+	Number* right = (Number*)result->record(right_visit);
 
 	if (result->error != nullptr)
 		return result;
@@ -173,24 +180,24 @@ Interpreter::Result* Interpreter::visit_binary_operation_node(Node* node, Contex
 	delete right;
 
 	if (number != nullptr) {
-		number->start = node->token->start;
-		number->end = node->token->end;
+		((Type*)number)->start = node->token->start;
+		((Type*)number)->end = node->token->end;
 	}
 
 	return result->success(number);
 }
 
-Interpreter::Result* Interpreter::visit_unary_operation_node(Node* node, Context* context)
+RuntimeResult* Interpreter::visit_unary_operation_node(Node* node, Context* context)
 {
-	Result* result = new Result();
-	Number* number = result->record(visit(node->right, context));
+	RuntimeResult* result = new RuntimeResult();
+	Number* number = (Number*)result->record(visit(node->right, context));
 	
 	if (result->error != nullptr) {
 		return result;
 	}
 
-	number->start = node->token->start;
-	number->end = node->token->end;
+	((Type*)number)->start = node->token->start;
+	((Type*)number)->end = node->token->end;
 
 	Error* error = nullptr;
 
@@ -216,9 +223,9 @@ Interpreter::Result* Interpreter::visit_unary_operation_node(Node* node, Context
 	return result->success(number);
 }
 
-Interpreter::Result* Interpreter::visit_variable_access_node(Node* node, Context* context)
+RuntimeResult* Interpreter::visit_variable_access_node(Node* node, Context* context)
 {
-	Result* result = new Result();
+	RuntimeResult* result = new RuntimeResult();
 	auto n = (VariableAccessNode*)node;
 
 	auto var_name = n->token->value;
@@ -232,12 +239,12 @@ Interpreter::Result* Interpreter::visit_variable_access_node(Node* node, Context
 	return result->success(new Number(value->second));
 }
 
-Interpreter::Result* Interpreter::visit_variable_assignment_node(Node* node, Context* context)
+RuntimeResult* Interpreter::visit_variable_assignment_node(Node* node, Context* context)
 {
-	Result* result = new Result();
+	RuntimeResult* result = new RuntimeResult();
 	auto var_name = node->token->value;
 	auto number_visit = visit(node->left, context);
-	Number* number = result->record(number_visit);
+	Type* number = result->record(number_visit);
 
 	if (result->error != nullptr)
 		return result;
@@ -257,9 +264,9 @@ Interpreter::Result* Interpreter::visit_variable_assignment_node(Node* node, Con
 	return result->success(number);
 }
 
-Interpreter::Result* Interpreter::visit_if_statement_node(Node* node, Context* context)
+RuntimeResult* Interpreter::visit_if_statement_node(Node* node, Context* context)
 {
-	Result* result = new Result();
+	RuntimeResult* result = new RuntimeResult();
 	auto if_node = (IfStatementNode*)node;
 
 	for (auto& if_case : if_node->cases) {
@@ -296,9 +303,9 @@ Interpreter::Result* Interpreter::visit_if_statement_node(Node* node, Context* c
 	return result->success(nullptr);
 }
 
-Interpreter::Result* Interpreter::visit_for_statement_node(Node* node, Context* context)
+RuntimeResult* Interpreter::visit_for_statement_node(Node* node, Context* context)
 {
-	Result* result = new Result();
+	RuntimeResult* result = new RuntimeResult();
 	auto for_node = (ForStatementNode*)node;
 
 	auto visit_start = visit(for_node->start_value, context);
@@ -313,7 +320,7 @@ Interpreter::Result* Interpreter::visit_for_statement_node(Node* node, Context* 
 	if (result->error != nullptr)
 		return result;
 
-	Number* step = new Number(1);
+	Type* step = new Number(1);
 
 	if (for_node->step != nullptr) {
 		auto visit_step = visit(for_node->step, context);
@@ -378,9 +385,9 @@ Interpreter::Result* Interpreter::visit_for_statement_node(Node* node, Context* 
 	return result->success(nullptr);
 }
 
-Interpreter::Result* Interpreter::visit_while_statement_node(Node* node, Context* context)
+RuntimeResult* Interpreter::visit_while_statement_node(Node* node, Context* context)
 {
-	Result* result = new Result();
+	RuntimeResult* result = new RuntimeResult();
 	auto while_node = (WhileStatementNode*)node;
 
 	while (true) {
@@ -417,4 +424,67 @@ Interpreter::Result* Interpreter::visit_while_statement_node(Node* node, Context
 	delete while_node;
 
 	return result->success(nullptr);
+}
+
+RuntimeResult* Interpreter::visit_function_definition_node(Node* node, Context* context)
+{
+	RuntimeResult* result = new RuntimeResult();
+
+	auto fn_node = (FunctionDefinitionNode*)node;
+
+	std::string fn_name;
+
+	if (fn_node->token != nullptr) {
+		try { fn_name = std::get<std::string>(fn_node->token->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+
+	std::vector<std::string> args_names;
+
+	for (auto arg : fn_node->args_names) {
+		std::string str;
+		try { str = std::get<std::string>(arg->value); }
+		catch (const std::bad_variant_access&) {}
+		args_names.push_back(str);
+	}
+
+	auto fn_value = new Function(fn_name, fn_node->body, args_names, nullptr, nullptr, context);
+
+	if (fn_node->token != nullptr) {
+		context->symbols->set(fn_name, fn_value);
+	}
+
+	return result->success(fn_value);
+}
+
+RuntimeResult* Interpreter::visit_function_call_node(Node* node, Context* context)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto fn_call = (FunctionCallNode*)node;
+	std::vector<Type*> args;
+
+	auto visit_callee = visit(fn_call->callee, context);
+	Type* to_call = (Type*)result->record(visit_callee);
+
+	if (result->error != nullptr)
+		return result;
+
+	for (auto arg : fn_call->args_nodes) {
+		args.push_back(result->record(visit(arg, context)));
+
+		if (result->error != nullptr)
+			return result;
+	}
+
+	Function* to_call_value = nullptr;
+	try { to_call_value = std::get<Function*>(to_call->value); }
+	catch (const std::bad_variant_access&) {}
+
+	auto call_visit = to_call_value->execute(args, context);
+	auto return_value = result->record(call_visit);
+
+	if (result->error != nullptr)
+		return result;
+
+	return result->success(return_value);
 }

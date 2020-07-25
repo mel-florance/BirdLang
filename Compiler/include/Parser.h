@@ -51,6 +51,8 @@ public:
 	Result* arithm();
 	Result* power();
 	Result* compare();
+	Result* function_definition();
+	Result* function_call();
 	
 	Result* binary_operation(
 		std::function<Result*()> fna, 
