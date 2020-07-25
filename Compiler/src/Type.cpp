@@ -5,7 +5,7 @@
 #include "Interpreter.h"
 
 Type::Type(
-	const std::variant<float, int, bool, Function*>& value,
+	const std::variant<double, int, bool, Function*>& value,
 	std::shared_ptr<Cursor> start,
 	std::shared_ptr<Cursor> end,
 	Context* context
@@ -92,7 +92,7 @@ std::ostream& operator << (std::ostream& stream, Type* type)
 
 	if (number != nullptr) {
 		if (number->value.index() == 0) {
-			try { stream << std::to_string(std::get<float>(number->value)); }
+			try { stream << std::to_string(std::get<double>(number->value)); }
 			catch (const std::bad_variant_access&) {}
 		}
 		else if (number->value.index() == 1) {
