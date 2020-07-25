@@ -216,6 +216,10 @@ public:
 
 	std::vector<Token*> args_names;
 	Node* body;
+
+	~FunctionDefinitionNode() {
+		delete body;
+	}
 };
 
 class FunctionCallNode : public Node {
@@ -233,6 +237,10 @@ public:
 			end = args_nodes.at(args_nodes.size() - 1)->end;
 		else
 			end = callee->end;
+	}
+
+	~FunctionCallNode() {
+		delete callee;
 	}
 
 	Node* callee;

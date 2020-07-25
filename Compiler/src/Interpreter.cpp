@@ -270,7 +270,8 @@ RuntimeResult* Interpreter::visit_if_statement_node(Node* node, Context* context
 	auto if_node = (IfStatementNode*)node;
 
 	for (auto& if_case : if_node->cases) {
-		auto left = result->record(visit(if_case.first, context));
+		auto visit_left = visit(if_case.first, context);
+		auto left = result->record(visit_left);
 
 		if (result->error != nullptr)
 			return result;
@@ -282,20 +283,29 @@ RuntimeResult* Interpreter::visit_if_statement_node(Node* node, Context* context
 		catch (const std::bad_variant_access&) {}
 
 		if (value == true) {
-			auto else_value = result->record(visit(if_case.second, context));
+			auto visit_else_value = visit(if_case.second, context);
+			auto else_value = result->record(visit_else_value);
 
 			if (result->error != nullptr)
 				return result;
 
+			delete visit_else_value;
+			delete visit_left;
+
 			return result->success(else_value);
 		}
+
+		delete visit_left;
 	}
 
 	if (if_node->else_case != nullptr) {
-		auto else_value = result->record(visit(if_node->else_case, context));
+		auto visit_else_case = visit(if_node->else_case, context);
+		auto else_value = result->record(visit_else_case);
 
 		if (result->error != nullptr)
 			return result;
+
+		delete visit_else_case;
 
 		return result->success(else_value);
 	}
@@ -448,7 +458,14 @@ RuntimeResult* Interpreter::visit_function_definition_node(Node* node, Context* 
 		args_names.push_back(str);
 	}
 
-	auto fn_value = new Function(fn_name, fn_node->body, args_names, nullptr, nullptr, context);
+	auto fn_value = new Function(
+		fn_name,
+		fn_node->body,
+		args_names,
+		nullptr,
+		nullptr,
+		context
+	);
 
 	if (fn_node->token != nullptr) {
 		context->symbols->set(fn_name, fn_value);
@@ -464,24 +481,34 @@ RuntimeResult* Interpreter::visit_function_call_node(Node* node, Context* contex
 	std::vector<Type*> args;
 
 	auto visit_callee = visit(fn_call->callee, context);
-	Type* to_call = (Type*)result->record(visit_callee);
+	auto to_call = result->record(visit_callee);
 
 	if (result->error != nullptr)
 		return result;
 
 	for (auto arg : fn_call->args_nodes) {
-		args.push_back(result->record(visit(arg, context)));
+		auto arg_visit = visit(arg, context);
+		args.push_back(result->record(arg_visit));
 
 		if (result->error != nullptr)
 			return result;
+
+		delete arg_visit;
 	}
 
 	Function* to_call_value = nullptr;
+
 	try { to_call_value = std::get<Function*>(to_call->value); }
 	catch (const std::bad_variant_access&) {}
+
 	to_call_value->context = context;
+
 	auto call_visit = to_call_value->execute(args, context);
 	auto return_value = result->record(call_visit);
+
+	delete visit_callee;
+	delete to_call;
+	delete call_visit;
 
 	if (result->error != nullptr)
 		return result;
