@@ -13,6 +13,7 @@ public:
 
 	SymbolsMap::iterator get(const std::string& name);
 	void set(const std::string& name, std::variant<float, int, bool, Function*> value);
+
 	bool remove(const std::string& name);
 	
 	SymbolsMap symbols;

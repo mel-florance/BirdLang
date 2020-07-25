@@ -163,7 +163,7 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 
 			switch (token->value.index()) {
 			case 0:
-				try { str << std::get<float>(token->value); }
+				try { str << std::get<double>(token->value); }
 				catch (const std::bad_variant_access&) {}
 				break;
 			case 1:
@@ -239,8 +239,8 @@ Token* Lexer::create_numeric_token()
 	}
 	else {
 		return new Token(
-			Token::Type::FLOAT,
-			(float)std::atof(str.c_str()),
+			Token::Type::DOUBLE,
+			std::atof(str.c_str()),
 			start, 
 			cursor
 		);

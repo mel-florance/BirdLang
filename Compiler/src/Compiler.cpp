@@ -26,10 +26,10 @@ Compiler::Compiler(
 
 	symbols->set("PI", PI);
 	symbols->set("TAU", TAU);
-	symbols->set("PHI", 1.618033988749895f);
-	symbols->set("EULER", 2.718281828459045f);
-	symbols->set("SQRT1_2", 0.7071067811865476f);
-	symbols->set("SQRT2", 1.4142135623730951f);
+	symbols->set("PHI", 1.618033988749895);
+	symbols->set("EULER", 2.718281828459045);
+	symbols->set("SQRT1_2", 0.7071067811865476);
+	symbols->set("SQRT2", 1.4142135623730951);
 
 	context->symbols = symbols;
 
@@ -40,6 +40,7 @@ Compiler::Compiler(
 	parser->debug = debug_parser;
 
 	interpreter = std::make_unique<Interpreter>();
+	std::cout.precision(std::numeric_limits<double>::max_digits10);
 }
 
 void Compiler::interpret(const std::string& input)
@@ -52,7 +53,7 @@ void Compiler::interpret(const std::string& input)
 
 	if (ast != nullptr) {
 		if (ast->error != nullptr) {
-			std::cout << ast->error << std::endl;
+			std::cout << ast->error << '\n';
 		}
 		else {
 			if (profiling) {
@@ -72,14 +73,15 @@ void Compiler::interpret(const std::string& input)
 					RuntimeError* error = static_cast<RuntimeError*>(result->error);
 
 					if (error != nullptr) {
-						std::cout << error << std::endl;
+						std::cout << error << '\n';
 					}
 				}
-				else
-					std::cout << result->error << std::endl;
+				else {
+					std::cout << result->error << '\n';
+				}
 			}
 			else {
-				std::cout << result->value << std::endl;
+				std::cout << result->value << '\n';
 			}
 		}
 	}

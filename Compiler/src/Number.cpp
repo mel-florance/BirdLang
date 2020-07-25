@@ -12,7 +12,7 @@ std::pair<Number*, Error*> Number::add(Type* other)
 	result->context = context;
     
     if (value.index() == 0 && other->value.index() == 0) {
-		try { result->value = std::get<float>(value) + std::get<float>(other->value); }
+		try { result->value = std::get<double>(value) + std::get<double>(other->value); }
 		catch (const std::bad_variant_access&) {}
     }
     else if(value.index() == 1 && other->value.index() == 1) {
@@ -20,11 +20,11 @@ std::pair<Number*, Error*> Number::add(Type* other)
 		catch (const std::bad_variant_access&) {}
     }
 	else if (value.index() == 0 && other->value.index() == 1) {
-		try { result->value = std::get<float>(value) + (float)std::get<int>(other->value); }
+		try { result->value = std::get<double>(value) + (double)std::get<int>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1 && other->value.index() == 0) {
-		try { result->value = (float)std::get<int>(value) + std::get<float>(other->value); }
+		try { result->value = (double)std::get<int>(value) + std::get<double>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 
@@ -37,7 +37,7 @@ std::pair<Number*, Error*> Number::subtract(Type* other)
 	result->context = context;
 
 	if (value.index() == 0 && other->value.index() == 0) {
-		try { result->value = std::get<float>(value) - std::get<float>(other->value); }
+		try { result->value = std::get<double>(value) - std::get<double>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1 && other->value.index() == 1) {
@@ -45,11 +45,11 @@ std::pair<Number*, Error*> Number::subtract(Type* other)
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 0 && other->value.index() == 1) {
-		try { result->value = std::get<float>(value) - (float)std::get<int>(other->value); }
+		try { result->value = std::get<double>(value) - (double)std::get<int>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1 && other->value.index() == 0) {
-		try { result->value = (float)std::get<int>(value) - std::get<float>(other->value); }
+		try { result->value = (double)std::get<int>(value) - std::get<double>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 
@@ -62,7 +62,7 @@ std::pair<Number*, Error*> Number::multiply(Type* other)
 	result->context = context;
 
 	if (value.index() == 0 && other->value.index() == 0) {
-		try { result->value = std::get<float>(value) * std::get<float>(other->value); }
+		try { result->value = std::get<double>(value) * std::get<double>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1 && other->value.index() == 1) {
@@ -70,11 +70,11 @@ std::pair<Number*, Error*> Number::multiply(Type* other)
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 0 && other->value.index() == 1) {
-		try { result->value = std::get<float>(value) * (float)std::get<int>(other->value); }
+		try { result->value = std::get<double>(value) * (double)std::get<int>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1 && other->value.index() == 0) {
-		try { result->value = (float)std::get<int>(value) * std::get<float>(other->value); }
+		try { result->value = (double)std::get<int>(value) * std::get<double>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 
@@ -103,12 +103,12 @@ std::pair<Number*, Error*> Number::divide(Type* other)
 
 	if (value.index() == 0 && other->value.index() == 0) {
 		try { 
-			auto rhs = std::get<float>(other->value);
+			auto rhs = std::get<double>(other->value);
 
-			if (rhs == 0.0f)
+			if (rhs == 0.0)
 				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero", context));
 			else
-				result->value = std::get<float>(value) / rhs;
+				result->value = std::get<double>(value) / rhs;
 		}
 		catch (const std::bad_variant_access&) {}
 	}
@@ -119,7 +119,7 @@ std::pair<Number*, Error*> Number::divide(Type* other)
 			if (rhs == 0)
 				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero", context));
 			else
-				result->value = (float)std::get<int>(value) / (float)rhs;
+				result->value = (double)std::get<int>(value) / (double)rhs;
 		}
 		catch (const std::bad_variant_access&) {}
 	}
@@ -130,18 +130,18 @@ std::pair<Number*, Error*> Number::divide(Type* other)
 			if (rhs == 0)
 				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero", context));
 			else
-				result->value = std::get<float>(value) / (float)rhs;
+				result->value = std::get<double>(value) / (double)rhs;
 		}
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1 && other->value.index() == 0) {
 		try {
-			auto rhs = std::get<float>(other->value);
+			auto rhs = std::get<double>(other->value);
 
 			if (rhs == 0)
 				return std::make_pair(nullptr, new RuntimeError(other->start, other->end, "Division by zero", context));
 			else
-				result->value = (float)std::get<int>(value) / rhs;
+				result->value = (double)std::get<int>(value) / rhs;
 		}
 		catch (const std::bad_variant_access&) {}
 	}
@@ -155,19 +155,19 @@ std::pair<Number*, Error*> Number::power(Type* other)
 	result->context = context;
 
 	if (value.index() == 0 && other->value.index() == 0) {
-		try { result->value = (float)pow(std::get<float>(value), std::get<float>(other->value)); }
+		try { result->value = (double)pow(std::get<double>(value), std::get<double>(other->value)); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1 && other->value.index() == 1) {
-		try { result->value = (float)pow((float)std::get<int>(value), std::get<int>(other->value)); }
+		try { result->value = (double)pow((double)std::get<int>(value), std::get<int>(other->value)); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 0 && other->value.index() == 1) {
-		try { result->value = (float)pow(std::get<float>(value), (float)std::get<int>(other->value)); }
+		try { result->value = (double)pow(std::get<double>(value), (double)std::get<int>(other->value)); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1 && other->value.index() == 0) {
-		try { result->value = (float)pow((float)std::get<int>(value), std::get<float>(other->value)); }
+		try { result->value = (double)pow((double)std::get<int>(value), std::get<double>(other->value)); }
 		catch (const std::bad_variant_access&) {}
 	}
 
@@ -221,19 +221,19 @@ std::pair<Number*, Error*> Number::compare_and(Type* other)
 	Number* result = new Number();
 
 	if (value.index() == 0 && other->value.index() == 0) {
-		try { result->value = std::get<float>(value) && std::get<float>(other->value); }
+		try { result->value = std::get<double>(value) && std::get<double>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1 && other->value.index() == 1) {
-		try { result->value = (float)std::get<int>(value) && std::get<int>(other->value); }
+		try { result->value = (double)std::get<int>(value) && std::get<int>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 0 && other->value.index() == 1) {
-		try { result->value = std::get<float>(value) && (float)std::get<int>(other->value); }
+		try { result->value = std::get<double>(value) && (double)std::get<int>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1 && other->value.index() == 0) {
-		try { result->value = (float)std::get<int>(value) && std::get<float>(other->value); }
+		try { result->value = (double)std::get<int>(value) && std::get<double>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 2 && other->value.index() == 2) {
@@ -249,19 +249,19 @@ std::pair<Number*, Error*> Number::compare_or(Type* other)
 	Number* result = new Number();
 
 	if (value.index() == 0 && other->value.index() == 0) {
-		try { result->value = std::get<float>(value) || std::get<float>(other->value); }
+		try { result->value = std::get<double>(value) || std::get<double>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1 && other->value.index() == 1) {
-		try { result->value = (float)std::get<int>(value) || std::get<int>(other->value); }
+		try { result->value = (double)std::get<int>(value) || std::get<int>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 0 && other->value.index() == 1) {
-		try { result->value = std::get<float>(value) || (float)std::get<int>(other->value); }
+		try { result->value = std::get<double>(value) || (double)std::get<int>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1 && other->value.index() == 0) {
-		try { result->value = (float)std::get<int>(value) ||  std::get<float>(other->value); }
+		try { result->value = (double)std::get<int>(value) ||  std::get<double>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 2 && other->value.index() == 2) {
@@ -277,7 +277,7 @@ std::pair<Number*, Error*> Number::compare_not(Type* other)
 	Number* result = new Number();
 
 	if (value.index() == 0) {
-		try { result->value = std::get<float>(value) == 0.0f ? 1 : 0; }
+		try { result->value = std::get<double>(value) == 0.0 ? 1 : 0; }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1) {
@@ -293,7 +293,7 @@ std::pair<Number*, Error*> Number::is_true()
 	Number* result = new Number();
 
 	if (value.index() == 0) {
-		try { result->value = std::get<float>(value) != 0.0f; }
+		try { result->value = std::get<double>(value) != 0.0; }
 		catch (const std::bad_variant_access&) {}
 	}
 	else if (value.index() == 1) {

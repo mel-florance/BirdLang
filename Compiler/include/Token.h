@@ -11,7 +11,7 @@ class Token
 public:
 	enum class Type {
 		INT,
-		FLOAT,
+		DOUBLE,
 		STRING,
 		PLUS,
 		MINUS,
@@ -47,7 +47,7 @@ public:
 
 	Token(
 		const Type& type = Type::NONE,
-		const std::variant<float, int, char, std::string>& value = '0',
+		const std::variant<double, int, char, std::string>& value = '0',
 		std::shared_ptr<Cursor> start = nullptr,
 		std::shared_ptr<Cursor> end = nullptr
 	);
@@ -55,7 +55,7 @@ public:
 	static inline std::string toString(Type type) {
 		switch (type) {
 		case Type::INT: return "INT";
-		case Type::FLOAT: return "FLOAT";
+		case Type::DOUBLE: return "DOUBLE";
 		case Type::STRING: return "STRING";
 		case Type::PLUS: return "PLUS";
 		case Type::MINUS: return "MINUS";
@@ -90,7 +90,7 @@ public:
 		switch (token->value.index()) {
 		case 0:
 			try {
-				stream << std::get<float>(token->value);
+				stream << std::get<double>(token->value);
 			}
 			catch (const std::bad_variant_access&) {}
 			break;
@@ -120,5 +120,5 @@ public:
 	Type type;
 	std::shared_ptr<Cursor> start;
 	std::shared_ptr<Cursor> end;
-	std::variant<float, int, char, std::string> value;
+	std::variant<double, int, char, std::string> value;
 };

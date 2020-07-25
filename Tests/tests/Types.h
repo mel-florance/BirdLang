@@ -32,7 +32,7 @@ TEST(Number, OperationDivide) {
 	Number b(3);
 
 	auto r = a.divide(&b);
-	EXPECT_EQ((float)std::get<float>(r.first->value), 33.333332f);
+	EXPECT_EQ((double)std::get<double>(r.first->value), 33.333332);
 }
 
 TEST(Number, OperationPower) {
@@ -40,5 +40,5 @@ TEST(Number, OperationPower) {
 	Number b(4);
 
 	auto r = a.power(&b);
-	EXPECT_EQ(std::get<float>(r.first->value), 1296);
+	EXPECT_EQ(std::get<double>(r.first->value), 1296);
 }
