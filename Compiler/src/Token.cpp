@@ -13,7 +13,8 @@ std::vector<std::string> Token::keywords = {
     "for",
     "while",
     "to",
-    "step"
+    "step",
+	"fn"
 };
 
 Token::Token(
