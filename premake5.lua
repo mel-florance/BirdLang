@@ -57,7 +57,10 @@ project "Compiler"
 		}
 
 	filter "configurations:Debug"
-		defines "DEBUG"
+		defines {
+			"DEBUG",
+			'_ITERATOR_DEBUG_LEVEL=0'
+		}
 		symbols "On"
 
 	filter "configurations:Release"
@@ -111,7 +114,10 @@ project "Interpreter"
 		}
 
 	filter "configurations:Debug"
-		defines "DEBUG"
+		defines {
+			"DEBUG",
+			'_ITERATOR_DEBUG_LEVEL=0'
+		}
 		kind "ConsoleApp"
 		symbols "On"
 		
@@ -180,7 +186,10 @@ project "Tests"
 		}
 
 	filter "configurations:Debug"
-		defines "DEBUG"
+		defines {
+			"DEBUG",
+			'_ITERATOR_DEBUG_LEVEL=0'
+		}
 		kind "ConsoleApp"
 		symbols "On"
 		
