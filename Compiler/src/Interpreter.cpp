@@ -479,7 +479,7 @@ RuntimeResult* Interpreter::visit_function_call_node(Node* node, Context* contex
 	Function* to_call_value = nullptr;
 	try { to_call_value = std::get<Function*>(to_call->value); }
 	catch (const std::bad_variant_access&) {}
-
+	to_call_value->context = context;
 	auto call_visit = to_call_value->execute(args, context);
 	auto return_value = result->record(call_visit);
 
