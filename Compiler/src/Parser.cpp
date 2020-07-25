@@ -113,7 +113,7 @@ Parser::Result* Parser::arithm()
 Parser::Result* Parser::power()
 {
 	return binary_operation([=]() {
-		return atom();
+		return function_call();
 	}, {
 		Token::Type::POW,
 		Token::Type::MOD
@@ -527,6 +527,14 @@ Parser::Result* Parser::atom()
 
 				return result->success(exp);
 			}
+			else if (current_token->type == Token::Type::KEYWORD && value == "fn") {
+				auto exp = result->record(function_definition());
+
+				if (result->error != nullptr)
+					return result;
+
+				return result->success(exp);
+			}
 		}
 
 		return result->failure(new InvalidSyntaxError(
@@ -577,11 +585,180 @@ Parser::Result* Parser::compare()
 		return result->failure(new InvalidSyntaxError(
 			current_token->start,
 			current_token->end,
-			"Expected Integer, Float, '+', '-', '(', 'not' "
+			"Expected Integer, Float, '+', '-', '(', 'not'"
 		));
 	}
 
 	return result->success(node);
+}
+
+Parser::Result* Parser::function_definition()
+{
+	Result* result = new Result();
+	Token* fn_name = nullptr;
+	std::vector<Token*> args_names = {};
+
+	std::string value;
+	try { value = std::get<std::string>(current_token->value); }
+	catch (const std::bad_variant_access&) {}
+
+
+	if (current_token->type != Token::Type::KEYWORD || value != "fn") {
+		return result->failure(new InvalidSyntaxError(
+			current_token->start,
+			current_token->end,
+			"Expected 'fn'"
+		));
+	}
+
+	result->record_advance();
+	advance();
+
+
+	if (current_token->type == Token::Type::IDENTIFIER) {
+		fn_name = new Token(current_token);
+		result->record_advance();
+		advance();
+
+		if (current_token->type != Token::Type::LPAREN) {
+			return result->failure(new InvalidSyntaxError(
+				current_token->start,
+				current_token->end,
+				"Expected '('"
+			));
+		}
+	}
+	else {
+		if (current_token->type != Token::Type::LPAREN) {
+			return result->failure(new InvalidSyntaxError(
+				current_token->start,
+				current_token->end,
+				"Expected identifier or '('"
+			));
+		}
+	}
+
+	result->record_advance();
+	advance();
+
+	if (current_token->type == Token::Type::IDENTIFIER) {
+		args_names.push_back(current_token);
+		result->record_advance();
+		advance();
+
+		while (current_token->type == Token::Type::COMMA) {
+			result->record_advance();
+			advance();
+
+			if (current_token->type != Token::Type::IDENTIFIER) {
+				return result->failure(new InvalidSyntaxError(
+					current_token->start,
+					current_token->end,
+					"Expected identifier"
+				));
+			}
+
+			args_names.push_back(current_token);
+			result->record_advance();
+			advance();
+		}
+
+		if (current_token->type != Token::Type::RPAREN) {
+			return result->failure(new InvalidSyntaxError(
+				current_token->start,
+				current_token->end,
+				"Expected ',' or ')'"
+			));
+		}
+	}
+	else {
+		if (current_token->type != Token::Type::RPAREN) {
+			return result->failure(new InvalidSyntaxError(
+				current_token->start,
+				current_token->end,
+				"Expected identifier or ')'"
+			));
+		}
+	}
+
+	result->record_advance();
+	advance();
+
+	if (current_token->type != Token::Type::ARROW) {
+		return result->failure(new InvalidSyntaxError(
+			current_token->start,
+			current_token->end,
+			"Expected '->'"
+		));
+	}
+
+	result->record_advance();
+	advance();
+
+	auto return_node = result->record(expr());
+
+	if (result->error != nullptr)
+		return result;
+
+	return result->success(new FunctionDefinitionNode(args_names, return_node, fn_name));
+}
+
+Parser::Result* Parser::function_call()
+{
+	Result* result = new Result();
+
+	auto atm = result->record(atom());
+
+	if (result->error != nullptr)
+		return result;
+
+	if (current_token->type == Token::Type::LPAREN) {
+		result->record_advance();
+		advance();
+
+		std::vector<Node*> args_nodes = {};
+
+		if (current_token->type == Token::Type::RPAREN) {
+			result->record_advance();
+			advance();
+		}
+		else {
+			args_nodes.push_back(result->record(expr()));
+
+			if (result->error != nullptr) {
+				return result->failure(new InvalidSyntaxError(
+					current_token->start,
+					current_token->end,
+					"Expected ')', 'var', 'if', 'for', 'while', 'fn', 'integer', 'double', 'identifier'"
+				));
+			}
+
+			while (current_token->type == Token::Type::COMMA) {
+				result->record_advance();
+				advance();
+
+				args_nodes.push_back(result->record(expr()));
+
+				if (result->error != nullptr)
+					return result;
+			}
+
+			if (current_token->type != Token::Type::RPAREN) {
+				return result->failure(new InvalidSyntaxError(
+					current_token->start,
+					current_token->end,
+					"Expected ',' or ')'"
+				));
+			}
+
+			result->record_advance();
+			advance();
+		}
+
+		return result->success(new FunctionCallNode(current_token, atm, args_nodes));
+	}
+
+	return result->success(atm);
 }
 
 Parser::Result* Parser::binary_operation(

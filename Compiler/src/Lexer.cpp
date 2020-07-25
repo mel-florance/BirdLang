@@ -129,7 +129,7 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 		}
 	}
 
-	cursor->column = tokens.size();
+	cursor->column = (int)tokens.size();
 	tokens.push_back(new Token(Token::Type::EOL, char(0x04)));
 	profiler.end = clock();
 	lexing_time = profiler.getReport();

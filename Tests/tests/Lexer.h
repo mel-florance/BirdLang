@@ -84,8 +84,8 @@ TEST(Lexer, RecognizeEquals) {
 	EXPECT_STREQ("EQ", Token::toString(tokens.at(2)->type).c_str());
 }
 
-TEST(Lexer, RecognizeEOT) {
+TEST(Lexer, RecognizeEOL) {
 	Lexer lexer("test");
 	auto tokens = lexer.index_tokens("var a = 2");
-	EXPECT_STREQ("EOT", Token::toString(tokens.at(4)->type).c_str());
+	EXPECT_STREQ("EOL", Token::toString(tokens.at(4)->type).c_str());
 }
