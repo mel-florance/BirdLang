@@ -16,7 +16,8 @@ public:
 		FOR_STATEMENT,
 		WHILE_STATEMENT,
 		FN_DEFINITION,
-		FN_CALL
+		FN_CALL,
+		STRING
 	};
 
 	Node(
@@ -55,6 +56,7 @@ public:
 		case Type::WHILE_STATEMENT: return "WHILE_STATEMENT";
 		case Type::FN_DEFINITION:	return "FN_DEFINITION";
 		case Type::FN_CALL:			return "FN_CALL";
+		case Type::STRING:			return "STRING";
 		}
 	}
 
@@ -72,6 +74,13 @@ class NumericNode : public Node {
 public:
 	NumericNode(Token* token) :
 		Node(token, nullptr, nullptr, Type::NUMERIC)
+	{}
+};
+
+class StringNode : public Node {
+public:
+	StringNode(Token* token) :
+		Node(token, nullptr, nullptr, Type::STRING)
 	{}
 };
 
@@ -216,6 +225,10 @@ public:
 
 	std::vector<Token*> args_names;
 	Node* body;
+
+	~FunctionDefinitionNode() {
+		delete body;
+	}
 };
 
 class FunctionCallNode : public Node {
@@ -233,6 +246,10 @@ public:
 			end = args_nodes.at(args_nodes.size() - 1)->end;
 		else
 			end = callee->end;
+	}
+
+	~FunctionCallNode() {
+		delete callee;
 	}
 
 	Node* callee;

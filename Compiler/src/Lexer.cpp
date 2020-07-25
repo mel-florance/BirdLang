@@ -56,6 +56,9 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 		else if (letters.find(current_char) != std::string::npos) {
 			tokens.push_back(create_identifier());
 		}
+		else if (current_char == '"') {
+			tokens.push_back(create_string());
+		}
 		else if (current_char == '+') {
 			create_token(Token::Type::PLUS, current_char);
 		}
@@ -354,4 +357,35 @@ Token* Lexer::create_minus_arrow_operator()
 	}
 
 	return new Token(type, value, start, cursor);
+}
+
+Token* Lexer::create_string()
+{
+	std::string str;
+	std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*cursor);
+	bool escape = false;
+	advance();
+
+	std::unordered_map<char, char> escape_chars = {
+		{'n', '\n'},
+		{'t', '\t'}
+	};
+	
+	while (current_char != '\0' && (current_char != '"' || escape)) {
+		if (escape)
+			str += current_char;
+		else {
+			if (current_char == '\\')
+				escape = true;
+			else
+				str += current_char;
+		}
+	
+		advance();
+		escape = false;
+	}
+
+	advance();
+
+	return new Token(Token::Type::STRING, str, start, cursor);
 }

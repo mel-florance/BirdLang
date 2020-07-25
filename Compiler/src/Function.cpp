@@ -25,7 +25,7 @@ Function::~Function()
 RuntimeResult* Function::execute(const std::vector<Type*>& args, Context* context)
 {
 	RuntimeResult* result = new RuntimeResult();
-	std::unique_ptr<Interpreter> interpreter = std::make_unique<Interpreter>();
+	Interpreter* interpreter = new Interpreter();
 
 	auto ctx = new Context(name, context, this->start);
 	ctx->symbols = new Symbols(ctx->parent->symbols);
@@ -34,7 +34,7 @@ RuntimeResult* Function::execute(const std::vector<Type*>& args, Context* contex
 		return result->failure(new RuntimeError(
 			this->start,
 			this->end,
-			std::to_string(args.size() - args_names.size()) + " too many args passed into" + name,
+			std::to_string(args.size() - args_names.size()) + " too many args passed into '" + name + '\'',
 			context
 		));
 	}
@@ -43,7 +43,7 @@ RuntimeResult* Function::execute(const std::vector<Type*>& args, Context* contex
 		return result->failure(new RuntimeError(
 			this->start,
 			this->end,
-			std::to_string(args_names.size() - args.size()) + " too few args passed into" + name,
+			std::to_string(args_names.size() - args.size()) + " too few args passed into '" + name + '\'',
 			context
 		));
 	}
@@ -57,6 +57,11 @@ RuntimeResult* Function::execute(const std::vector<Type*>& args, Context* contex
 
 	auto body_visit = interpreter->visit(body, ctx);
 	auto result_value = result->record(body_visit);
+
+	delete body_visit;
+	delete ctx->symbols;
+	delete ctx;
+	delete interpreter;
 
 	if (result->error != nullptr)
 		return result;

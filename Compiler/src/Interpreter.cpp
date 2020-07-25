@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Interpreter.h"
 #include "Function.h"
+#include "Str.h"
 
 Interpreter::Interpreter()
 {
@@ -49,6 +50,10 @@ RuntimeResult* Interpreter::visit(Node* node, Context* context)
 		if (function_call_node)
 			return visit_function_call_node(function_call_node, context);
 
+		StringNode* string_node = dynamic_cast<StringNode*>(node);
+		if (string_node)
+			return visit_string_node(string_node, context);
+
 		auto type = typeid(*node).name();
 		std::cout << "No visit " << type << " method defined." << '\n';
 	}
@@ -79,16 +84,16 @@ RuntimeResult* Interpreter::visit_numeric_node(Node* node, Context* context)
 RuntimeResult* Interpreter::visit_binary_operation_node(Node* node, Context* context)
 {
 	RuntimeResult* result = new RuntimeResult();
-	Number* number = nullptr;
+	Type* number = nullptr;
 
 	auto left_visit = visit(node->left, context);
-	Number* left = (Number*)result->record(left_visit);
+	Type* left = (Type*)result->record(left_visit);
 
 	if (result->error != nullptr)
 		return result;
 
 	auto right_visit = visit(node->right, context);
-	Number* right = (Number*)result->record(right_visit);
+	Type* right = (Type*)result->record(right_visit);
 
 	if (result->error != nullptr)
 		return result;
@@ -190,7 +195,7 @@ RuntimeResult* Interpreter::visit_binary_operation_node(Node* node, Context* con
 RuntimeResult* Interpreter::visit_unary_operation_node(Node* node, Context* context)
 {
 	RuntimeResult* result = new RuntimeResult();
-	Number* number = (Number*)result->record(visit(node->right, context));
+	Type* number = (Type*)result->record(visit(node->right, context));
 	
 	if (result->error != nullptr) {
 		return result;
@@ -236,7 +241,13 @@ RuntimeResult* Interpreter::visit_variable_access_node(Node* node, Context* cont
 		return result->failure(new RuntimeError(n->start, n->end, "'" + name + "' is not defined", context));
 	}
 
-	return result->success(new Number(value->second));
+	switch (value->second.index()) {
+	case 0:
+	case 1:
+		return result->success(new Number(value->second));
+	case 4:
+		return result->success(new String(value->second));
+	}
 }
 
 RuntimeResult* Interpreter::visit_variable_assignment_node(Node* node, Context* context)
@@ -258,6 +269,12 @@ RuntimeResult* Interpreter::visit_variable_assignment_node(Node* node, Context* 
 	else if (number->value.index() == 2) {
 		context->symbols->set(std::get<std::string>(var_name), std::get<bool>(number->value));
 	}
+	else if (number->value.index() == 3) {
+		context->symbols->set(std::get<std::string>(var_name), std::get<Function*>(number->value));
+	}
+	else if (number->value.index() == 4) {
+		context->symbols->set(std::get<std::string>(var_name), std::get<std::string>(number->value));
+	}
 
 	delete number_visit;
 
@@ -270,7 +287,8 @@ RuntimeResult* Interpreter::visit_if_statement_node(Node* node, Context* context
 	auto if_node = (IfStatementNode*)node;
 
 	for (auto& if_case : if_node->cases) {
-		auto left = result->record(visit(if_case.first, context));
+		auto visit_left = visit(if_case.first, context);
+		auto left = result->record(visit_left);
 
 		if (result->error != nullptr)
 			return result;
@@ -282,20 +300,29 @@ RuntimeResult* Interpreter::visit_if_statement_node(Node* node, Context* context
 		catch (const std::bad_variant_access&) {}
 
 		if (value == true) {
-			auto else_value = result->record(visit(if_case.second, context));
+			auto visit_else_value = visit(if_case.second, context);
+			auto else_value = result->record(visit_else_value);
 
 			if (result->error != nullptr)
 				return result;
 
+			delete visit_else_value;
+			delete visit_left;
+
 			return result->success(else_value);
 		}
+
+		delete visit_left;
 	}
 
 	if (if_node->else_case != nullptr) {
-		auto else_value = result->record(visit(if_node->else_case, context));
+		auto visit_else_case = visit(if_node->else_case, context);
+		auto else_value = result->record(visit_else_case);
 
 		if (result->error != nullptr)
 			return result;
+
+		delete visit_else_case;
 
 		return result->success(else_value);
 	}
@@ -448,7 +475,14 @@ RuntimeResult* Interpreter::visit_function_definition_node(Node* node, Context* 
 		args_names.push_back(str);
 	}
 
-	auto fn_value = new Function(fn_name, fn_node->body, args_names, nullptr, nullptr, context);
+	auto fn_value = new Function(
+		fn_name,
+		fn_node->body,
+		args_names,
+		nullptr,
+		nullptr,
+		context
+	);
 
 	if (fn_node->token != nullptr) {
 		context->symbols->set(fn_name, fn_value);
@@ -464,27 +498,50 @@ RuntimeResult* Interpreter::visit_function_call_node(Node* node, Context* contex
 	std::vector<Type*> args;
 
 	auto visit_callee = visit(fn_call->callee, context);
-	Type* to_call = (Type*)result->record(visit_callee);
+	auto to_call = result->record(visit_callee);
 
 	if (result->error != nullptr)
 		return result;
 
 	for (auto arg : fn_call->args_nodes) {
-		args.push_back(result->record(visit(arg, context)));
+		auto arg_visit = visit(arg, context);
+		args.push_back(result->record(arg_visit));
 
 		if (result->error != nullptr)
 			return result;
+
+		delete arg_visit;
 	}
 
 	Function* to_call_value = nullptr;
+
 	try { to_call_value = std::get<Function*>(to_call->value); }
 	catch (const std::bad_variant_access&) {}
+
 	to_call_value->context = context;
+
 	auto call_visit = to_call_value->execute(args, context);
 	auto return_value = result->record(call_visit);
+
+	delete visit_callee;
+	delete to_call;
+	delete call_visit;
 
 	if (result->error != nullptr)
 		return result;
 
 	return result->success(return_value);
+}
+
+RuntimeResult* Interpreter::visit_string_node(Node* node, Context* context)
+{
+	RuntimeResult* result = new RuntimeResult();
+	String* str = new String();
+
+	str->context = context;
+	str->start = node->token->start;
+	str->end = node->token->end;
+	str->value = std::get<std::string>(node->token->value);
+
+	return result->success(str);
 }

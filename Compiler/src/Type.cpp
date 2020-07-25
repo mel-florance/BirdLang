@@ -2,10 +2,11 @@
 #include "Type.h"
 #include "Number.h"
 #include "Function.h"
+#include "Str.h"
 #include "Interpreter.h"
 
 Type::Type(
-	const std::variant<double, int, bool, Function*>& value,
+	const std::variant<double, int, bool, Function*, std::string>& value,
 	std::shared_ptr<Cursor> start,
 	std::shared_ptr<Cursor> end,
 	Context* context
@@ -22,67 +23,67 @@ RuntimeResult* Type::execute(const std::vector<Type*>& args, Context* context)
 	return nullptr;
 }
 
-std::pair<Number*, Error*> Type::add(Type* other) {
+std::pair<Type*, Error*> Type::add(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::subtract(Type* other) {
+std::pair<Type*, Error*> Type::subtract(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::multiply(Type* other) {
+std::pair<Type*, Error*> Type::multiply(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::modulus(Type* other) {
+std::pair<Type*, Error*> Type::modulus(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::divide(Type* other) {
+std::pair<Type*, Error*> Type::divide(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::power(Type* other) {
+std::pair<Type*, Error*> Type::power(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::compare_equal(Type* other) {
+std::pair<Type*, Error*> Type::compare_equal(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::compare_not_equal(Type* other) {
+std::pair<Type*, Error*> Type::compare_not_equal(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::compare_less_than(Type* other) {
+std::pair<Type*, Error*> Type::compare_less_than(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::compare_greater_than(Type* other) {
+std::pair<Type*, Error*> Type::compare_greater_than(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::compare_less_or_equal(Type* other) {
+std::pair<Type*, Error*> Type::compare_less_or_equal(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::compare_greater_or_equal(Type* other) {
+std::pair<Type*, Error*> Type::compare_greater_or_equal(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::compare_and(Type* other) {
+std::pair<Type*, Error*> Type::compare_and(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::compare_or(Type* other) {
+std::pair<Type*, Error*> Type::compare_or(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::compare_not(Type* other) {
+std::pair<Type*, Error*> Type::compare_not(Type* other) {
 	return std::pair<Number*, Error*>();
 }
 
-std::pair<Number*, Error*> Type::is_true() {
+std::pair<Type*, Error*> Type::is_true() {
 	return std::pair<Number*, Error*>();
 }
 
@@ -111,6 +112,13 @@ std::ostream& operator << (std::ostream& stream, Type* type)
 
 	if (function != nullptr) {
 		return stream << "<function " << function->name << ">";
+	}
+
+	String* string = dynamic_cast<String*>(type);
+
+	if (string != nullptr) {
+		try { stream << std::get<std::string>(string->value); }
+		catch (const std::bad_variant_access&) {}
 	}
 
 	return stream;

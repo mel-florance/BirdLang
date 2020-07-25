@@ -1,12 +1,12 @@
 #include "pch.h"
 #include "Number.h"
 
-Number::Number(const std::variant<double, int, bool, Function*>& value) :
+Number::Number(const std::variant<double, int, bool, Function*, std::string>& value) :
 	Type(value)
 {
 }
 
-std::pair<Number*, Error*> Number::add(Type* other)
+std::pair<Type*, Error*> Number::add(Type* other)
 {
     Number* result = new Number();
 	result->context = context;
@@ -31,7 +31,7 @@ std::pair<Number*, Error*> Number::add(Type* other)
     return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::subtract(Type* other)
+std::pair<Type*, Error*> Number::subtract(Type* other)
 {
 	Number* result = new Number();
 	result->context = context;
@@ -56,7 +56,7 @@ std::pair<Number*, Error*> Number::subtract(Type* other)
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::multiply(Type* other)
+std::pair<Type*, Error*> Number::multiply(Type* other)
 {
 	Number* result = new Number();
 	result->context = context;
@@ -81,7 +81,7 @@ std::pair<Number*, Error*> Number::multiply(Type* other)
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::modulus(Type* other)
+std::pair<Type*, Error*> Number::modulus(Type* other)
 {
 	Number* result = new Number();
 	result->context = context;
@@ -96,7 +96,7 @@ std::pair<Number*, Error*> Number::modulus(Type* other)
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::divide(Type* other)
+std::pair<Type*, Error*> Number::divide(Type* other)
 {
 	Number* result = new Number();
 	result->context = context;
@@ -149,7 +149,7 @@ std::pair<Number*, Error*> Number::divide(Type* other)
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::power(Type* other)
+std::pair<Type*, Error*> Number::power(Type* other)
 {
 	Number* result = new Number();
 	result->context = context;
@@ -174,49 +174,49 @@ std::pair<Number*, Error*> Number::power(Type* other)
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::compare_equal(Type* other)
+std::pair<Type*, Error*> Number::compare_equal(Type* other)
 {
 	Number* result = new Number();
 	result->value = (bool)(value == other->value);
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::compare_not_equal(Type* other)
+std::pair<Type*, Error*> Number::compare_not_equal(Type* other)
 {
 	Number* result = new Number();
 	result->value = value != other->value;
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::compare_less_than(Type* other)
+std::pair<Type*, Error*> Number::compare_less_than(Type* other)
 {
 	Number* result = new Number();
 	result->value = value < other->value;
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::compare_greater_than(Type* other)
+std::pair<Type*, Error*> Number::compare_greater_than(Type* other)
 {
 	Number* result = new Number();
 	result->value = value > other->value;
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::compare_less_or_equal(Type* other)
+std::pair<Type*, Error*> Number::compare_less_or_equal(Type* other)
 {
 	Number* result = new Number();
 	result->value = value <= other->value;
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::compare_greater_or_equal(Type* other)
+std::pair<Type*, Error*> Number::compare_greater_or_equal(Type* other)
 {
 	Number* result = new Number();
 	result->value = value >= other->value;
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::compare_and(Type* other)
+std::pair<Type*, Error*> Number::compare_and(Type* other)
 {
 	Number* result = new Number();
 
@@ -244,7 +244,7 @@ std::pair<Number*, Error*> Number::compare_and(Type* other)
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::compare_or(Type* other)
+std::pair<Type*, Error*> Number::compare_or(Type* other)
 {
 	Number* result = new Number();
 
@@ -272,7 +272,7 @@ std::pair<Number*, Error*> Number::compare_or(Type* other)
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::compare_not(Type* other)
+std::pair<Type*, Error*> Number::compare_not(Type* other)
 {
 	Number* result = new Number();
 
@@ -288,7 +288,7 @@ std::pair<Number*, Error*> Number::compare_not(Type* other)
 	return std::make_pair(result, nullptr);
 }
 
-std::pair<Number*, Error*> Number::is_true()
+std::pair<Type*, Error*> Number::is_true()
 {
 	Number* result = new Number();
 
