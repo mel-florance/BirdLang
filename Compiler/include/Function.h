@@ -21,7 +21,7 @@ public:
 	);
 	~Function();
 
-	RuntimeResult* Function::execute(const std::vector<Type*>& args, Context* context) override;
+	RuntimeResult* execute(const std::vector<Type*>& args, Context* context) override;
 
 	std::string name;
 	Node* body;
