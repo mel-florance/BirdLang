@@ -4,7 +4,7 @@ TEST(Interpreter, VisitNumericNode) {
 	auto token_int = new Token(Token::Type::INT, 5);
 	auto node_int = new NumericNode(token_int);
 
-	auto token_float = new Token(Token::Type::FLOAT, 3.14f);
+	auto token_float = new Token(Token::Type::DOUBLE, 3.14);
 	auto node_float = new NumericNode(token_float);
 
 	auto interp = new Interpreter();
@@ -15,8 +15,8 @@ TEST(Interpreter, VisitNumericNode) {
 	EXPECT_EQ(value_int, 5);
 
 	auto result_float = interp->visit_numeric_node(node_float, ctx);
-	auto value_float = std::get<float>(result_float->value->value);
-	EXPECT_EQ(value_float, 3.14f);
+	auto value_float = std::get<double>(result_float->value->value);
+	EXPECT_EQ(value_float, 3.14);
 }
 
 TEST(Interpreter, VisitBinaryNode) {
@@ -42,7 +42,7 @@ TEST(Interpreter, VisitUnaryNode) {
 	auto numeric_node_int = new NumericNode(number_int);
 	auto unary_node_int = new UnaryOperationNode(numeric_node_int, number_int);
 
-	auto number_float = new Token(Token::Type::FLOAT, -2.0f);
+	auto number_float = new Token(Token::Type::DOUBLE, -2.0);
 	auto numeric_node_float = new NumericNode(number_float);
 	auto unary_node_float = new UnaryOperationNode(numeric_node_float, number_float);
 
@@ -54,8 +54,8 @@ TEST(Interpreter, VisitUnaryNode) {
 	EXPECT_EQ(value_int, -5);
 
 	auto result_float = interp->visit_unary_operation_node(unary_node_float, ctx);
-	auto value_float = std::get<float>(result_float->value->value);
-	EXPECT_EQ(value_float, -2.0f);
+	auto value_float = std::get<double>(result_float->value->value);
+	EXPECT_EQ(value_float, -2.0);
 }
 
 TEST(Interpreter, VisitVariableAccessNode) {
@@ -76,7 +76,7 @@ TEST(Interpreter, VisitVariableAccessNode) {
 
 TEST(Interpreter, VisitVariableAssignNode) {
 	auto name = new Token(Token::Type::IDENTIFIER, "myvar");
-	auto number = new Token(Token::Type::FLOAT, -51.3f);
+	auto number = new Token(Token::Type::DOUBLE, -51.3);
 	auto number_node = new NumericNode(number);
 	auto assign_node = new VariableAssignmentNode(name, number_node);
 
@@ -86,7 +86,7 @@ TEST(Interpreter, VisitVariableAssignNode) {
 	ctx->symbols = symbols;
 
 	auto result = interp->visit_variable_assignment_node(assign_node, ctx);
-	auto value = std::get<float>(result->value->value);
+	auto value = std::get<double>(result->value->value);
 
-	EXPECT_EQ(value, -51.3f);
+	EXPECT_EQ(value, -51.3);
 }

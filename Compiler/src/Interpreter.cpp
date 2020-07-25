@@ -50,7 +50,7 @@ RuntimeResult* Interpreter::visit(Node* node, Context* context)
 			return visit_function_call_node(function_call_node, context);
 
 		auto type = typeid(*node).name();
-		std::cout << "No visit " << type << " method defined" << std::endl;
+		std::cout << "No visit " << type << " method defined." << '\n';
 	}
 
 	return nullptr;
@@ -65,7 +65,7 @@ RuntimeResult* Interpreter::visit_numeric_node(Node* node, Context* context)
 	number->end = node->token->end;
 
 	if (node->token->value.index() == 0) {
-		try { number->value = std::get<float>(node->token->value); }
+		try { number->value = std::get<double>(node->token->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 	else {
@@ -250,7 +250,7 @@ RuntimeResult* Interpreter::visit_variable_assignment_node(Node* node, Context* 
 		return result;
 
 	if (number->value.index() == 0) {
-		context->symbols->set(std::get<std::string>(var_name), std::get<float>(number->value));
+		context->symbols->set(std::get<std::string>(var_name), std::get<double>(number->value));
 	}
 	else if (number->value.index() == 1) {
 		context->symbols->set(std::get<std::string>(var_name), std::get<int>(number->value));
@@ -409,7 +409,7 @@ RuntimeResult* Interpreter::visit_while_statement_node(Node* node, Context* cont
 		auto body_visit = visit(while_node->body, context);
 		auto body_value = result->record(body_visit);
 
-		//std::cout << body_value << '\n';
+		// std::cout << body_value << '\n';
 
 		if (result->error != nullptr)
 			return result;

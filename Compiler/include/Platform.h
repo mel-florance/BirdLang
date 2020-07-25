@@ -12,9 +12,5 @@
 	#endif
 #endif
 
-<<<<<<< Updated upstream
-#define PI 3.141592653589793f
-=======
-#define PI 3.14159265358f
->>>>>>> Stashed changes
-#define TAU 2.0f * PI
+#define PI 3.14159265358979323846264338327950288419716939937
+#define TAU 2.0 * PI

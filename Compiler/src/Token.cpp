@@ -19,7 +19,7 @@ std::vector<std::string> Token::keywords = {
 
 Token::Token(
 	const Token::Type& type,
-	const std::variant<float, int, char, std::string>& value,
+	const std::variant<double, int, char, std::string>& value,
 	std::shared_ptr<Cursor> start,
 	std::shared_ptr<Cursor> end
 ) :
