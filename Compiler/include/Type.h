@@ -17,7 +17,7 @@ public:
 	);
 
 	friend std::ostream& operator << (std::ostream& stream, Type* type);
-	virtual RuntimeResult* Type::execute(const std::vector<Type*>& args, Context* context);
+	virtual RuntimeResult* execute(const std::vector<Type*>& args, Context* context);
 
 	virtual std::pair<Number*, Error*> add(Type* other);
 	virtual std::pair<Number*, Error*> subtract(Type* other);
