@@ -20,6 +20,7 @@ public:
 	Token* create_less_operator();
 	Token* create_greater_operator();
 	Token* create_minus_arrow_operator();
+	Token* create_string();
 
 	std::string filename;
 	std::string input;

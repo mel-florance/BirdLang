@@ -48,4 +48,5 @@ public:
 	RuntimeResult* visit_while_statement_node(Node* node, Context* context);
 	RuntimeResult* visit_function_definition_node(Node* node, Context* context);
 	RuntimeResult* visit_function_call_node(Node* node, Context* context);
+	RuntimeResult* visit_string_node(Node* node, Context* context);
 };

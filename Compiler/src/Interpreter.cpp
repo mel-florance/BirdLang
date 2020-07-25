@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Interpreter.h"
 #include "Function.h"
+#include "Str.h"
 
 Interpreter::Interpreter()
 {
@@ -49,6 +50,10 @@ RuntimeResult* Interpreter::visit(Node* node, Context* context)
 		if (function_call_node)
 			return visit_function_call_node(function_call_node, context);
 
+		StringNode* string_node = dynamic_cast<StringNode*>(node);
+		if (string_node)
+			return visit_string_node(string_node, context);
+
 		auto type = typeid(*node).name();
 		std::cout << "No visit " << type << " method defined." << '\n';
 	}
@@ -79,16 +84,16 @@ RuntimeResult* Interpreter::visit_numeric_node(Node* node, Context* context)
 RuntimeResult* Interpreter::visit_binary_operation_node(Node* node, Context* context)
 {
 	RuntimeResult* result = new RuntimeResult();
-	Number* number = nullptr;
+	Type* number = nullptr;
 
 	auto left_visit = visit(node->left, context);
-	Number* left = (Number*)result->record(left_visit);
+	Type* left = (Type*)result->record(left_visit);
 
 	if (result->error != nullptr)
 		return result;
 
 	auto right_visit = visit(node->right, context);
-	Number* right = (Number*)result->record(right_visit);
+	Type* right = (Type*)result->record(right_visit);
 
 	if (result->error != nullptr)
 		return result;
@@ -190,7 +195,7 @@ RuntimeResult* Interpreter::visit_binary_operation_node(Node* node, Context* con
 RuntimeResult* Interpreter::visit_unary_operation_node(Node* node, Context* context)
 {
 	RuntimeResult* result = new RuntimeResult();
-	Number* number = (Number*)result->record(visit(node->right, context));
+	Type* number = (Type*)result->record(visit(node->right, context));
 	
 	if (result->error != nullptr) {
 		return result;
@@ -236,7 +241,13 @@ RuntimeResult* Interpreter::visit_variable_access_node(Node* node, Context* cont
 		return result->failure(new RuntimeError(n->start, n->end, "'" + name + "' is not defined", context));
 	}
 
-	return result->success(new Number(value->second));
+	switch (value->second.index()) {
+	case 0:
+	case 1:
+		return result->success(new Number(value->second));
+	case 4:
+		return result->success(new String(value->second));
+	}
 }
 
 RuntimeResult* Interpreter::visit_variable_assignment_node(Node* node, Context* context)
@@ -257,6 +268,12 @@ RuntimeResult* Interpreter::visit_variable_assignment_node(Node* node, Context* 
 	}
 	else if (number->value.index() == 2) {
 		context->symbols->set(std::get<std::string>(var_name), std::get<bool>(number->value));
+	}
+	else if (number->value.index() == 3) {
+		context->symbols->set(std::get<std::string>(var_name), std::get<Function*>(number->value));
+	}
+	else if (number->value.index() == 4) {
+		context->symbols->set(std::get<std::string>(var_name), std::get<std::string>(number->value));
 	}
 
 	delete number_visit;
@@ -514,4 +531,17 @@ RuntimeResult* Interpreter::visit_function_call_node(Node* node, Context* contex
 		return result;
 
 	return result->success(return_value);
+}
+
+RuntimeResult* Interpreter::visit_string_node(Node* node, Context* context)
+{
+	RuntimeResult* result = new RuntimeResult();
+	String* str = new String();
+
+	str->context = context;
+	str->start = node->token->start;
+	str->end = node->token->end;
+	str->value = std::get<std::string>(node->token->value);
+
+	return result->success(str);
 }

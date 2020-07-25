@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cstring>
-
+#include <string.h>
 #include <BirdLang.h>
 
 #ifdef PLATFORM_WINDOWS

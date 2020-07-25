@@ -466,6 +466,14 @@ Parser::Result* Parser::atom()
 
 			return result->success(new NumericNode(token));
 		}
+		if (current_token->type == Token::Type::STRING) {
+			Token* token = new Token(current_token);
+
+			result->record_advance();
+			advance();
+
+			return result->success(new StringNode(token));
+		}
 		else if (current_token->type == Token::Type::IDENTIFIER) {
 			Token* token = new Token(current_token);
 

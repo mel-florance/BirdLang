@@ -9,22 +9,22 @@
 class Function;
 class Number : public Type {
 public:
-	Number(const std::variant<double, int, bool, Function*>& value = 0);
+	Number(const std::variant<double, int, bool, Function*, std::string>& value = 0);
 
-	std::pair<Number*, Error*> add(Type* other) override;
-	std::pair<Number*, Error*> subtract(Type* other) override;
-	std::pair<Number*, Error*> multiply(Type* other) override;
-	std::pair<Number*, Error*> modulus(Type* other) override;
-	std::pair<Number*, Error*> divide(Type* other) override;
-	std::pair<Number*, Error*> power(Type* other) override;
-	std::pair<Number*, Error*> compare_equal(Type* other) override;
-	std::pair<Number*, Error*> compare_not_equal(Type* other) override;
-	std::pair<Number*, Error*> compare_less_than(Type* other) override;
-	std::pair<Number*, Error*> compare_greater_than(Type* other) override;
-	std::pair<Number*, Error*> compare_less_or_equal(Type* other) override;
-	std::pair<Number*, Error*> compare_greater_or_equal(Type* other) override;
-	std::pair<Number*, Error*> compare_and(Type* other) override;
-	std::pair<Number*, Error*> compare_or(Type* other) override;
-	std::pair<Number*, Error*> compare_not(Type* other) override;
-	std::pair<Number*, Error*> is_true();
+	std::pair<Type*, Error*> add(Type* other) override;
+	std::pair<Type*, Error*> subtract(Type* other) override;
+	std::pair<Type*, Error*> multiply(Type* other) override;
+	std::pair<Type*, Error*> modulus(Type* other) override;
+	std::pair<Type*, Error*> divide(Type* other) override;
+	std::pair<Type*, Error*> power(Type* other) override;
+	std::pair<Type*, Error*> compare_equal(Type* other) override;
+	std::pair<Type*, Error*> compare_not_equal(Type* other) override;
+	std::pair<Type*, Error*> compare_less_than(Type* other) override;
+	std::pair<Type*, Error*> compare_greater_than(Type* other) override;
+	std::pair<Type*, Error*> compare_less_or_equal(Type* other) override;
+	std::pair<Type*, Error*> compare_greater_or_equal(Type* other) override;
+	std::pair<Type*, Error*> compare_and(Type* other) override;
+	std::pair<Type*, Error*> compare_or(Type* other) override;
+	std::pair<Type*, Error*> compare_not(Type* other) override;
+	std::pair<Type*, Error*> is_true();
 };
