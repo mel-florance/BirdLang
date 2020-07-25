@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Number.h"
 
-Number::Number(const std::variant<float, int, bool, Function*>& value) :
+Number::Number(const std::variant<double, int, bool, Function*>& value) :
 	Type(value)
 {
 }
