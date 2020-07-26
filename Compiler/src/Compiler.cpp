@@ -4,6 +4,7 @@
 #include "Profiler.h"
 #include "Utils.h"
 #include "ConsoleTable.h"
+#include "NativeFunction.h"
 
 using ConsoleTable = samilton::ConsoleTable;
 
@@ -20,9 +21,9 @@ Compiler::Compiler(
 	context = new Context("<program>");
 	symbols = new Symbols();
 
-	symbols->set("null", 0);
-	symbols->set("true", 1);
-	symbols->set("false", 0);
+	symbols->set("null", Type::Null);
+	symbols->set("true", Type::True);
+	symbols->set("false", Type::False);
 
 	symbols->set("PI", PI);
 	symbols->set("TAU", TAU);
@@ -30,6 +31,60 @@ Compiler::Compiler(
 	symbols->set("EULER", 2.718281828459045);
 	symbols->set("SQRT1_2", 0.7071067811865476);
 	symbols->set("SQRT2", 1.4142135623730951);
+
+	NativeFunction* fn_print = new NativeFunction("print", nullptr, { "value" });
+	NativeFunction* fn_abs = new NativeFunction("abs", nullptr, { "value" });
+	NativeFunction* fn_acos = new NativeFunction("acos", nullptr, { "value" });
+	NativeFunction* fn_acosh = new NativeFunction("acosh", nullptr, { "value" });
+	NativeFunction* fn_asin = new NativeFunction("asin", nullptr, { "value" });
+	NativeFunction* fn_asinh = new NativeFunction("asinh", nullptr, { "value" });
+	NativeFunction* fn_atan = new NativeFunction("atan", nullptr, { "value" });
+	NativeFunction* fn_atan2 = new NativeFunction("atan2", nullptr, { "x", "y" });
+	NativeFunction* fn_atanh = new NativeFunction("atanh", nullptr, { "value" });
+	NativeFunction* fn_cbrt = new NativeFunction("cbrt", nullptr, { "value" });
+	NativeFunction* fn_ceil = new NativeFunction("ceil", nullptr, { "value" });
+	NativeFunction* fn_cos = new NativeFunction("cos", nullptr, { "value" });
+	NativeFunction* fn_cosh = new NativeFunction("cosh", nullptr, { "value" });
+	NativeFunction* fn_exp = new NativeFunction("exp", nullptr, { "value" });
+	NativeFunction* fn_floor = new NativeFunction("floor", nullptr, { "value" });
+	NativeFunction* fn_log = new NativeFunction("log", nullptr, { "value" });
+	NativeFunction* fn_max = new NativeFunction("max", nullptr, { "x", "y" });
+	NativeFunction* fn_min = new NativeFunction("min", nullptr, { "x", "y" });
+	NativeFunction* fn_pow = new NativeFunction("pow", nullptr, { "n", "exp" });
+	NativeFunction* fn_round = new NativeFunction("round", nullptr, { "value" });
+	NativeFunction* fn_sin = new NativeFunction("sin", nullptr, { "value" });
+	NativeFunction* fn_sinh = new NativeFunction("sinh", nullptr, { "value" });
+	NativeFunction* fn_sqrt = new NativeFunction("sqrt", nullptr, { "value" });
+	NativeFunction* fn_tan = new NativeFunction("tan", nullptr, { "value" });
+	NativeFunction* fn_tanh = new NativeFunction("tanh", nullptr, { "value" });
+	NativeFunction* fn_trunc = new NativeFunction("trunc", nullptr, { "value" });
+
+	symbols->set("print", (Function*)fn_print);
+	symbols->set("abs", (Function*)fn_abs);
+	symbols->set("acos", (Function*)fn_acos);
+	symbols->set("acosh", (Function*)fn_acosh);
+	symbols->set("asin", (Function*)fn_asin);
+	symbols->set("asinh", (Function*)fn_asinh);
+	symbols->set("atan", (Function*)fn_atan);
+	symbols->set("atan2", (Function*)fn_atan2);
+	symbols->set("atanh", (Function*)fn_atanh);
+	symbols->set("trunc", (Function*)fn_trunc);
+	symbols->set("cbrt", (Function*)fn_cbrt);
+	symbols->set("ceil", (Function*)fn_ceil);
+	symbols->set("cos", (Function*)fn_cos);
+	symbols->set("cosh", (Function*)fn_cosh);
+	symbols->set("exp", (Function*)fn_exp);
+	symbols->set("floor", (Function*)fn_floor);
+	symbols->set("log", (Function*)fn_log);
+	symbols->set("max", (Function*)fn_max);
+	symbols->set("min", (Function*)fn_min);
+	symbols->set("pow", (Function*)fn_pow);
+	symbols->set("round", (Function*)fn_round);
+	symbols->set("sin", (Function*)fn_sin);
+	symbols->set("sinh", (Function*)fn_sinh);
+	symbols->set("sqrt", (Function*)fn_sqrt);
+	symbols->set("tan", (Function*)fn_tan);
+	symbols->set("tanh", (Function*)fn_tanh);
 
 	context->symbols = symbols;
 

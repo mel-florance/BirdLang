@@ -13,7 +13,6 @@ std::pair<Type*, Error*> Array::compare_less_than(Type* other)
 	auto array = std::get<std::vector<Type*>>(value);
 	array.push_back(other);
 	value = std::move(array);
-
 	return std::make_pair(this, nullptr);
 }
 

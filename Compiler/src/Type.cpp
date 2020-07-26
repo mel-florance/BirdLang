@@ -1,10 +1,15 @@
 #include "pch.h"
+
 #include "Type.h"
 #include "Number.h"
 #include "Function.h"
 #include "Str.h"
 #include "Array.h"
 #include "Interpreter.h"
+
+bool Type::Null = false;
+bool Type::False = false;
+bool Type::True = true;
 
 Type::Type(
 	const std::variant<double, int, bool, Function*, std::string, std::vector<Type*>>& value,
@@ -88,47 +93,59 @@ std::pair<Type*, Error*> Type::is_true() {
 	return std::pair<Number*, Error*>();
 }
 
+void Type::printArray(std::ostream& stream, Array* array)
+{
+	auto elements = std::get<std::vector<Type*>>(array->value);
+	std::vector<Type*>::iterator it = elements.begin();
+
+	stream << "[" << '\n';
+
+	for (unsigned int i = 0; it != elements.end(); ++it, i++) {
+		stream << std::string(4, ' ') << *it << (i != elements.size() - 1 ? ',' : '\0') << '\n';
+	}
+
+	stream << "]" << '\n';
+}
+
+void Type::printFunction(std::ostream& stream, Function* function)
+{
+	stream << "<function " << function->name << ">";
+}
+
+void Type::printString(std::ostream& stream, String* string)
+{
+	try { stream << '"' << std::get<std::string>(string->value) << '"'; }
+	catch (const std::bad_variant_access&) {}
+}
+
+void Type::printNumber(std::ostream& stream, Number* number)
+{
+	if (number->value.index() == 0) {
+		try { stream << std::to_string(std::get<double>(number->value)); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (number->value.index() == 1) {
+		try { stream << std::to_string(std::get<int>(number->value)); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (number->value.index() == 2) {
+		try { stream << (std::get<bool>(number->value) == true ? "true" : "false"); }
+		catch (const std::bad_variant_access&) {}
+	}
+}
+
 std::ostream& operator << (std::ostream& stream, Type* type)
 {
 	if (type != nullptr)
 	{
-		if (Array* array = dynamic_cast<Array*>(type)) {
-			try {
-				auto elements = std::get<std::vector<Type*>>(array->value);
-				std::vector<Type*>::iterator it = elements.begin();
-
-				stream << "[" << '\n';
-				
-				for (unsigned int i = 0; it != elements.end(); ++it, i++)
-					stream << std::string(4, ' ') << *it << (i != elements.size() - 1? ',' : '\0') << '\n';
-
-				stream << "]" << '\n';
-			}
-			catch (const std::bad_variant_access&) {}
-		}
-		else if (Number* number = dynamic_cast<Number*>(type)) {
-			if (number->value.index() == 0) {
-				try { stream << std::to_string(std::get<double>(number->value)); }
-				catch (const std::bad_variant_access&) {}
-			}
-			else if (number->value.index() == 1) {
-				try { stream << std::to_string(std::get<int>(number->value)); }
-				catch (const std::bad_variant_access&) {}
-			}
-			else if (number->value.index() == 2) {
-				try { stream << (std::get<bool>(number->value) == true ? "true" : "false"); }
-				catch (const std::bad_variant_access&) {}
-			}
-
-			return stream;
-		}
-		else if (Function* function = dynamic_cast<Function*>(type)) {
-			return stream << "<function " << function->name << ">";
-		}
-		else if (String* string = dynamic_cast<String*>(type)) {
-			try { stream << std::get<std::string>(string->value); }
-			catch (const std::bad_variant_access&) {}
-		}
+		if (Array* array = dynamic_cast<Array*>(type))
+			Type::printArray(stream, array);
+		else if (Number* number = dynamic_cast<Number*>(type))
+			Type::printNumber(stream, number);
+		else if (Function* function = dynamic_cast<Function*>(type))
+			Type::printFunction(stream, function);
+		else if (String* string = dynamic_cast<String*>(type))
+			Type::printString(stream, string);
 	}
 	
 	return stream;

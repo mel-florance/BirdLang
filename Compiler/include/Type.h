@@ -4,6 +4,8 @@
 
 class Number;
 class Function;
+class Array;
+class String;
 class Error;
 class RuntimeResult;
 
@@ -18,6 +20,11 @@ public:
 
 	friend std::ostream& operator << (std::ostream& stream, Type* type);
 	virtual RuntimeResult* execute(const std::vector<Type*>& args, Context* context);
+
+	static void printArray(std::ostream& stream, Array* array);
+	static void printFunction(std::ostream& stream, Function* function);
+	static void printString(std::ostream& stream, String* string);
+	static void printNumber(std::ostream& stream, Number* number);
 
 	virtual std::pair<Type*, Error*> add(Type* other);
 	virtual std::pair<Type*, Error*> subtract(Type* other);
@@ -35,6 +42,11 @@ public:
 	virtual std::pair<Type*, Error*> compare_or(Type* other);
 	virtual std::pair<Type*, Error*> compare_not(Type* other);
 	virtual std::pair<Type*, Error*> is_true();
+
+
+	static bool Null;
+	static bool False;
+	static bool True;
 
 	std::variant<double, int, bool, Function*, std::string, std::vector<Type*>> value;
 	std::shared_ptr<Cursor> start;

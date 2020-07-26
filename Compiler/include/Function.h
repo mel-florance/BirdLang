@@ -7,9 +7,9 @@
 #include "Context.h"
 #include "Interpreter.h"
 #include "Type.h"
+#include "BaseFunction.h"
 
-
-class Function : public Type {
+class Function : public BaseFunction {
 public:
 	Function(
 		const std::string& name,
@@ -19,7 +19,6 @@ public:
 		std::shared_ptr<Cursor> end = nullptr,
 		Context* context = nullptr
 	);
-	~Function();
 
 	RuntimeResult* execute(const std::vector<Type*>& args, Context* context) override;
 
