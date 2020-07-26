@@ -21,6 +21,8 @@ public:
 		MOD,
 		LPAREN,
 		RPAREN,
+		LSBRACKET,
+		RSBRACKET,
 		IDENTIFIER,
 		KEYWORD,
 		COMMA,
@@ -65,6 +67,8 @@ public:
 		case Type::DIV: return "DIV";
 		case Type::LPAREN: return "LPAREN";
 		case Type::RPAREN: return "RPAREN";
+		case Type::LSBRACKET: return "LSBRACKET";
+		case Type::RSBRACKET: return "RSBRACKET";
 		case Type::IDENTIFIER: return "IDENTIFIER";
 		case Type::KEYWORD: return "KEYWORD";
 		case Type::COMMA: return "COMMA";

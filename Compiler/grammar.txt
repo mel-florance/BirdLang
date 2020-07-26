@@ -17,10 +17,13 @@ fn-call	:	atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
 
 atom	:	INT|FLOAT|STRING|IDENTIFIER
 		:	LPAREN expr RPAREN
+		:	array-expr
 		:	if-expr
 		:	for-expr
 		:	while-expr
 		:	fn-def
+
+array	:	LSBRACKET (expr (COMMA expr)*)? RSBRACKET
 
 if		:	KEYWORD:if expr KEYWORD:then expr
 		:	(KEYWORD:elseif expr KEYWORD:then expr)*

@@ -81,7 +81,9 @@ void Compiler::interpret(const std::string& input)
 				}
 			}
 			else {
-				std::cout << result->value << '\n';
+				if (result->value != nullptr) {
+					std::cout << result->value << '\n';
+				}
 			}
 		}
 	}

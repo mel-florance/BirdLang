@@ -17,7 +17,8 @@ public:
 		WHILE_STATEMENT,
 		FN_DEFINITION,
 		FN_CALL,
-		STRING
+		STRING,
+		ARRAY
 	};
 
 	Node(
@@ -57,6 +58,7 @@ public:
 		case Type::FN_DEFINITION:	return "FN_DEFINITION";
 		case Type::FN_CALL:			return "FN_CALL";
 		case Type::STRING:			return "STRING";
+		case Type::ARRAY:			return "ARRAY";
 		}
 	}
 
@@ -254,4 +256,14 @@ public:
 
 	Node* callee;
 	std::vector<Node*> args_nodes;
+};
+
+class ArrayNode : public Node {
+public:
+	ArrayNode(Token* token, const std::vector<Node*>& elements) :
+		Node(token, nullptr, nullptr, Type::ARRAY),
+		elements(elements)
+	{}
+
+	std::vector<Node*> elements;
 };
