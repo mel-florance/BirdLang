@@ -409,7 +409,6 @@ RuntimeResult* Interpreter::visit_for_statement_node(Node* node, Context* contex
 
 		auto visit_body = visit(for_node->body, context);
 		auto body_result = result->record(visit_body);
-		std::cout << body_result << '\n';
 
 		delete visit_body;
 		delete body_result;
@@ -444,8 +443,6 @@ RuntimeResult* Interpreter::visit_while_statement_node(Node* node, Context* cont
 
 		auto body_visit = visit(while_node->body, context);
 		auto body_value = result->record(body_visit);
-
-		std::cout << body_value << '\n';
 
 		if (result->error != nullptr)
 			return result;

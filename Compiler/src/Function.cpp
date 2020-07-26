@@ -9,17 +9,14 @@ Function::Function(
 	std::shared_ptr<Cursor> end,
 	Context* context
 ) :
-	Type(),
-	body(body),
-	args_names(args_names)
+	BaseFunction(name, body, args_names, start, end, context)
 {
-	this->name = name.size() == 0
-		? "<anonymous>"
-		: name;
-}
-
-Function::~Function()
-{
+	this->name = name;
+	this->body = body;
+	this->args_names = args_names;
+	this->start = start;
+	this->end = end;
+	this->context = context;
 }
 
 RuntimeResult* Function::execute(const std::vector<Type*>& args, Context* context)
@@ -27,40 +24,18 @@ RuntimeResult* Function::execute(const std::vector<Type*>& args, Context* contex
 	RuntimeResult* result = new RuntimeResult();
 	Interpreter* interpreter = new Interpreter();
 
-	auto ctx = new Context(name, context, this->start);
-	ctx->symbols = new Symbols(ctx->parent->symbols);
+	auto scope = generate_context();
+	result->record(check_and_populate_arguments(this->args_names, args, scope));
 
-	if (args.size() > args_names.size()) {
-		return result->failure(new RuntimeError(
-			this->start,
-			this->end,
-			std::to_string(args.size() - args_names.size()) + " too many args passed into '" + name + '\'',
-			context
-		));
-	}
+	if (result->error != nullptr)
+		return result;
 
-	if (args.size() < args_names.size()) {
-		return result->failure(new RuntimeError(
-			this->start,
-			this->end,
-			std::to_string(args_names.size() - args.size()) + " too few args passed into '" + name + '\'',
-			context
-		));
-	}
-
-	for (unsigned int i = 0; i < args.size(); ++i) {
-		auto name = args_names.at(i);
-		auto value = args.at(i);
-		value->context = ctx;
-		ctx->symbols->set(name, value->value);
-	}
-
-	auto body_visit = interpreter->visit(body, ctx);
+	auto body_visit = interpreter->visit(body, scope);
 	auto result_value = result->record(body_visit);
 
 	delete body_visit;
-	delete ctx->symbols;
-	delete ctx;
+	delete scope->symbols;
+	delete scope;
 	delete interpreter;
 
 	if (result->error != nullptr)
