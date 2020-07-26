@@ -284,7 +284,7 @@ RuntimeResult* Interpreter::visit_variable_assignment_node(Node* node, Context* 
 		context->symbols->set(std::get<std::string>(var_name), std::get<std::string>(number->value));
 	}
 	else if (number->value.index() == 5) {
-		context->symbols->set(std::get<std::string>(var_name), std::move(std::get<std::vector<Type*>>(number->value)));
+		context->symbols->set(std::get<std::string>(var_name), std::get<std::vector<Type*>>(number->value));
 	}
 
 	return result->success(number);

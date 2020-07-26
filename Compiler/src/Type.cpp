@@ -97,9 +97,12 @@ std::ostream& operator << (std::ostream& stream, Type* type)
 				auto elements = std::get<std::vector<Type*>>(array->value);
 				std::vector<Type*>::iterator it = elements.begin();
 
-				for (; it != elements.end(); ++it) {
-					stream << *it << '\n';
-				}
+				stream << "[" << '\n';
+				
+				for (unsigned int i = 0; it != elements.end(); ++it, i++)
+					stream << std::string(4, ' ') << *it << (i != elements.size() - 1? ',' : '\0') << '\n';
+
+				stream << "]" << '\n';
 			}
 			catch (const std::bad_variant_access&) {}
 		}
