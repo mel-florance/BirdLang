@@ -1,14 +1,15 @@
 #include "pch.h"
 #include "Number.h"
+#include "Str.h"
 
-Number::Number(const std::variant<double, int, bool, Function*, std::string>& value) :
+Number::Number(const std::variant<double, int, bool, Function*, std::string, std::vector<Type*>>& value) :
 	Type(value)
 {
 }
 
 std::pair<Type*, Error*> Number::add(Type* other)
 {
-    Number* result = new Number();
+    Type* result = new Number();
 	result->context = context;
     
     if (value.index() == 0 && other->value.index() == 0) {
@@ -25,6 +26,16 @@ std::pair<Type*, Error*> Number::add(Type* other)
 	}
 	else if (value.index() == 1 && other->value.index() == 0) {
 		try { result->value = (double)std::get<int>(value) + std::get<double>(other->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 0 && other->value.index() == 4) {
+		result = new String();
+		try { ((String*)result)->value = std::to_string(std::get<double>(value)) + std::get<std::string>(other->value); }
+		catch (const std::bad_variant_access&) {}
+	}
+	else if (value.index() == 1 && other->value.index() == 4) {
+		result = new String();
+		try { result->value = std::to_string(std::get<int>(value)) + std::get<std::string>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
 

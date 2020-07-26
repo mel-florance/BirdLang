@@ -188,7 +188,6 @@ project "Tests"
 	filter "configurations:Debug"
 		defines {
 			"DEBUG",
-			'_ITERATOR_DEBUG_LEVEL=0'
 		}
 		kind "ConsoleApp"
 		symbols "On"

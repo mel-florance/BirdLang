@@ -511,7 +511,15 @@ Parser::Result* Parser::atom()
 			try { value = std::get<std::string>(current_token->value); }
 			catch (const std::bad_variant_access&) {}
 
-			if (current_token->type == Token::Type::KEYWORD && value == "if") {
+			if (current_token->type == Token::Type::LSBRACKET) {
+				auto array = result->record(array_expr());
+
+				if (result->error != nullptr)
+					return result;
+
+				return result->success(array);
+			}
+			else if (current_token->type == Token::Type::KEYWORD && value == "if") {
 				auto exp = result->record(if_expr());
 
 				if (result->error != nullptr)
@@ -548,7 +556,7 @@ Parser::Result* Parser::atom()
 		return result->failure(new InvalidSyntaxError(
 			current_token->start,
 			current_token->end,
-			"Expected Integer, Float, '+', '-' or '('"
+			"Expected integer, float, identifier, if, for, while, fn,'+', '-', '(', '['"
 		));
 	}
 
@@ -767,6 +775,63 @@ Parser::Result* Parser::function_call()
 	}
 
 	return result->success(atm);
+}
+
+Parser::Result* Parser::array_expr()
+{
+	Result* result = new Result();
+	std::vector<Node*> elements;
+	std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*current_token->start);
+
+	if (current_token->type != Token::Type::LSBRACKET) {
+		return result->failure(new InvalidSyntaxError(
+			current_token->start,
+			current_token->end,
+			"Expected '['"
+		));
+	}
+
+	result->record_advance();
+	advance();
+
+	if (current_token->type == Token::Type::RSBRACKET) {
+		result->record_advance();
+		advance();
+	}
+	else {
+		elements.push_back(result->record(expr()));
+
+		if (result->error != nullptr) {
+			return result->failure(new InvalidSyntaxError(
+				current_token->start,
+				current_token->end,
+				"Expected ']', 'var', 'if', 'for', 'while', 'fn', 'integer', 'double', 'identifier'"
+			));
+		}
+
+		while (current_token->type == Token::Type::COMMA) {
+			result->record_advance();
+			advance();
+
+			elements.push_back(result->record(expr()));
+
+			if (result->error != nullptr)
+				return result;
+		}
+
+		if (current_token->type != Token::Type::RSBRACKET) {
+			return result->failure(new InvalidSyntaxError(
+				current_token->start,
+				current_token->end,
+				"Expected ',' or ']'"
+			));
+		}
+
+		result->record_advance();
+		advance();
+	}
+
+	return result->success(new ArrayNode(current_token, elements));
 }
 
 Parser::Result* Parser::binary_operation(

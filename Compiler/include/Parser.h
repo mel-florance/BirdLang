@@ -53,6 +53,7 @@ public:
 	Result* compare();
 	Result* function_definition();
 	Result* function_call();
+	Result* array_expr();
 	
 	Result* binary_operation(
 		std::function<Result*()> fna, 

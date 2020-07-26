@@ -83,6 +83,12 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 		else if (current_char == ')') {
 			create_token(Token::Type::RPAREN, current_char);
 		}
+		else if (current_char == '[') {
+			create_token(Token::Type::LSBRACKET, current_char);
+		}
+		else if (current_char == ']') {
+			create_token(Token::Type::RSBRACKET, current_char);
+		}
 		else if (current_char == '!') {
 			Token* token = create_not_equals_operator();
 

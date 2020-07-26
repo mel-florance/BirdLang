@@ -2,6 +2,7 @@
 #include "Interpreter.h"
 #include "Function.h"
 #include "Str.h"
+#include "Array.h"
 
 Interpreter::Interpreter()
 {
@@ -53,6 +54,10 @@ RuntimeResult* Interpreter::visit(Node* node, Context* context)
 		StringNode* string_node = dynamic_cast<StringNode*>(node);
 		if (string_node)
 			return visit_string_node(string_node, context);
+
+		ArrayNode* array_node = dynamic_cast<ArrayNode*>(node);
+		if (array_node)
+			return visit_array_node(array_node, context);
 
 		auto type = typeid(*node).name();
 		std::cout << "No visit " << type << " method defined." << '\n';
@@ -179,14 +184,14 @@ RuntimeResult* Interpreter::visit_binary_operation_node(Node* node, Context* con
 		return result->failure(error);
 	}
 
-	delete left_visit;
-	delete right_visit;
-	delete left;
-	delete right;
+	//delete left_visit;
+	//delete right_visit;
+	//delete left;
+	//delete right;
 
 	if (number != nullptr) {
-		((Type*)number)->start = node->token->start;
-		((Type*)number)->end = node->token->end;
+		//((Type*)number)->start = node->token->start;
+		//((Type*)number)->end = node->token->end;
 	}
 
 	return result->success(number);
@@ -242,11 +247,14 @@ RuntimeResult* Interpreter::visit_variable_access_node(Node* node, Context* cont
 	}
 
 	switch (value->second.index()) {
+	default:
 	case 0:
 	case 1:
 		return result->success(new Number(value->second));
 	case 4:
 		return result->success(new String(value->second));
+	case 5:
+		return result->success(new Array(std::get<std::vector<Type*>>(value->second)));
 	}
 }
 
@@ -275,8 +283,9 @@ RuntimeResult* Interpreter::visit_variable_assignment_node(Node* node, Context* 
 	else if (number->value.index() == 4) {
 		context->symbols->set(std::get<std::string>(var_name), std::get<std::string>(number->value));
 	}
-
-	delete number_visit;
+	else if (number->value.index() == 5) {
+		context->symbols->set(std::get<std::string>(var_name), std::move(std::get<std::vector<Type*>>(number->value)));
+	}
 
 	return result->success(number);
 }
@@ -436,7 +445,7 @@ RuntimeResult* Interpreter::visit_while_statement_node(Node* node, Context* cont
 		auto body_visit = visit(while_node->body, context);
 		auto body_value = result->record(body_visit);
 
-		// std::cout << body_value << '\n';
+		std::cout << body_value << '\n';
 
 		if (result->error != nullptr)
 			return result;
@@ -536,12 +545,28 @@ RuntimeResult* Interpreter::visit_function_call_node(Node* node, Context* contex
 RuntimeResult* Interpreter::visit_string_node(Node* node, Context* context)
 {
 	RuntimeResult* result = new RuntimeResult();
-	String* str = new String();
+	String* str = new String(std::get<std::string>(node->token->value));
 
 	str->context = context;
 	str->start = node->token->start;
 	str->end = node->token->end;
-	str->value = std::get<std::string>(node->token->value);
 
 	return result->success(str);
+}
+
+RuntimeResult* Interpreter::visit_array_node(Node* node, Context* context)
+{
+	auto array_node = (ArrayNode*)node;
+	RuntimeResult* result = new RuntimeResult();
+	std::vector<Type*> elements;
+
+	for (auto element : array_node->elements) {
+		auto visit_element = visit(element, context);
+		elements.push_back(result->record(visit_element));
+
+		if (result->error != nullptr)
+			return result;
+	}
+
+	return result->success(new Array(elements));
 }

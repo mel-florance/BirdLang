@@ -9,7 +9,7 @@
 class Function;
 class Number : public Type {
 public:
-	Number(const std::variant<double, int, bool, Function*, std::string>& value = 0);
+	Number(const std::variant<double, int, bool, Function*, std::string, std::vector<Type*>>& value = 0);
 
 	std::pair<Type*, Error*> add(Type* other) override;
 	std::pair<Type*, Error*> subtract(Type* other) override;

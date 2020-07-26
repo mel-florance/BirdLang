@@ -10,7 +10,7 @@ class RuntimeResult;
 class Type {
 public:
 	Type(
-		const std::variant<double, int, bool, Function*, std::string>& value = 0,
+		const std::variant<double, int, bool, Function*, std::string, std::vector<Type*>>& value = 0,
 		std::shared_ptr<Cursor> start = nullptr,
 		std::shared_ptr<Cursor> end = nullptr,
 		Context* context = nullptr
@@ -36,7 +36,7 @@ public:
 	virtual std::pair<Type*, Error*> compare_not(Type* other);
 	virtual std::pair<Type*, Error*> is_true();
 
-	std::variant<double, int, bool, Function*, std::string> value;
+	std::variant<double, int, bool, Function*, std::string, std::vector<Type*>> value;
 	std::shared_ptr<Cursor> start;
 	std::shared_ptr<Cursor> end;
 	Context* context;
