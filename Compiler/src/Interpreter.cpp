@@ -59,6 +59,11 @@ RuntimeResult* Interpreter::visit(Node* node, Context* context)
 		if (array_node)
 			return visit_array_node(array_node, context);
 
+		PropertyAccessNode* property_access_node = dynamic_cast<PropertyAccessNode*>(node);
+		if (property_access_node)
+			return visit_property_access_node(property_access_node, context);
+
+
 		auto type = typeid(*node).name();
 		std::cout << "No visit " << type << " method defined." << '\n';
 	}
@@ -278,7 +283,7 @@ RuntimeResult* Interpreter::visit_variable_assignment_node(Node* node, Context* 
 		context->symbols->set(std::get<std::string>(var_name), std::get<bool>(number->value));
 	}
 	else if (number->value.index() == 3) {
-		context->symbols->set(std::get<std::string>(var_name), std::get<Function*>(number->value));
+		context->symbols->set(std::get<std::string>(var_name), (Function*)std::get<Function*>(number->value));
 	}
 	else if (number->value.index() == 4) {
 		context->symbols->set(std::get<std::string>(var_name), std::get<std::string>(number->value));
@@ -566,4 +571,34 @@ RuntimeResult* Interpreter::visit_array_node(Node* node, Context* context)
 	}
 
 	return result->success(new Array(elements));
+}
+
+RuntimeResult* Interpreter::visit_property_access_node(Node* node, Context* context)
+{
+	auto property_node = (PropertyAccessNode*)node;
+	RuntimeResult* result = new RuntimeResult();
+	Type* result_value = nullptr;
+
+	auto it = context->symbols->get(property_node->var_name);
+
+	if (it == context->symbols->symbols.end()) {
+		return result->failure(new RuntimeError(
+			node->token->start,
+			node->token->end,
+			"'" + property_node->var_name + "' is not defined",
+			context
+		));
+	}
+
+	if (it->second.index() == Type::Native::STRING) {
+		result_value = new String();
+
+		auto value = std::get<std::string>(it->second);
+		auto constant = String::constants.find(std::get<std::string>(property_node->token->value));
+
+		if (constant != String::constants.end())
+			result_value->value = constant->second;
+	}
+
+	return result->success(result_value);
 }

@@ -16,6 +16,11 @@ public:
 	RuntimeResult* execute(const std::vector<Type*>& args, Context* context) override;
 
 	RuntimeResult* fn_print(Context* ctx);
+	RuntimeResult* fn_str(Context* ctx);
+	RuntimeResult* fn_sizeof(Context* ctx);
+	RuntimeResult* fn_typeof(Context* ctx);
+	RuntimeResult* fn_char_at(Context* ctx);
+
 	RuntimeResult* fn_abs(Context* ctx);
 	RuntimeResult* fn_acos(Context* ctx);
 	RuntimeResult* fn_acosh(Context* ctx);

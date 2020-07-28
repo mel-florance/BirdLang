@@ -33,6 +33,11 @@ Compiler::Compiler(
 	symbols->set("SQRT2", 1.4142135623730951);
 
 	NativeFunction* fn_print = new NativeFunction("print", nullptr, { "value" });
+	NativeFunction* fn_str = new NativeFunction("str", nullptr, { "value" });
+	NativeFunction* fn_sizeof = new NativeFunction("sizeof", nullptr, { "value" });
+	NativeFunction* fn_typeof = new NativeFunction("typeof", nullptr, { "value" });
+	NativeFunction* fn_char_at = new NativeFunction("charAt", nullptr, { "string", "index" });
+
 	NativeFunction* fn_abs = new NativeFunction("abs", nullptr, { "value" });
 	NativeFunction* fn_acos = new NativeFunction("acos", nullptr, { "value" });
 	NativeFunction* fn_acosh = new NativeFunction("acosh", nullptr, { "value" });
@@ -51,6 +56,7 @@ Compiler::Compiler(
 	NativeFunction* fn_max = new NativeFunction("max", nullptr, { "x", "y" });
 	NativeFunction* fn_min = new NativeFunction("min", nullptr, { "x", "y" });
 	NativeFunction* fn_pow = new NativeFunction("pow", nullptr, { "n", "exp" });
+	NativeFunction* fn_random = new NativeFunction("random", nullptr, {});
 	NativeFunction* fn_round = new NativeFunction("round", nullptr, { "value" });
 	NativeFunction* fn_sin = new NativeFunction("sin", nullptr, { "value" });
 	NativeFunction* fn_sinh = new NativeFunction("sinh", nullptr, { "value" });
@@ -60,6 +66,11 @@ Compiler::Compiler(
 	NativeFunction* fn_trunc = new NativeFunction("trunc", nullptr, { "value" });
 
 	symbols->set("print", (Function*)fn_print);
+	symbols->set("str", (Function*)fn_str);
+	symbols->set("sizeof", (Function*)fn_sizeof);
+	symbols->set("typeof", (Function*)fn_typeof);
+	symbols->set("charAt", (Function*)fn_char_at);
+
 	symbols->set("abs", (Function*)fn_abs);
 	symbols->set("acos", (Function*)fn_acos);
 	symbols->set("acosh", (Function*)fn_acosh);
@@ -79,6 +90,7 @@ Compiler::Compiler(
 	symbols->set("max", (Function*)fn_max);
 	symbols->set("min", (Function*)fn_min);
 	symbols->set("pow", (Function*)fn_pow);
+	symbols->set("random", (Function*)fn_random);
 	symbols->set("round", (Function*)fn_round);
 	symbols->set("sin", (Function*)fn_sin);
 	symbols->set("sinh", (Function*)fn_sinh);

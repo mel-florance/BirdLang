@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "NativeFunction.h"
 #include "Interpreter.h"
+#include "Str.h"
+#include "Function.h"
 
 NativeFunction::NativeFunction(
 	const std::string& name,
@@ -35,6 +37,18 @@ RuntimeResult* NativeFunction::execute(const std::vector<Type*>& args, Context* 
 	if (name == "print") {
 		args_names = { "value" };
 		return_value = result->record(fn_print(context));
+	} else if (name == "str") {
+		args_names = { "value" };
+		return_value = result->record(fn_str(context));
+	} else if (name == "sizeof") {
+		args_names = { "value" };
+		return_value = result->record(fn_sizeof(context));
+	} else if (name == "typeof") {
+		args_names = { "value" };
+		return_value = result->record(fn_typeof(context));
+	} else if (name == "charAt") {
+		args_names = { "string", "index" };
+		return_value = result->record(fn_char_at(context));
 	} else if (name == "abs") {
 		args_names = { "value" };
 		return_value = result->record(fn_abs(context));
@@ -92,6 +106,9 @@ RuntimeResult* NativeFunction::execute(const std::vector<Type*>& args, Context* 
 	} else if (name == "pow") {
 		args_names = { "n", "exp" };
 		return_value = result->record(fn_pow(context));
+	} else if (name == "random") {
+		args_names = {};
+		return_value = result->record(fn_random(context));
 	} else if (name == "round") {
 		args_names = { "value" };
 		return_value = result->record(fn_round(context));
@@ -118,7 +135,7 @@ RuntimeResult* NativeFunction::execute(const std::vector<Type*>& args, Context* 
 	if (result->error != nullptr)
 		return result;
 
-	result->success(return_value);
+	return result->success(return_value);
 }
 
 RuntimeResult* NativeFunction::fn_print(Context* ctx)
@@ -127,26 +144,119 @@ RuntimeResult* NativeFunction::fn_print(Context* ctx)
 	auto value = ctx->symbols->get("value")->second;
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { std::cout << std::get<double>(value); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { std::cout << std::get<int>(value); }
 		catch (const std::bad_variant_access&) {}
-	case 2:
+		break;
+	case Type::Native::BOOL:
 		try { std::cout << (std::get<bool>(value) ? "true" : "false"); }
 		catch (const std::bad_variant_access&) {}
-	case 3:
+		break;
+	case Type::Native::FUNCTION:
 		try { std::cout << std::get<Function*>(value);  }
 		catch (const std::bad_variant_access&) {}
-	case 4:
+		break;
+	case Type::Native::STRING:
 		try { std::cout << std::get<std::string>(value); }
 		catch (const std::bad_variant_access&) {}
-	//case 5:
-		//std::cout << new Type(std::get<std::vector<Type*>>(value));
+		break;
 	}
 
 	return result->success(nullptr);
+}
+
+RuntimeResult* NativeFunction::fn_str(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto string = new String();
+
+	switch (value.index()) {
+	case Type::Native::DOUBLE:
+		try { string->value = std::to_string(std::get<double>(value)); }
+		catch (const std::bad_variant_access&) {}
+		break;
+	case Type::Native::INT:
+		try { string->value = std::to_string(std::get<int>(value)); }
+		catch (const std::bad_variant_access&) {}
+		break;
+	case Type::Native::BOOL:
+		try { string->value = (std::get<bool>(value) ? "true" : "false"); }
+		catch (const std::bad_variant_access&) {}
+		break;
+	case Type::Native::FUNCTION:
+		try { string->value = "<function " + (std::get<Function*>(value)->name) + '>'; }
+		catch (const std::bad_variant_access&) {}
+		break;
+	case Type::Native::STRING:
+		try { string->value = std::get<std::string>(value); }
+		catch (const std::bad_variant_access&) {}
+		break;
+	}
+
+	return result->success(string);
+}
+
+RuntimeResult* NativeFunction::fn_sizeof(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto size = new Number();
+
+	switch (value.index()) {
+	case Type::Native::STRING:
+		try { size->value = (int)std::get<std::string>(value).size(); }
+		catch (const std::bad_variant_access&) {}
+		break;
+	case Type::Native::ARRAY:
+		try { size->value = (int)std::get<std::vector<Type*>>(value).size(); }
+		catch (const std::bad_variant_access&) {}
+		break;
+	}
+
+	return result->success(size);
+}
+
+RuntimeResult* NativeFunction::fn_typeof(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto string = new String();
+
+	switch (value.index()) {
+	case Type::Native::DOUBLE   : string->value = std::string("float"); break;
+	case Type::Native::INT	    : string->value = std::string("integer"); break;
+	case Type::Native::BOOL     : string->value = std::string("boolean"); break;
+	case Type::Native::FUNCTION : string->value = std::string("function"); break;
+	case Type::Native::STRING   : string->value = std::string("string"); break;
+	case Type::Native::ARRAY    : string->value = std::string("array"); break;
+	}
+
+	return result->success(string);
+}
+
+RuntimeResult* NativeFunction::fn_char_at(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto string = ctx->symbols->get("string")->second;
+	auto index = ctx->symbols->get("index")->second;
+	auto character = new String();
+
+	if (string.index() == Type::Native::STRING && index.index() == Type::Native::INT) {
+		auto id = std::get<int>(index);
+		auto str = std::get<std::string>(string);
+
+		if (id >= 0 && id < str.size()) {
+			try { character->value = std::string(1, str.at(id)); }
+			catch (const std::bad_variant_access&) {}
+		}
+	}
+
+	return result->success(character);
 }
 
 RuntimeResult* NativeFunction::fn_abs(Context* ctx)
@@ -156,12 +266,14 @@ RuntimeResult* NativeFunction::fn_abs(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = abs(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = abs(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -174,12 +286,14 @@ RuntimeResult* NativeFunction::fn_acos(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = acos(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = acos(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -192,12 +306,14 @@ RuntimeResult* NativeFunction::fn_acosh(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = acosh(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = acosh(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -210,12 +326,14 @@ RuntimeResult* NativeFunction::fn_asin(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = asin(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = asin(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -228,12 +346,14 @@ RuntimeResult* NativeFunction::fn_asinh(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = asinh(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = asinh(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -246,12 +366,14 @@ RuntimeResult* NativeFunction::fn_atan(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = atan(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = atan(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -264,11 +386,11 @@ RuntimeResult* NativeFunction::fn_atan2(Context* ctx)
 	auto x = ctx->symbols->get("x")->second;
 	auto number = new Number(0);
 
-	if (x.index() == 0 && y.index() == 0) {
+	if (x.index() == Type::Native::DOUBLE && y.index() == Type::Native::DOUBLE) {
 		try { number->value = atan2(std::get<double>(y), std::get<double>(x)); }
 		catch (const std::bad_variant_access&) {}
 	}
-	else if (x.index() == 1 && y.index() == 1) {
+	else if (x.index() == Type::Native::INT && y.index() == Type::Native::INT) {
 		try { number->value = atan2(std::get<int>(y), std::get<int>(x)); }
 		catch (const std::bad_variant_access&) {}
 	}
@@ -283,12 +405,14 @@ RuntimeResult* NativeFunction::fn_atanh(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = atanh(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = atanh(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -301,12 +425,14 @@ RuntimeResult* NativeFunction::fn_cbrt(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = cbrt(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = cbrt(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -319,12 +445,14 @@ RuntimeResult* NativeFunction::fn_ceil(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = ceil(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = ceil(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -338,12 +466,14 @@ RuntimeResult* NativeFunction::fn_cos(Context* ctx)
 	auto cosine_result = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { cosine_result->value = cos(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { cosine_result->value = cos(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(cosine_result);
@@ -356,12 +486,14 @@ RuntimeResult* NativeFunction::fn_cosh(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = cosh(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = cosh(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -374,12 +506,14 @@ RuntimeResult* NativeFunction::fn_exp(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = exp(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = exp(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -392,12 +526,14 @@ RuntimeResult* NativeFunction::fn_floor(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = floor(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = floor(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -410,12 +546,14 @@ RuntimeResult* NativeFunction::fn_log(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = log(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = log(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -424,19 +562,31 @@ RuntimeResult* NativeFunction::fn_log(Context* ctx)
 RuntimeResult* NativeFunction::fn_max(Context* ctx)
 {
 	RuntimeResult* result = new RuntimeResult();
-	auto value = ctx->symbols->get("value")->second;
-	auto number = new Number(0);
+	auto x = ctx->symbols->get("x")->second;
+	auto y = ctx->symbols->get("y")->second;
+	auto max = new Number();
 
-	return result->success(number);
+	if (x.index() == Type::Native::INT && y.index() == Type::Native::INT) {
+		try { max->value = std::max(std::get<int>(x), std::get<int>(y)); }
+		catch (const std::bad_variant_access&) {}
+	}
+
+	return result->success(max);
 }
 
 RuntimeResult* NativeFunction::fn_min(Context* ctx)
 {
 	RuntimeResult* result = new RuntimeResult();
-	auto value = ctx->symbols->get("value")->second;
-	auto number = new Number(0);
+	auto x = ctx->symbols->get("x")->second;
+	auto y = ctx->symbols->get("y")->second;
+	auto min = new Number();
 
-	return result->success(number);
+	if (x.index() == Type::Native::INT && y.index() == Type::Native::INT) {
+		try { min->value = std::min(std::get<int>(x), std::get<int>(y)); }
+		catch (const std::bad_variant_access&) {}
+	}
+
+	return result->success(min);
 }
 
 RuntimeResult* NativeFunction::fn_pow(Context* ctx)
@@ -446,7 +596,7 @@ RuntimeResult* NativeFunction::fn_pow(Context* ctx)
 	auto exp = ctx->symbols->get("exp")->second;
 	auto number = new Number(0);
 
-	if (n.index() == 1 && exp.index() == 1) {
+	if (n.index() == Type::Native::INT && exp.index() == Type::Native::INT) {
 		try { number->value = pow(std::get<int>(n), std::get<int>(exp)); }
 		catch (const std::bad_variant_access&) {}
 	}
@@ -456,7 +606,11 @@ RuntimeResult* NativeFunction::fn_pow(Context* ctx)
 
 RuntimeResult* NativeFunction::fn_random(Context* ctx)
 {
-	return nullptr;
+	RuntimeResult* result = new RuntimeResult();
+	auto number = new Number(0);
+	number->value = rand();
+
+	return result->success(number);
 }
 
 RuntimeResult* NativeFunction::fn_round(Context* ctx)
@@ -466,12 +620,14 @@ RuntimeResult* NativeFunction::fn_round(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = round(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = round(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -484,12 +640,14 @@ RuntimeResult* NativeFunction::fn_sin(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = sin(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = sin(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -502,12 +660,14 @@ RuntimeResult* NativeFunction::fn_sinh(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = sinh(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = sinh(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -520,12 +680,14 @@ RuntimeResult* NativeFunction::fn_sqrt(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = sqrt(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = sqrt(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -538,12 +700,14 @@ RuntimeResult* NativeFunction::fn_tan(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = tan(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = tan(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -556,12 +720,14 @@ RuntimeResult* NativeFunction::fn_tanh(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = tanh(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = tanh(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);
@@ -574,12 +740,14 @@ RuntimeResult* NativeFunction::fn_trunc(Context* ctx)
 	auto number = new Number(0);
 
 	switch (value.index()) {
-	case 0:
+	case Type::Native::DOUBLE:
 		try { number->value = trunc(std::get<double>(value)); }
 		catch (const std::bad_variant_access&) {}
-	case 1:
+		break;
+	case Type::Native::INT:
 		try { number->value = trunc(std::get<int>(value)); }
 		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(number);

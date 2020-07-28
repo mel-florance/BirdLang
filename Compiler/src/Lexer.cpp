@@ -121,6 +121,9 @@ std::vector<Token*> Lexer::index_tokens(const std::string& str)
 		else if (current_char == ',') {
 			create_token(Token::Type::COMMA, current_char);
 		}
+		else if (current_char == '.') {
+			create_token(Token::Type::DOT, current_char);
+		}
 		else {
 			std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*cursor);
 			char c = current_char;
@@ -378,8 +381,15 @@ Token* Lexer::create_string()
 	};
 	
 	while (current_char != '\0' && (current_char != '"' || escape)) {
-		if (escape)
-			str += current_char;
+		if (escape) {
+			auto it = escape_chars.find(current_char);
+
+			str += it != escape_chars.end()
+				? it->second
+				: current_char;
+
+			escape = false;
+		}
 		else {
 			if (current_char == '\\')
 				escape = true;
@@ -388,10 +398,8 @@ Token* Lexer::create_string()
 		}
 	
 		advance();
-		escape = false;
 	}
 
 	advance();
-
 	return new Token(Token::Type::STRING, str, start, cursor);
 }
