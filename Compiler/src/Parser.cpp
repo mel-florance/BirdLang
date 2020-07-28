@@ -481,7 +481,17 @@ Parser::Result* Parser::atom()
 			result->record_advance();
 			advance();
 
-			return result->success(new VariableAccessNode(token));
+			if (current_token->type == Token::Type::DOT) {
+				result->record_advance();
+				advance();
+				Token* prop_name = new Token(current_token);
+				result->record_advance();
+				advance();
+				return result->success(new PropertyAccessNode(prop_name, std::get<std::string>(token->value)));
+			}
+			else {
+				return result->success(new VariableAccessNode(token));
+			}
 		}
 		else if (current_token->type == Token::Type::LPAREN) {
 			Token* token = new Token(current_token);
@@ -553,6 +563,7 @@ Parser::Result* Parser::atom()
 				return result->success(exp);
 			}
 		}
+
 
 		return result->failure(new InvalidSyntaxError(
 			current_token->start,

@@ -18,7 +18,8 @@ public:
 		FN_DEFINITION,
 		FN_CALL,
 		STRING,
-		ARRAY
+		ARRAY,
+		PROPERTY_ACCESS
 	};
 
 	Node(
@@ -59,6 +60,7 @@ public:
 		case Type::FN_CALL:			return "FN_CALL";
 		case Type::STRING:			return "STRING";
 		case Type::ARRAY:			return "ARRAY";
+		case Type::PROPERTY_ACCESS: return "PROPERTY_ACCESS";
 		}
 	}
 
@@ -266,4 +268,14 @@ public:
 	{}
 
 	std::vector<Node*> elements;
+};
+
+class PropertyAccessNode : public Node {
+public:
+	PropertyAccessNode(Token* token, const std::string& var_name) :
+		Node(token, nullptr, nullptr, Type::PROPERTY_ACCESS),
+		var_name(var_name)
+	{}
+
+	std::string var_name;
 };

@@ -26,6 +26,7 @@ public:
 		IDENTIFIER,
 		KEYWORD,
 		COMMA,
+		DOT,
 		ARROW,
 		EQ,
 		EE,
@@ -72,6 +73,7 @@ public:
 		case Type::IDENTIFIER: return "IDENTIFIER";
 		case Type::KEYWORD: return "KEYWORD";
 		case Type::COMMA: return "COMMA";
+		case Type::DOT: return "DOT";
 		case Type::ARROW: return "ARROW";
 		case Type::EQ: return "EQ";
 		case Type::EE: return "EE";
