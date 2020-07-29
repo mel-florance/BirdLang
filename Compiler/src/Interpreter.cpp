@@ -594,10 +594,19 @@ RuntimeResult* Interpreter::visit_property_access_node(Node* node, Context* cont
 		result_value = new String();
 
 		auto value = std::get<std::string>(it->second);
-		auto constant = String::constants.find(std::get<std::string>(property_node->token->value));
+		auto prop_value = std::get<std::string>(property_node->token->value);
+		auto constant = String::constants.find(prop_value);
 
 		if (constant != String::constants.end())
 			result_value->value = constant->second;
+		else {
+			return result->failure(new RuntimeError(
+				node->token->start,
+				node->token->end,
+				"'" + prop_value + "' is not defined",
+				context
+			));
+		}
 	}
 
 	return result->success(result_value);
