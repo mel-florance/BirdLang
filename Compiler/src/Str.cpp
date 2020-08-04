@@ -8,6 +8,7 @@ const std::string str_digits = "0123456789";
 const std::string str_hexdigits = "0123456789abcdefABCDEF";
 const std::string str_octdigits = "01234567";
 const std::string str_punctuation = "!\"#$ % &'()*+,-./:;<=>?@[\\]^_`{|}~";
+const std::string str_vowels = "aeiouy";
 
 std::unordered_map<std::string, std::string> String::constants = {
 	{"ascii_lowercase", str_ascii_lowercase},
@@ -17,10 +18,11 @@ std::unordered_map<std::string, std::string> String::constants = {
 	{"hexdigits", str_hexdigits},
 	{"octdigits", str_octdigits},
 	{"punctuation", str_punctuation},
-	{"printable", str_digits + str_ascii_lowercase + str_ascii_uppercase + str_punctuation}
+	{"printable", str_digits + str_ascii_lowercase + str_ascii_uppercase + str_punctuation},
+	{"vowels", str_vowels}
 };
 
-String::String(const std::variant<double, int, bool, Function*, std::string, std::vector<Type*>>& value) :
+String::String(const DynamicType& value) :
 	Type(value)
 {
 }

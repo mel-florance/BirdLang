@@ -6,8 +6,20 @@ class Number;
 class Function;
 class Array;
 class String;
+class File;
+
 class Error;
 class RuntimeResult;
+
+using DynamicType = std::variant<
+	double,
+	int,
+	bool,
+	Function*,
+	std::string,
+	std::vector<Type*>,
+	File*
+>;
 
 class Type {
 public:
@@ -17,11 +29,12 @@ public:
 		BOOL,
 		FUNCTION,
 		STRING,
-		ARRAY
+		ARRAY,
+		FILE
 	};
 
 	Type(
-		const std::variant<double, int, bool, Function*, std::string, std::vector<Type*>>& value = 0,
+		const DynamicType& value = 0,
 		std::shared_ptr<Cursor> start = nullptr,
 		std::shared_ptr<Cursor> end = nullptr,
 		Context* context = nullptr
@@ -34,6 +47,7 @@ public:
 	static void printFunction(std::ostream& stream, Function* function);
 	static void printString(std::ostream& stream, String* string);
 	static void printNumber(std::ostream& stream, Number* number);
+	static void printFile(std::ostream& stream, File* file);
 
 	virtual std::pair<Type*, Error*> add(Type* other);
 	virtual std::pair<Type*, Error*> subtract(Type* other);
@@ -56,7 +70,7 @@ public:
 	static bool False;
 	static bool True;
 
-	std::variant<double, int, bool, Function*, std::string, std::vector<Type*>> value;
+	DynamicType value;
 	std::shared_ptr<Cursor> start;
 	std::shared_ptr<Cursor> end;
 	Context* context;

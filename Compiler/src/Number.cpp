@@ -2,7 +2,7 @@
 #include "Number.h"
 #include "Str.h"
 
-Number::Number(const std::variant<double, int, bool, Function*, std::string, std::vector<Type*>>& value) :
+Number::Number(const DynamicType& value) :
 	Type(value)
 {
 }

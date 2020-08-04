@@ -3,7 +3,7 @@
 #include "Number.h"
 #include "Str.h"
 
-Array::Array(const std::variant<double, int, bool, Function*, std::string, std::vector<Type*>>& value) :
+Array::Array(const DynamicType& value) :
 	Type(value)
 {
 }

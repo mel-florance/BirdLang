@@ -21,6 +21,8 @@ public:
 	RuntimeResult* fn_typeof(Context* ctx);
 	RuntimeResult* fn_char_at(Context* ctx);
 
+	RuntimeResult* fn_open(Context* ctx);
+
 	RuntimeResult* fn_abs(Context* ctx);
 	RuntimeResult* fn_acos(Context* ctx);
 	RuntimeResult* fn_acosh(Context* ctx);

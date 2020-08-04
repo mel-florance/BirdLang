@@ -47,9 +47,9 @@ project "Compiler"
 		"Vendor/llvm/include"
 	}
 
-	libdirs { 
-		"Vendor/llvm/lib"
-	}
+	--libdirs { 
+		--"Vendor/llvm/lib"
+	--}
 
 	filter "system:windows"
 		cppdialect "C++17"
@@ -62,9 +62,9 @@ project "Compiler"
 			"PLATFORM_WINDOWS"
 		}
 
-		links {
-			"LLVMCore.lib"
-		}
+		--links {
+			--"LLVMCore.lib"
+		--}
 
 	filter "system:linux"
 		cppdialect "C++17"

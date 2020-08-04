@@ -5,6 +5,7 @@
 #include "Function.h"
 #include "Str.h"
 #include "Array.h"
+#include "File.h"
 #include "Interpreter.h"
 
 bool Type::Null = false;
@@ -12,7 +13,7 @@ bool Type::False = false;
 bool Type::True = true;
 
 Type::Type(
-	const std::variant<double, int, bool, Function*, std::string, std::vector<Type*>>& value,
+	const DynamicType& value,
 	std::shared_ptr<Cursor> start,
 	std::shared_ptr<Cursor> end,
 	Context* context
@@ -134,6 +135,12 @@ void Type::printNumber(std::ostream& stream, Number* number)
 	}
 }
 
+void Type::printFile(std::ostream& stream, File* file)
+{
+	if (file != nullptr)
+		stream << "<file " << std::filesystem::path(file->name).filename() << ">";
+}
+
 std::ostream& operator << (std::ostream& stream, Type* type)
 {
 	if (type != nullptr)
@@ -146,6 +153,8 @@ std::ostream& operator << (std::ostream& stream, Type* type)
 			Type::printFunction(stream, function);
 		else if (String* string = dynamic_cast<String*>(type))
 			Type::printString(stream, string);
+		else if (File* file = (File*)type)
+			Type::printFile(stream, std::get<File*>(file->value));
 	}
 	
 	return stream;

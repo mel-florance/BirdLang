@@ -2,6 +2,7 @@
 #include "NativeFunction.h"
 #include "Interpreter.h"
 #include "Str.h"
+#include "File.h"
 #include "Function.h"
 
 NativeFunction::NativeFunction(
@@ -49,6 +50,9 @@ RuntimeResult* NativeFunction::execute(const std::vector<Type*>& args, Context* 
 	} else if (name == "charAt") {
 		args_names = { "string", "index" };
 		return_value = result->record(fn_char_at(context));
+	} else if (name == "open") {
+		args_names = { "filename", "mode" };
+		return_value = result->record(fn_open(context));
 	} else if (name == "abs") {
 		args_names = { "value" };
 		return_value = result->record(fn_abs(context));
@@ -164,6 +168,10 @@ RuntimeResult* NativeFunction::fn_print(Context* ctx)
 		try { std::cout << std::get<std::string>(value); }
 		catch (const std::bad_variant_access&) {}
 		break;
+	case Type::Native::FILE:
+		try { std::cout << std::get<std::string>(std::get<File*>(value)->value); }
+		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(nullptr);
@@ -216,6 +224,10 @@ RuntimeResult* NativeFunction::fn_sizeof(Context* ctx)
 		try { size->value = (int)std::get<std::vector<Type*>>(value).size(); }
 		catch (const std::bad_variant_access&) {}
 		break;
+	case Type::Native::FILE:
+		try { size->value = (int)std::get<File*>(value)->size; }
+		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(size);
@@ -234,6 +246,7 @@ RuntimeResult* NativeFunction::fn_typeof(Context* ctx)
 	case Type::Native::FUNCTION : string->value = std::string("function"); break;
 	case Type::Native::STRING   : string->value = std::string("string"); break;
 	case Type::Native::ARRAY    : string->value = std::string("array"); break;
+	case Type::Native::FILE		: string->value = std::string("file"); break;
 	}
 
 	return result->success(string);
@@ -257,6 +270,65 @@ RuntimeResult* NativeFunction::fn_char_at(Context* ctx)
 	}
 
 	return result->success(character);
+}
+
+RuntimeResult* NativeFunction::fn_open(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto arg_filename = ctx->symbols->get("filename")->second;
+	auto arg_mode = ctx->symbols->get("mode")->second;
+	int read_mode = 0;
+	auto out = new Type();
+
+	std::string mode_value;
+	try { mode_value = std::get<std::string>(arg_mode); }
+	catch (const std::bad_variant_access&) {}
+
+	if (mode_value == "r")
+		read_mode = std::ifstream::in;
+	else if (mode_value == "w")
+		read_mode = std::ifstream::out;
+	else if (mode_value == "rw")
+		read_mode = read_mode = std::ifstream::in | std::ifstream::out;
+	else if (mode_value == "b")
+		read_mode = std::ifstream::binary;
+	else if (mode_value == "e")
+		read_mode = std::ifstream::ate;
+	else if (mode_value == "a")
+		read_mode = std::ifstream::app;
+	else if (mode_value == "t")
+		read_mode = std::ifstream::trunc;
+
+	std::string filename_value;
+	try { filename_value = std::get<std::string>(arg_filename); }
+	catch (const std::bad_variant_access&) {}
+
+	std::ifstream stream;
+	stream.open(filename_value, std::ifstream::in);
+
+	if (!stream) {
+		return result->failure(new RuntimeError(start, end, "Unable to open file: " + filename_value, context));
+	}
+
+	stream.seekg(0, std::ios::end);
+	std::streampos length = stream.tellg();
+	stream.seekg(0, std::ios::beg);
+
+	std::vector<char> buffer(length);
+	stream.read(&buffer[0], length);
+
+	std::string str(&buffer[0]);
+	auto file = new File();
+
+	file->closed = false;
+	file->name = filename_value;
+	file->value = str.substr(0, str.size());
+	file->mode = static_cast<File::Mode>(read_mode);
+	file->size = std::filesystem::file_size(filename_value);
+
+	out->value = file;
+
+	return result->success(out);
 }
 
 RuntimeResult* NativeFunction::fn_abs(Context* ctx)

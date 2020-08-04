@@ -38,6 +38,8 @@ Compiler::Compiler(
 	NativeFunction* fn_typeof = new NativeFunction("typeof", nullptr, { "value" });
 	NativeFunction* fn_char_at = new NativeFunction("charAt", nullptr, { "string", "index" });
 
+	NativeFunction* fn_open = new NativeFunction("open", nullptr, { "filename", "mode" });
+
 	NativeFunction* fn_abs = new NativeFunction("abs", nullptr, { "value" });
 	NativeFunction* fn_acos = new NativeFunction("acos", nullptr, { "value" });
 	NativeFunction* fn_acosh = new NativeFunction("acosh", nullptr, { "value" });
@@ -70,6 +72,8 @@ Compiler::Compiler(
 	symbols->set("sizeof", (Function*)fn_sizeof);
 	symbols->set("typeof", (Function*)fn_typeof);
 	symbols->set("charAt", (Function*)fn_char_at);
+
+	symbols->set("open", (Function*)fn_open);
 
 	symbols->set("abs", (Function*)fn_abs);
 	symbols->set("acos", (Function*)fn_acos);

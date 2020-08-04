@@ -484,10 +484,40 @@ Parser::Result* Parser::atom()
 			if (current_token->type == Token::Type::DOT) {
 				result->record_advance();
 				advance();
+
 				Token* prop_name = new Token(current_token);
+
 				result->record_advance();
 				advance();
+
 				return result->success(new PropertyAccessNode(prop_name, std::get<std::string>(token->value)));
+			}
+			else if (current_token->type == Token::Type::LSBRACKET) {
+				result->record_advance();
+				advance();
+
+				auto exp = result->record(expr());
+
+				if (result->error != nullptr)
+					return result;
+
+				if (current_token->type == Token::Type::RSBRACKET) {
+					result->record_advance();
+					advance();
+
+					return result->success(new IndexAccessNode(
+						token,
+						exp,
+						current_token->start,
+						current_token->end
+					));
+				}
+
+				return result->failure(new InvalidSyntaxError(
+					current_token->start,
+					current_token->end,
+					"Expected ']'"
+				));
 			}
 			else {
 				return result->success(new VariableAccessNode(token));
