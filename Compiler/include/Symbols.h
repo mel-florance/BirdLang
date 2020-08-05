@@ -3,9 +3,11 @@
 #include "Platform.h"
 
 #include <unordered_map>
+#include <map>
 
 class Function;
 class File;
+class Object;
 class Type;
 
 using DynamicType = std::variant<
@@ -15,7 +17,8 @@ using DynamicType = std::variant<
 	Function*,
 	std::string,
 	std::vector<Type*>,
-	File*
+	File*,
+	std::map<std::string, Type*>
 >;
 
 class Symbols {

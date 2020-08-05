@@ -560,6 +560,14 @@ Parser::Result* Parser::atom()
 
 				return result->success(array);
 			}
+			if (current_token->type == Token::Type::LCBRACKET) {
+				auto map = result->record(map_expr());
+
+				if (result->error != nullptr)
+					return result;
+
+				return result->success(map);
+			}
 			else if (current_token->type == Token::Type::KEYWORD && value == "if") {
 				auto exp = result->record(if_expr());
 
@@ -874,6 +882,97 @@ Parser::Result* Parser::array_expr()
 	}
 
 	return result->success(new ArrayNode(current_token, elements));
+}
+
+Parser::Result* Parser::map_expr()
+{
+	Result* result = new Result();
+	std::map<std::string, Node*> elements;
+	std::shared_ptr<Cursor> start = std::make_shared<Cursor>(*current_token->start);
+
+	if (current_token->type != Token::Type::LCBRACKET) {
+		return result->failure(new InvalidSyntaxError(
+			current_token->start,
+			current_token->end,
+			"Expected '{'"
+		));
+	}
+
+	result->record_advance();
+	advance();
+
+	auto var_name = new Token(current_token);
+
+	if (current_token->type == Token::Type::RCBRACKET) {
+		result->record_advance();
+		advance();
+	}
+	else {
+		result->record_advance();
+		advance();
+
+		if (current_token->type != Token::Type::COLON) {
+			return result->failure(new InvalidSyntaxError(
+				current_token->start,
+				current_token->end,
+				"Expected ':'"
+			));
+		}
+
+		result->record_advance();
+		advance();
+
+		elements[std::get<std::string>(var_name->value)] = result->record(expr());
+
+		if (result->error != nullptr) {
+			return result->failure(new InvalidSyntaxError(
+				current_token->start,
+				current_token->end,
+				"Expected ']', 'var', 'if', 'for', 'while', 'fn', 'integer', 'double', 'identifier'"
+			));
+		}
+
+		while (current_token->type == Token::Type::COMMA) {
+			result->record_advance();
+			advance();
+
+			if (current_token->type == Token::Type::IDENTIFIER) {
+				auto prop_name = std::get<std::string>(current_token->value);
+
+				result->record_advance();
+				advance();
+
+				if (current_token->type != Token::Type::COLON) {
+					return result->failure(new InvalidSyntaxError(
+						current_token->start,
+						current_token->end,
+						"Expected ':'"
+					));
+				}
+
+				result->record_advance();
+				advance();
+
+				elements[prop_name] = result->record(expr());
+
+				if (result->error != nullptr)
+					return result;
+			}
+		}
+
+		if (current_token->type != Token::Type::RCBRACKET) {
+			return result->failure(new InvalidSyntaxError(
+				current_token->start,
+				current_token->end,
+				"Expected ',' or '}'"
+			));
+		}
+
+		result->record_advance();
+		advance();
+	}
+
+	return result->success(new MapNode(current_token, elements));
 }
 
 Parser::Result* Parser::binary_operation(

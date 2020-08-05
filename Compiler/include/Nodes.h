@@ -19,6 +19,7 @@ public:
 		FN_CALL,
 		STRING,
 		ARRAY,
+		MAP,
 		PROPERTY_ACCESS,
 		PROPERTY_ASSIGN,
 		INDEX_ACCESS,
@@ -274,6 +275,16 @@ public:
 	{}
 
 	std::vector<Node*> elements;
+};
+
+class MapNode : public Node {
+public:
+	MapNode(Token* token, const std::map<std::string, Node*>& elements) :
+		Node(token, nullptr, nullptr, Type::MAP),
+		elements(elements)
+	{}
+
+	std::map<std::string, Node*> elements;
 };
 
 class PropertyAccessNode : public Node {

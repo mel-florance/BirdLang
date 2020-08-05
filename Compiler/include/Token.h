@@ -23,6 +23,10 @@ public:
 		RPAREN,
 		LSBRACKET,
 		RSBRACKET,
+		LCBRACKET,
+		RCBRACKET,
+		COLON,
+		SEMI_COLON,
 		IDENTIFIER,
 		KEYWORD,
 		COMMA,
@@ -70,6 +74,10 @@ public:
 		case Type::RPAREN: return "RPAREN";
 		case Type::LSBRACKET: return "LSBRACKET";
 		case Type::RSBRACKET: return "RSBRACKET";
+		case Type::LCBRACKET: return "LCBRACKET";
+		case Type::RCBRACKET: return "RCBRACKET";
+		case Type::COLON: return "COLON";
+		case Type::SEMI_COLON: return "SEMI_COLON";
 		case Type::IDENTIFIER: return "IDENTIFIER";
 		case Type::KEYWORD: return "KEYWORD";
 		case Type::COMMA: return "COMMA";

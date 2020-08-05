@@ -6,8 +6,10 @@
 #include "Str.h"
 #include "Array.h"
 #include "File.h"
-#include "Interpreter.h"
 
+#include "Object.h"
+#include "Interpreter.h"
+#include "Map.h"
 bool Type::Null = false;
 bool Type::False = false;
 bool Type::True = true;
@@ -141,12 +143,32 @@ void Type::printFile(std::ostream& stream, File* file)
 		stream << "<file " << std::filesystem::path(file->name).filename() << ">";
 }
 
+void Type::printMap(std::ostream& stream, Map* map)
+{
+	auto elements = std::get<std::map<std::string, Type*>>(map->value);
+	std::map<std::string, Type*>::reverse_iterator it = elements.rbegin();
+
+	stream << "{" << '\n';
+
+	for (unsigned int i = 0; it != elements.rend(); ++it, i++) {
+		stream << std::string(4, ' ') << it->first << ": " << it->second << (i != elements.size() - 1 ? ',' : '\0') << '\n';
+	}
+
+	stream << "}" << '\n';
+}
+
+void Type::printObject(std::ostream& stream, Object* map)
+{
+}
+
 std::ostream& operator << (std::ostream& stream, Type* type)
 {
 	if (type != nullptr)
 	{
 		if (Array* array = dynamic_cast<Array*>(type))
 			Type::printArray(stream, array);
+		else if (Map* map = dynamic_cast<Map*>(type))
+			Type::printMap(stream, map);
 		else if (Number* number = dynamic_cast<Number*>(type))
 			Type::printNumber(stream, number);
 		else if (Function* function = dynamic_cast<Function*>(type))
@@ -155,6 +177,8 @@ std::ostream& operator << (std::ostream& stream, Type* type)
 			Type::printString(stream, string);
 		else if (File* file = (File*)type)
 			Type::printFile(stream, std::get<File*>(file->value));
+	/*	else if (Object* object = (Object*)type)
+			Type::printObject(stream, std::get<Object*>(object->value));*/
 	}
 	
 	return stream;

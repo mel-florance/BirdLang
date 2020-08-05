@@ -52,4 +52,5 @@ public:
 	RuntimeResult* visit_array_node(Node* node, Context* context);
 	RuntimeResult* visit_property_access_node(Node* node, Context* context);
 	RuntimeResult* visit_index_access_node(Node* node, Context* context);
+	RuntimeResult* visit_map_node(Node* node, Context* context);
 };

@@ -3,6 +3,7 @@
 #include "Function.h"
 #include "Str.h"
 #include "Array.h"
+#include "Map.h"
 #include "File.h"
 
 Interpreter::Interpreter()
@@ -40,8 +41,11 @@ RuntimeResult* Interpreter::visit(Node* node, Context* context)
 			return visit_property_access_node(property_access_node, context);
 		else if(IndexAccessNode* index_access_node = dynamic_cast<IndexAccessNode*>(node))
 			return visit_index_access_node(index_access_node, context);
+		else if (MapNode* map_node = dynamic_cast<MapNode*>(node))
+			return visit_map_node(map_node, context);
 
 		auto type = typeid(*node).name();
+
 		std::cout << "No visit " << type << " method defined." << '\n';
 	}
 
@@ -237,6 +241,8 @@ RuntimeResult* Interpreter::visit_variable_access_node(Node* node, Context* cont
 		return result->success(new String(value->second));
 	case Type::Native::ARRAY:
 		return result->success(new Array(std::get<std::vector<Type*>>(value->second)));
+	case Type::Native::MAP:
+		return result->success(new Map(std::get<std::map<std::string, Type*>>(value->second)));
 	case Type::Native::FILE:
 		auto file = new File();
 		auto ref = std::get<File*>(value->second);
@@ -281,6 +287,9 @@ RuntimeResult* Interpreter::visit_variable_assignment_node(Node* node, Context* 
 	}
 	else if (number->value.index() == Type::Native::FILE) {
 		context->symbols->set(std::get<std::string>(var_name), (File*)std::get<File*>(number->value));
+	}
+	else if (number->value.index() == Type::Native::MAP) {
+		context->symbols->set(std::get<std::string>(var_name), std::get<std::map<std::string, Type*>>(number->value));
 	}
 
 	return result->success(number);
@@ -602,6 +611,7 @@ RuntimeResult* Interpreter::visit_property_access_node(Node* node, Context* cont
 	else if (it->second.index() == Type::Native::FILE) {
 		auto prop_value = std::get<std::string>(property_node->token->value);
 		auto file = std::get<File*>(it->second);
+
 		if (prop_value == "name") {
 			result_value = new String();
 			result_value->value = std::filesystem::path(file->name).filename().string();
@@ -629,6 +639,58 @@ RuntimeResult* Interpreter::visit_property_access_node(Node* node, Context* cont
 		else if (prop_value == "mode") {
 			result_value = new String();
 			result_value->value = File::modeToStr(static_cast<File::Mode>(file->mode));
+		}
+	}
+	else if (it->second.index() == Type::Native::MAP) {
+		auto value = std::get<std::map<std::string, Type*>>(it->second);
+		auto map_it = value.find(std::get<std::string>(property_node->token->value));
+
+		if (map_it != value.end()) {
+			switch (map_it->second->value.index()) {
+			case Type::Native::DOUBLE:
+				try {
+					result_value = new Number();
+					result_value->value = std::get<double>(map_it->second->value);
+				}
+				catch (const std::bad_variant_access&) {}
+				break;
+			case Type::Native::INT:
+				try {
+					result_value = new Number();
+					result_value->value = std::get<int>(map_it->second->value);
+				}
+				catch (const std::bad_variant_access&) {}
+				break;
+			case Type::Native::BOOL:
+				try {
+					result_value = new Number();
+					result_value->value = std::get<bool>(map_it->second->value);
+				}
+				catch (const std::bad_variant_access&) {}
+				break;
+			case Type::Native::STRING:
+				try {
+					result_value = new String();
+					result_value->value = std::get<std::string>(map_it->second->value);
+				}
+				catch (const std::bad_variant_access&) {}
+				break;
+			case Type::Native::ARRAY:
+				try {
+					result_value = new Array();
+					result_value->value = std::get<std::vector<Type*>>(map_it->second->value);
+				}
+				catch (const std::bad_variant_access&) {}
+				break;
+			case Type::Native::FILE:
+				try {
+					result_value = new Type();
+					auto file = std::get<File*>(map_it->second->value);
+					result_value->value = file;
+				}
+				catch (const std::bad_variant_access&) {}
+				break;
+			}
 		}
 	}
 
@@ -687,6 +749,54 @@ RuntimeResult* Interpreter::visit_index_access_node(Node* node, Context* context
 		result_value = new String();
 		result_value->value = std::string(1, index);
 	}
+	else if (it->second.index() == Type::Native::MAP) {
+		switch (number->value.index()) {
+		case Type::Native::STRING:
+			auto map = std::get<std::map<std::string, Type*>>(it->second);
+			auto found = map.find(std::get<std::string>(number->value));
+
+			if (found != map.end()) {
+				switch (found->second->value.index()) {
+				case Type::Native::DOUBLE:
+					result_value = new Number();
+					result_value->value = std::get<double>(found->second->value);
+					break;
+				case Type::Native::INT:
+					result_value = new Number();
+					result_value->value = std::get<int>(found->second->value);
+					break;
+				case Type::Native::STRING:
+					result_value = new String();
+					result_value->value = std::get<std::string>(found->second->value);
+					break;
+				case Type::Native::BOOL:
+					result_value = new Number();
+					result_value->value = std::get<bool>(found->second->value);
+					break;
+				}
+			}
+			break;
+		}
+	}
 
 	return result->success(result_value);
+}
+
+RuntimeResult* Interpreter::visit_map_node(Node* node, Context* context)
+{
+	auto map_node = (MapNode*)node;
+	RuntimeResult* result = new RuntimeResult();
+	std::map<std::string, Type*> elements;;
+
+	for (auto it = map_node->elements.begin(); it != map_node->elements.end(); ++it) {
+		auto visit_element = visit(it->second, context);
+		elements.emplace(it->first, result->record(visit_element));
+
+		if (result->error != nullptr)
+			return result;
+	}
+
+	
+
+	return result->success(new Map(elements));
 }

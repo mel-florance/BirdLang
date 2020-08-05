@@ -3,7 +3,61 @@
 #include "Interpreter.h"
 #include "Str.h"
 #include "File.h"
+#include "Array.h"
 #include "Function.h"
+#include "Utils.h"
+
+NativeFunction::NativeFunctionList NativeFunction::list = {
+	{"str", {{ "value" }, &NativeFunction::fn_str}},
+	{"bool", {{ "value" }, &NativeFunction::fn_bool}},
+	{"int", {{ "value" }, &NativeFunction::fn_int}},
+	{"float", {{ "value" }, &NativeFunction::fn_float}},
+
+	{"keys", {{ "value"}, &NativeFunction::fn_keys} },
+	{"values", {{ "value"}, &NativeFunction::fn_values}},
+
+	{"print", {{ "value" }, &NativeFunction::fn_print}},
+	{"sizeof", {{ "value" }, &NativeFunction::fn_sizeof}},
+	{"hsize", {{ "value" }, &NativeFunction::fn_hsize}},
+	{"typeof", {{ "value" }, &NativeFunction::fn_typeof}},
+	{"chr", {{ "string", "index" }, &NativeFunction::fn_chr}},
+
+	{"exec", {{ "command" }, &NativeFunction::fn_exec}},
+	{"open", {{ "filename", "mode?" }, &NativeFunction::fn_open}},
+
+	{"bin", {{ "value" }, &NativeFunction::fn_bin}},
+	{"hex", {{ "value" }, &NativeFunction::fn_hex}},
+	{"dec", {{ "value" }, &NativeFunction::fn_dec}},
+	{"bin", {{ "value" }, &NativeFunction::fn_bin}},
+	{"oct", {{ "value" }, &NativeFunction::fn_oct}},
+
+	{"abs", {{ "value" }, &NativeFunction::fn_abs}},
+	{"acos", {{ "value" }, &NativeFunction::fn_acos}},
+	{"acosh", {{ "value" }, &NativeFunction::fn_acosh}},
+	{"asin", {{ "value" }, &NativeFunction::fn_asin}},
+	{"asinh", {{ "value" }, &NativeFunction::fn_asinh}},
+	{"atan", {{ "value" }, &NativeFunction::fn_atan}},
+	{"atan2", {{ "x", "y" }, &NativeFunction::fn_atan2}},
+	{"atanh", {{ "value" }, &NativeFunction::fn_atanh}},
+	{"cbrt", {{ "value" }, &NativeFunction::fn_cbrt}},
+	{"ceil", {{ "value" }, &NativeFunction::fn_ceil}},
+	{"cos", {{ "value" }, &NativeFunction::fn_cos}},
+	{"cosh", {{ "value" }, &NativeFunction::fn_cosh}},
+	{"exp", {{ "value" }, &NativeFunction::fn_exp}},
+	{"floor", {{ "value" }, &NativeFunction::fn_floor}},
+	{"log", {{ "value" }, &NativeFunction::fn_log}},
+	{"max", {{ "x", "y" }, &NativeFunction::fn_max}},
+	{"min", {{ "x", "y" }, &NativeFunction::fn_min}},
+	{"pow", {{ "n", "exp" }, &NativeFunction::fn_exp}},
+	{"random", {{}, &NativeFunction::fn_random}},
+	{"round", {{ "value" }, &NativeFunction::fn_round}},
+	{"sin", {{ "value" }, &NativeFunction::fn_sin}},
+	{"sinh", {{ "value" }, &NativeFunction::fn_sinh}},
+	{"sqrt", {{ "value" }, &NativeFunction::fn_sqrt}},
+	{"tan", {{ "value" }, &NativeFunction::fn_tan}},
+	{"tanh", {{ "value" }, &NativeFunction::fn_tanh}},
+	{"trunc", {{ "value" }, &NativeFunction::fn_trunc}}
+};
 
 NativeFunction::NativeFunction(
 	const std::string& name,
@@ -34,106 +88,13 @@ RuntimeResult* NativeFunction::execute(const std::vector<Type*>& args, Context* 
 		return result;
 
 	Type* return_value = nullptr;
+	auto it = NativeFunction::list.begin();
 
-	if (name == "print") {
-		args_names = { "value" };
-		return_value = result->record(fn_print(context));
-	} else if (name == "str") {
-		args_names = { "value" };
-		return_value = result->record(fn_str(context));
-	} else if (name == "sizeof") {
-		args_names = { "value" };
-		return_value = result->record(fn_sizeof(context));
-	} else if (name == "typeof") {
-		args_names = { "value" };
-		return_value = result->record(fn_typeof(context));
-	} else if (name == "charAt") {
-		args_names = { "string", "index" };
-		return_value = result->record(fn_char_at(context));
-	} else if (name == "open") {
-		args_names = { "filename", "mode" };
-		return_value = result->record(fn_open(context));
-	} else if (name == "abs") {
-		args_names = { "value" };
-		return_value = result->record(fn_abs(context));
-	} else if (name == "abs") {
-		args_names = { "value" };
-		return_value = result->record(fn_abs(context));
-	} else if (name == "acos") {
-		args_names = { "value" };
-		return_value = result->record(fn_acos(context));
-	} else if (name == "acosh") {
-		args_names = { "value" };
-		return_value = result->record(fn_acosh(context));
-	} else if (name == "asin") {
-		args_names = { "value" };
-		return_value = result->record(fn_asin(context));
-	} else if (name == "asinh") {
-		args_names = { "value" };
-		return_value = result->record(fn_asinh(context));
-	} else if (name == "atan") {
-		args_names = { "value" };
-		return_value = result->record(fn_atan(context));
-	} else if (name == "atan2") {
-		args_names = { "x", "y" };
-		return_value = result->record(fn_atan2(context));
-	} else if (name == "atanh") {
-		args_names = { "value" };
-		return_value = result->record(fn_atanh(context));
-	} else if (name == "cbrt") {
-		args_names = { "value" };
-		return_value = result->record(fn_cbrt(context));
-	} else if (name == "ceil") {
-		args_names = { "value" };
-		return_value = result->record(fn_ceil(context));
-	} else if (name == "cos") {
-		args_names = { "value" };
-		return_value = result->record(fn_cos(context));
-	} else if (name == "cosh") {
-		args_names = { "value" };
-		return_value = result->record(fn_cosh(context));
-	} else if (name == "exp") {
-		args_names = { "value" };
-		return_value = result->record(fn_exp(context));
-	} else if (name == "floor") {
-		args_names = { "value" };
-		return_value = result->record(fn_floor(context));
-	} else if (name == "log") {
-		args_names = { "value" };
-		return_value = result->record(fn_log(context));
-	} else if (name == "max") {
-		args_names = { "x", "y" };
-		return_value = result->record(fn_max(context));
-	} else if (name == "min") {
-		args_names = { "x", "y" };
-		return_value = result->record(fn_min(context));
-	} else if (name == "pow") {
-		args_names = { "n", "exp" };
-		return_value = result->record(fn_pow(context));
-	} else if (name == "random") {
-		args_names = {};
-		return_value = result->record(fn_random(context));
-	} else if (name == "round") {
-		args_names = { "value" };
-		return_value = result->record(fn_round(context));
-	} else if (name == "sin") {
-		args_names = { "value" };
-		return_value = result->record(fn_sin(context));
-	} else if (name == "sinh") {
-		args_names = { "value" };
-		return_value = result->record(fn_sinh(context));
-	} else if (name == "sqrt") {
-		args_names = { "value" };
-		return_value = result->record(fn_sqrt(context));
-	} else if (name == "tan") {
-		args_names = { "value" };
-		return_value = result->record(fn_tan(context));
-	} else if (name == "tanh") {
-		args_names = { "value" };
-		return_value = result->record(fn_tanh(context));
-	} else if (name == "trunc") {
-		args_names = { "value" };
-		return_value = result->record(fn_trunc(context));
+	for (; it != NativeFunction::list.end(); ++it) {
+		if (name == it->first) {
+			args_names = std::get<0>(it->second);
+			return_value = result->record(std::get<1>(it->second)(context));
+		}
 	}
 
 	if (result->error != nullptr)
@@ -149,27 +110,27 @@ RuntimeResult* NativeFunction::fn_print(Context* ctx)
 
 	switch (value.index()) {
 	case Type::Native::DOUBLE:
-		try { std::cout << std::get<double>(value); }
+		try { std::cout << std::get<double>(value) << '\n'; }
 		catch (const std::bad_variant_access&) {}
 		break;
 	case Type::Native::INT:
-		try { std::cout << std::get<int>(value); }
+		try { std::cout << std::get<int>(value) << '\n'; }
 		catch (const std::bad_variant_access&) {}
 		break;
 	case Type::Native::BOOL:
-		try { std::cout << (std::get<bool>(value) ? "true" : "false"); }
+		try { std::cout << (std::get<bool>(value) ? "true" : "false") << '\n'; }
 		catch (const std::bad_variant_access&) {}
 		break;
 	case Type::Native::FUNCTION:
-		try { std::cout << std::get<Function*>(value);  }
+		try { std::cout << std::get<Function*>(value) << '\n'; }
 		catch (const std::bad_variant_access&) {}
 		break;
 	case Type::Native::STRING:
-		try { std::cout << std::get<std::string>(value); }
+		try { std::cout << std::get<std::string>(value) << '\n'; }
 		catch (const std::bad_variant_access&) {}
 		break;
 	case Type::Native::FILE:
-		try { std::cout << std::get<std::string>(std::get<File*>(value)->value); }
+		try { std::cout << std::get<std::string>(std::get<File*>(value)->value) << '\n'; }
 		catch (const std::bad_variant_access&) {}
 		break;
 	}
@@ -209,6 +170,147 @@ RuntimeResult* NativeFunction::fn_str(Context* ctx)
 	return result->success(string);
 }
 
+RuntimeResult* NativeFunction::fn_bool(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto boolean = new Number();
+
+	switch (value.index()) {
+	case Type::Native::DOUBLE:
+		try { boolean->value = (bool)(std::get<double>(value) != 0.0); }
+		catch (const std::bad_variant_access&) {}
+		break;
+	case Type::Native::INT:
+		try { boolean->value = (bool)(std::get<int>(value) != 0); }
+		catch (const std::bad_variant_access&) {}
+		break;
+	case Type::Native::STRING:
+		try {
+			auto n = std::get<std::string>(value);
+			boolean->value = !n.empty() && (strcmp(n.c_str(), "true") == 0 || atoi(n.c_str()) != 0);
+		}
+		catch (const std::bad_variant_access&) {}
+		break;
+	}
+
+	return result->success(boolean);
+}
+
+RuntimeResult* NativeFunction::fn_int(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto integer = new Number();
+
+	switch (value.index()) {
+	case Type::Native::DOUBLE:
+		try { integer->value = (int)std::get<double>(value);  }
+		catch (const std::bad_variant_access&) {}
+	case Type::Native::INT:
+		try { integer->value = std::get<int>(value); }
+		catch (const std::bad_variant_access&) {}
+	case Type::Native::STRING:
+		try { integer->value = std::stoi(std::get<std::string>(value)); }
+		catch (const std::bad_variant_access&) {}
+	}
+
+	return result->success(integer);
+}
+
+RuntimeResult* NativeFunction::fn_float(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto number = new Number();
+
+	switch (value.index()) {
+	case Type::Native::DOUBLE:
+		try { number->value = std::get<double>(value); }
+		catch (const std::bad_variant_access&) {}
+	case Type::Native::INT:
+		try { number->value = (double)std::get<int>(value); }
+		catch (const std::bad_variant_access&) {}
+	case Type::Native::STRING:
+		try { number->value = std::stod(std::get<std::string>(value)); }
+		catch (const std::bad_variant_access&) {}
+	}
+
+	return result->success(number);
+}
+
+RuntimeResult* NativeFunction::fn_keys(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto result_value = new Array();
+	std::vector<Type*> keys = {};
+
+	switch (value.index()) {
+	case Type::Native::ARRAY:
+		try {
+			auto array = std::get<std::vector<Type*>>(value);
+			auto it = array.begin();
+
+			for (int i = 0; it != array.end(); ++it, i++)
+				keys.push_back(new Number(i));
+		}
+		catch (const std::bad_variant_access&) {}
+		break;
+	case Type::Native::MAP:
+		try {
+			auto map = std::get<std::map<std::string, Type*>>(value);
+			auto it = map.begin();
+
+			for (; it != map.end(); ++it)
+				keys.push_back(new String(it->first));
+		}
+		catch (const std::bad_variant_access&) {}
+		break;
+	}
+
+	result_value->value = keys;
+
+	return result->success(result_value);
+}
+
+RuntimeResult* NativeFunction::fn_values(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto result_value = new Array();
+	std::vector<Type*> values = {};
+
+	switch (value.index()) {
+	case Type::Native::ARRAY: {
+		try {
+			auto array = std::get<std::vector<Type*>>(value);
+			auto array_it = array.begin();
+
+			for (; array_it != array.end(); ++array_it) {
+				values.push_back(*array_it);
+			}
+		}
+		catch (const std::bad_variant_access&) {}
+	}
+	break;
+	case Type::Native::MAP: {
+		try {
+			auto map = std::get<std::map<std::string, Type*>>(value);
+			auto map_it = map.begin();
+
+			for (; map_it != map.end(); ++map_it)
+				values.push_back(map_it->second);
+		}
+		catch (const std::bad_variant_access&) {}
+	}
+	break;
+	}
+	result_value->value = values;
+
+	return result->success(result_value);
+}
+
 RuntimeResult* NativeFunction::fn_sizeof(Context* ctx)
 {
 	RuntimeResult* result = new RuntimeResult();
@@ -224,8 +326,36 @@ RuntimeResult* NativeFunction::fn_sizeof(Context* ctx)
 		try { size->value = (int)std::get<std::vector<Type*>>(value).size(); }
 		catch (const std::bad_variant_access&) {}
 		break;
+	case Type::Native::MAP:
+		try { size->value = (int)std::get<std::map<std::string, Type*>>(value).size(); }
+		catch (const std::bad_variant_access&) {}
+		break;
 	case Type::Native::FILE:
 		try { size->value = (int)std::get<File*>(value)->size; }
+		catch (const std::bad_variant_access&) {}
+		break;
+	}
+
+	return result->success(size);
+}
+
+RuntimeResult* NativeFunction::fn_hsize(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto size = new String();
+
+	switch (value.index()) {
+	case Type::Native::STRING:
+		try { size->value = Utils::bytesToSize((int)std::get<std::string>(value).length()); }
+		catch (const std::bad_variant_access&) {}
+		break;
+	case Type::Native::ARRAY:
+		try { size->value = Utils::bytesToSize(sizeof std::get<std::vector<Type*>>(value).size()); }
+		catch (const std::bad_variant_access&) {}
+		break;
+	case Type::Native::FILE:
+		try { size->value = Utils::bytesToSize((int)std::get<File*>(value)->size); }
 		catch (const std::bad_variant_access&) {}
 		break;
 	}
@@ -247,12 +377,13 @@ RuntimeResult* NativeFunction::fn_typeof(Context* ctx)
 	case Type::Native::STRING   : string->value = std::string("string"); break;
 	case Type::Native::ARRAY    : string->value = std::string("array"); break;
 	case Type::Native::FILE		: string->value = std::string("file"); break;
+	case Type::Native::MAP		: string->value = std::string("map"); break;
 	}
 
 	return result->success(string);
 }
 
-RuntimeResult* NativeFunction::fn_char_at(Context* ctx)
+RuntimeResult* NativeFunction::fn_chr(Context* ctx)
 {
 	RuntimeResult* result = new RuntimeResult();
 	auto string = ctx->symbols->get("string")->second;
@@ -272,11 +403,32 @@ RuntimeResult* NativeFunction::fn_char_at(Context* ctx)
 	return result->success(character);
 }
 
+RuntimeResult* NativeFunction::fn_exec(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto command = ctx->symbols->get("command")->second;
+	auto return_value = new Number();
+
+	if (command.index() == Type::Native::STRING) {
+		return_value->value = system(std::get<std::string>(command).c_str());
+	}
+
+	return result->success(return_value);
+}
+
 RuntimeResult* NativeFunction::fn_open(Context* ctx)
 {
 	RuntimeResult* result = new RuntimeResult();
 	auto arg_filename = ctx->symbols->get("filename")->second;
 	auto arg_mode = ctx->symbols->get("mode")->second;
+	std::string arg_mode_str;
+
+	try { arg_mode_str = std::get<std::string>(arg_mode); }
+	catch (const std::bad_variant_access&) {}
+
+	if (arg_mode_str.find("?") != std::string::npos)
+		arg_mode = "r";
+
 	int read_mode = 0;
 	auto out = new Type();
 
@@ -307,7 +459,7 @@ RuntimeResult* NativeFunction::fn_open(Context* ctx)
 	stream.open(filename_value, std::ifstream::in);
 
 	if (!stream) {
-		return result->failure(new RuntimeError(start, end, "Unable to open file: " + filename_value, context));
+		return result->failure(new RuntimeError(nullptr, nullptr, "Unable to open file: " + filename_value, nullptr));
 	}
 
 	stream.seekg(0, std::ios::end);
@@ -329,6 +481,113 @@ RuntimeResult* NativeFunction::fn_open(Context* ctx)
 	out->value = file;
 
 	return result->success(out);
+}
+
+RuntimeResult* NativeFunction::fn_bin(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto string = new String();
+
+	switch (value.index()) {
+	case Type::Native::INT:
+		try {
+			unsigned long n = (unsigned long)std::get<int>(value);
+			char buffer[(sizeof(unsigned long) * 8) + 1];
+			unsigned index = sizeof(unsigned long) * 8;
+			char temp = 0;
+			buffer[index] = '\0';
+
+			do {
+				temp = (n & 1);
+				temp = temp + '0';
+				buffer[--index] = temp;
+			} while (n >>= 1);
+
+			string->value = std::string(buffer + index);
+		}
+		catch (const std::bad_variant_access&) {}
+		break;
+	}
+
+	return result->success(string);
+}
+
+RuntimeResult* NativeFunction::fn_hex(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto string = new String();
+
+	switch (value.index()) {
+	case Type::Native::INT:
+		try {
+			std::stringstream stream;
+			stream << "0x"
+				<< std::setfill('0') << std::setw(sizeof(int) * 2)
+				<< std::hex << std::get<int>(value);
+			string->value = stream.str();
+		}
+		catch (const std::bad_variant_access&) {}
+		break;
+	}
+
+	return result->success(string);
+}
+
+RuntimeResult* NativeFunction::fn_dec(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto number = new Number();
+
+	switch (value.index()) {
+	case Type::Native::INT:
+		try {
+			auto n = std::get<int>(value);
+			int d = 0, i = 0, r;
+
+			while (n != 0)
+			{
+				r = n % 10;
+				n /= 10;
+				d += r * pow(8, i);
+				++i;
+			}
+			number->value = d;
+		}
+		catch (const std::bad_variant_access&) {}
+		break;
+	}
+
+	return result->success(number);
+}
+
+RuntimeResult* NativeFunction::fn_oct(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto number = new Number();
+
+	switch (value.index()) {
+	case Type::Native::INT:
+		try {
+			auto n = std::get<int>(value);
+			int o = 0, p = 1;
+
+			while (n != 0) {
+				o += (n % 8) * p;
+				n /= 8;
+				p *= 10;
+			}
+
+			number->value = o;
+		}
+		catch (const std::bad_variant_access&) {}
+		break;
+	}
+
+	return result->success(number);
 }
 
 RuntimeResult* NativeFunction::fn_abs(Context* ctx)

@@ -22,6 +22,7 @@ public:
 
 	inline static std::string modeToStr(Mode mode) {
 		switch (mode) {
+		default:
 		case Mode::READ: return "r";
 		case Mode::WRITE: return "w";
 		case Mode::READ_WRITE: return "rw";

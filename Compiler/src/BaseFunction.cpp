@@ -45,7 +45,17 @@ RuntimeResult* BaseFunction::check_arguments(
 		));
 	}
 
-	if (args.size() < names.size()) {
+	bool few = false;
+
+	for (auto arg : args) {
+		for (auto name : names) {
+			if (name.find("?") != std::string::npos) {
+				few = true;
+			}
+		}
+	}
+
+	if (args.size() < names.size() && !few) {
 		return result->failure(new RuntimeError(
 			this->start,
 			this->end,

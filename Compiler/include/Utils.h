@@ -27,4 +27,18 @@ public:
 
 		return result;
 	}
+
+
+	static inline std::string bytesToSize(int size)
+	{
+		const char* sizes[5] = { "bytes", "Kb", "Mb", "Gb", "Tb" };
+
+		int i;
+		double dblByte = size;
+
+		for (i = 0; i < 5 && size >= 1024; i++, size /= 1024)
+			dblByte = size / 1024.0;
+
+		return std::to_string(dblByte) + " " + std::string(sizes[i]);
+	}
 };

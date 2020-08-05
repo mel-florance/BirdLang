@@ -1,5 +1,5 @@
 #pragma once
-
+#include <map>
 #include "Context.h"
 
 class Number;
@@ -7,6 +7,8 @@ class Function;
 class Array;
 class String;
 class File;
+class Map;
+class Object;
 
 class Error;
 class RuntimeResult;
@@ -18,7 +20,8 @@ using DynamicType = std::variant<
 	Function*,
 	std::string,
 	std::vector<Type*>,
-	File*
+	File*,
+	std::map<std::string, Type*>
 >;
 
 class Type {
@@ -30,7 +33,9 @@ public:
 		FUNCTION,
 		STRING,
 		ARRAY,
-		FILE
+		FILE,
+		MAP,
+		OBJECT
 	};
 
 	Type(
@@ -48,6 +53,8 @@ public:
 	static void printString(std::ostream& stream, String* string);
 	static void printNumber(std::ostream& stream, Number* number);
 	static void printFile(std::ostream& stream, File* file);
+	static void printMap(std::ostream& stream, Map* map);
+	static void printObject(std::ostream& stream, Object* map);
 
 	virtual std::pair<Type*, Error*> add(Type* other);
 	virtual std::pair<Type*, Error*> subtract(Type* other);
