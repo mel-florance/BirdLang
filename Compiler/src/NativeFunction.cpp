@@ -4,6 +4,7 @@
 #include "Str.h"
 #include "File.h"
 #include "Array.h"
+#include "Map.h"
 #include "Function.h"
 #include "Utils.h"
 
@@ -133,6 +134,15 @@ RuntimeResult* NativeFunction::fn_print(Context* ctx)
 		try { std::cout << std::get<std::string>(std::get<File*>(value)->value) << '\n'; }
 		catch (const std::bad_variant_access&) {}
 		break;
+	case Type::Native::MAP:
+		try {
+			auto map = std::get<std::map<std::string, Type*>>(value);
+			auto instance = new Map(map);
+
+			std::cout << instance << std::endl;
+		}
+		catch (const std::bad_variant_access&) {}
+		break;
 	}
 
 	return result->success(nullptr);
@@ -161,7 +171,7 @@ RuntimeResult* NativeFunction::fn_str(Context* ctx)
 		try { string->value = "<function " + (std::get<Function*>(value)->name) + '>'; }
 		catch (const std::bad_variant_access&) {}
 		break;
-	case Type::Native::STRING:
+	case Type::Native::STRING:	
 		try { string->value = std::get<std::string>(value); }
 		catch (const std::bad_variant_access&) {}
 		break;

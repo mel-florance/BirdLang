@@ -20,7 +20,7 @@ std::pair<Type*, Error*> Array::subtract(Type* other)
 {
 	auto array = std::get<std::vector<Type*>>(value);
 
-	if (other->value.index() == 1 && array.size() > 0) {
+	if (other->is(Type::Native::INT) && array.size() > 0) {
 		auto index = std::get<int>(other->value);
 
 		if (index < array.size() && index >= 0) {
@@ -50,7 +50,7 @@ std::pair<Type*, Error*> Array::compare_greater_than(Type* other)
 {
 	auto array = std::get<std::vector<Type*>>(value);
 
-	if (other->value.index() == 1) {
+	if (other->is(Type::Native::INT)) {
 		auto index = std::get<int>(other->value);
 
 		if (index < array.size()) {

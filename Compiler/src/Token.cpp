@@ -2,19 +2,24 @@
 #include "Token.h"
 
 std::vector<std::string> Token::keywords = {
-    "var",
-    "and",
-    "or",
-    "not",
-    "if",
-    "then",
-    "else",
-    "else if",
-    "for",
-    "while",
-    "to",
-    "step",
-	"fn"
+	"var",
+	"and",
+	"or",
+	"not",
+	"if",
+	"then",
+	"else",
+	"elif",
+	"for",
+	"while",
+	"to",
+	"step",
+	"function",
+	"import",
+	"break",
+	"return",
+	"continue",
+	"delete"
 };
 
 Token::Token(

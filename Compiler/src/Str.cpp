@@ -31,22 +31,22 @@ std::pair<Type*, Error*> String::add(Type* other)
 {
 	auto str = new String();
 
-	if(other->value.index() == 0) {
+	if(other->value.index() == Type::Native::DOUBLE) {
 		try { str->value = std::get<std::string>(value) + std::to_string(std::get<double>(other->value)); }
 		catch (const std::bad_variant_access&) {}
 	}
 
-	if (other->value.index() == 1) {
+	if (other->value.index() == Type::Native::INT) {
 		try { str->value = std::get<std::string>(value) + std::to_string(std::get<int>(other->value)); }
 		catch (const std::bad_variant_access&) {}
 	}
 
-	if (other->value.index() == 2) {
+	if (other->value.index() == Type::Native::BOOL) {
 		try { str->value = std::get<std::string>(value) + std::to_string(std::get<bool>(other->value)); }
 		catch (const std::bad_variant_access&) {}
 	}
 
-	if (other->value.index() == 4) {
+	if (other->value.index() == Type::Native::STRING) {
 		try { str->value = std::get<std::string>(value) + std::get<std::string>(other->value); }
 		catch (const std::bad_variant_access&) {}
 	}
@@ -58,7 +58,7 @@ std::pair<Type*, Error*> String::multiply(Type* other)
 {
 	auto str = new String();
 
-	if (other->value.index() == 1) {
+	if (other->value.index() == Type::Native::INT) {
 		std::string out;
 		auto n = std::get<int>(other->value);
 
@@ -76,7 +76,7 @@ std::pair<Type*, Error*> String::compare_equal(Type* other)
 {
 	auto result = new Number(false);
 
-	if (other->value.index() == 4) {
+	if (other->value.index() == Type::Native::STRING) {
 		try { result->value = (bool)(std::get<std::string>(value) == std::get<std::string>(other->value)); }
 		catch (const std::bad_variant_access&) {}
 	}
@@ -88,7 +88,7 @@ std::pair<Type*, Error*> String::compare_not_equal(Type* other)
 {
 	auto result = new Number(false);
 
-	if (other->value.index() == 4) {
+	if (other->value.index() == Type::Native::STRING) {
 		try { result->value = (bool)(std::get<std::string>(value) != std::get<std::string>(other->value)); }
 		catch (const std::bad_variant_access&) {}
 	}
@@ -100,7 +100,7 @@ std::pair<Type*, Error*> String::compare_less_than(Type* other)
 {
 	auto result = new Number(false);
 
-	if (other->value.index() == 4) {
+	if (other->value.index() == Type::Native::STRING) {
 		try { result->value = (bool)(std::get<std::string>(value).size() < std::get<std::string>(other->value).size()); }
 		catch (const std::bad_variant_access&) {}
 	}
@@ -112,7 +112,7 @@ std::pair<Type*, Error*> String::compare_greater_than(Type* other)
 {
 	auto result = new Number(false);
 
-	if (other->value.index() == 4) {
+	if (other->value.index() == Type::Native::STRING) {
 		try { result->value = (bool)(std::get<std::string>(value).size() > std::get<std::string>(other->value).size()); }
 		catch (const std::bad_variant_access&) {}
 	}
@@ -124,7 +124,7 @@ std::pair<Type*, Error*> String::compare_less_or_equal(Type* other)
 {
 	auto result = new Number(false);
 
-	if (other->value.index() == 4) {
+	if (other->value.index() == Type::Native::STRING) {
 		try { result->value = (bool)(std::get<std::string>(value).size() <= std::get<std::string>(other->value).size()); }
 		catch (const std::bad_variant_access&) {}
 	}
@@ -136,7 +136,7 @@ std::pair<Type*, Error*> String::compare_greater_or_equal(Type* other)
 {
 	auto result = new Number(false);
 
-	if (other->value.index() == 4) {
+	if (other->value.index() == Type::Native::STRING) {
 		try { result->value = (bool)(std::get<std::string>(value).size() >= std::get<std::string>(other->value).size()); }
 		catch (const std::bad_variant_access&) {}
 	}

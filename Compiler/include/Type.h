@@ -47,6 +47,7 @@ public:
 
 	friend std::ostream& operator << (std::ostream& stream, Type* type);
 	virtual RuntimeResult* execute(const std::vector<Type*>& args, Context* context);
+	inline bool is(Native type) { return value.index() == type; }
 
 	static void printArray(std::ostream& stream, Array* array);
 	static void printFunction(std::ostream& stream, Function* function);
@@ -81,4 +82,5 @@ public:
 	std::shared_ptr<Cursor> start;
 	std::shared_ptr<Cursor> end;
 	Context* context;
+	int depth;
 };

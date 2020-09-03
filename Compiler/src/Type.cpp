@@ -25,6 +25,7 @@ Type::Type(
 	this->start = start;
 	this->end = end;
 	this->context = context;
+	this->depth = 0;
 }
 
 RuntimeResult* Type::execute(const std::vector<Type*>& args, Context* context)
@@ -101,13 +102,17 @@ void Type::printArray(std::ostream& stream, Array* array)
 	auto elements = std::get<std::vector<Type*>>(array->value);
 	std::vector<Type*>::iterator it = elements.begin();
 
-	stream << "[" << '\n';
+	stream << std::string(array->depth, ' ') << "[" << '\n';
+	array->depth += 4;
 
 	for (unsigned int i = 0; it != elements.end(); ++it, i++) {
-		stream << std::string(4, ' ') << *it << (i != elements.size() - 1 ? ',' : '\0') << '\n';
+		auto comma = i != elements.size() - 1 ? ',' : '\0';
+			
+		stream << std::string(array->depth, ' ') <<
+			*it << comma << '\n';
 	}
 
-	stream << "]" << '\n';
+	stream << std::string(array->depth, ' ') << "]" << '\n';
 }
 
 void Type::printFunction(std::ostream& stream, Function* function)
@@ -148,13 +153,18 @@ void Type::printMap(std::ostream& stream, Map* map)
 	auto elements = std::get<std::map<std::string, Type*>>(map->value);
 	std::map<std::string, Type*>::reverse_iterator it = elements.rbegin();
 
-	stream << "{" << '\n';
+	stream << std::string(map->depth, ' ') << "{" << '\n';
+	map->depth += 4;
 
 	for (unsigned int i = 0; it != elements.rend(); ++it, i++) {
-		stream << std::string(4, ' ') << it->first << ": " << it->second << (i != elements.size() - 1 ? ',' : '\0') << '\n';
+		auto comma = i != elements.size() - 1 ? ',' : '\0';
+
+		stream << std::string(map->depth + 4, ' ') <<
+			it->first << ": " << it->second << comma << '\n';
 	}
 
-	stream << "}" << '\n';
+	stream << std::string(map->depth, ' ') << "}";
+	map->depth = 0;
 }
 
 void Type::printObject(std::ostream& stream, Object* map)
@@ -165,10 +175,14 @@ std::ostream& operator << (std::ostream& stream, Type* type)
 {
 	if (type != nullptr)
 	{
-		if (Array* array = dynamic_cast<Array*>(type))
+		if (Array* array = dynamic_cast<Array*>(type)) {
+			type->depth = 0;
 			Type::printArray(stream, array);
-		else if (Map* map = dynamic_cast<Map*>(type))
+		}
+		else if (Map* map = dynamic_cast<Map*>(type)) {
+			type->depth = 0;
 			Type::printMap(stream, map);
+		}
 		else if (Number* number = dynamic_cast<Number*>(type))
 			Type::printNumber(stream, number);
 		else if (Function* function = dynamic_cast<Function*>(type))

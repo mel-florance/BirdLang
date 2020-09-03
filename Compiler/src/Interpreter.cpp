@@ -236,6 +236,7 @@ RuntimeResult* Interpreter::visit_variable_access_node(Node* node, Context* cont
 	default:
 	case Type::Native::DOUBLE:
 	case Type::Native::INT:
+	case Type::Native::BOOL:
 		return result->success(new Number(value->second));
 	case Type::Native::STRING:
 		return result->success(new String(value->second));
@@ -267,30 +268,22 @@ RuntimeResult* Interpreter::visit_variable_assignment_node(Node* node, Context* 
 	if (result->error != nullptr)
 		return result;
 
-	if (number->value.index() == Type::Native::DOUBLE) {
+	if (number->value.index() == Type::Native::DOUBLE)
 		context->symbols->set(std::get<std::string>(var_name), std::get<double>(number->value));
-	}
-	else if (number->value.index() == Type::Native::INT) {
+	else if (number->value.index() == Type::Native::INT)
 		context->symbols->set(std::get<std::string>(var_name), std::get<int>(number->value));
-	}
-	else if (number->value.index() == Type::Native::BOOL) {
+	else if (number->value.index() == Type::Native::BOOL)
 		context->symbols->set(std::get<std::string>(var_name), std::get<bool>(number->value));
-	}
-	else if (number->value.index() == Type::Native::FUNCTION) {
+	else if (number->value.index() == Type::Native::FUNCTION)
 		context->symbols->set(std::get<std::string>(var_name), (Function*)std::get<Function*>(number->value));
-	}
-	else if (number->value.index() == Type::Native::STRING) {
+	else if (number->value.index() == Type::Native::STRING)
 		context->symbols->set(std::get<std::string>(var_name), std::get<std::string>(number->value));
-	}
-	else if (number->value.index() == Type::Native::ARRAY) {
+	else if (number->value.index() == Type::Native::ARRAY)
 		context->symbols->set(std::get<std::string>(var_name), std::get<std::vector<Type*>>(number->value));
-	}
-	else if (number->value.index() == Type::Native::FILE) {
+	else if (number->value.index() == Type::Native::FILE)
 		context->symbols->set(std::get<std::string>(var_name), (File*)std::get<File*>(number->value));
-	}
-	else if (number->value.index() == Type::Native::MAP) {
+	else if (number->value.index() == Type::Native::MAP)
 		context->symbols->set(std::get<std::string>(var_name), std::get<std::map<std::string, Type*>>(number->value));
-	}
 
 	return result->success(number);
 }
@@ -616,11 +609,11 @@ RuntimeResult* Interpreter::visit_property_access_node(Node* node, Context* cont
 			result_value = new String();
 			result_value->value = std::filesystem::path(file->name).filename().string();
 		}
-		if (prop_value == "extension") {
+		else if (prop_value == "extension") {
 			result_value = new String();
 			result_value->value = std::filesystem::path(file->name).extension().string();
 		}
-		if (prop_value == "path") {
+		else if (prop_value == "path") {
 			result_value = new String();
 			result_value->value = file->name;
 		}
@@ -641,57 +634,39 @@ RuntimeResult* Interpreter::visit_property_access_node(Node* node, Context* cont
 			result_value->value = File::modeToStr(static_cast<File::Mode>(file->mode));
 		}
 	}
+	else if (it->second.index() == Type::Native::ARRAY) {
+		auto prop_value = std::get<std::string>(property_node->token->value);
+		auto array = std::get<std::vector<Type*>>(it->second);
+
+		if (prop_value == "size") {
+			result_value = new Number();
+			result_value->value = (int)array.size();
+		}
+		else if (prop_value == "keys") {
+			result_value = new Array();
+			std::vector<Type*> keys = {};
+
+			for (int i = 0; i < array.size(); ++i)
+				keys.push_back(new Number(i));
+
+			result_value->value = keys;
+		}
+		else if (prop_value == "values") {
+			result_value = new Array();
+			std::vector<Type*> keys = {};
+
+			for (auto item : array)
+				keys.push_back(item);
+
+			result_value->value = keys;
+		}
+	}
 	else if (it->second.index() == Type::Native::MAP) {
 		auto value = std::get<std::map<std::string, Type*>>(it->second);
-		auto map_it = value.find(std::get<std::string>(property_node->token->value));
+		auto search = value.find(std::get<std::string>(property_node->token->value));
 
-		if (map_it != value.end()) {
-			switch (map_it->second->value.index()) {
-			case Type::Native::DOUBLE:
-				try {
-					result_value = new Number();
-					result_value->value = std::get<double>(map_it->second->value);
-				}
-				catch (const std::bad_variant_access&) {}
-				break;
-			case Type::Native::INT:
-				try {
-					result_value = new Number();
-					result_value->value = std::get<int>(map_it->second->value);
-				}
-				catch (const std::bad_variant_access&) {}
-				break;
-			case Type::Native::BOOL:
-				try {
-					result_value = new Number();
-					result_value->value = std::get<bool>(map_it->second->value);
-				}
-				catch (const std::bad_variant_access&) {}
-				break;
-			case Type::Native::STRING:
-				try {
-					result_value = new String();
-					result_value->value = std::get<std::string>(map_it->second->value);
-				}
-				catch (const std::bad_variant_access&) {}
-				break;
-			case Type::Native::ARRAY:
-				try {
-					result_value = new Array();
-					result_value->value = std::get<std::vector<Type*>>(map_it->second->value);
-				}
-				catch (const std::bad_variant_access&) {}
-				break;
-			case Type::Native::FILE:
-				try {
-					result_value = new Type();
-					auto file = std::get<File*>(map_it->second->value);
-					result_value->value = file;
-				}
-				catch (const std::bad_variant_access&) {}
-				break;
-			}
-		}
+		if (search != value.end())
+			result_value = search->second;
 	}
 
 	return result->success(result_value);
@@ -721,26 +696,7 @@ RuntimeResult* Interpreter::visit_index_access_node(Node* node, Context* context
 		auto array = std::get<std::vector<Type*>>(it->second);
 		auto index = array.at(std::get<int>(number->value));
 
-		if (index->value.index() == 0) {
-			result_value = new Number();
-			result_value->value = std::get<double>(index->value);
-		}
-		else if (index->value.index() == 1) {
-			result_value = new Number();
-			result_value->value = std::get<int>(index->value);
-		}
-		else if (index->value.index() == 2) {
-			result_value = new Number();
-			result_value->value = std::get<bool>(index->value);
-		}
-		else if (index->value.index() == 4) {
-			result_value = new String();
-			result_value->value = std::get<std::string>(index->value);
-		}
-		else if (index->value.index() == 5) {
-			result_value = new Array();
-			result_value->value = std::get<std::vector<Type*>>(index->value);
-		}
+		result_value = index;
 	}
 	else if (it->second.index() == Type::Native::STRING) {
 		auto string = std::get<std::string>(it->second);
@@ -754,27 +710,7 @@ RuntimeResult* Interpreter::visit_index_access_node(Node* node, Context* context
 		case Type::Native::STRING:
 			auto map = std::get<std::map<std::string, Type*>>(it->second);
 			auto found = map.find(std::get<std::string>(number->value));
-
-			if (found != map.end()) {
-				switch (found->second->value.index()) {
-				case Type::Native::DOUBLE:
-					result_value = new Number();
-					result_value->value = std::get<double>(found->second->value);
-					break;
-				case Type::Native::INT:
-					result_value = new Number();
-					result_value->value = std::get<int>(found->second->value);
-					break;
-				case Type::Native::STRING:
-					result_value = new String();
-					result_value->value = std::get<std::string>(found->second->value);
-					break;
-				case Type::Native::BOOL:
-					result_value = new Number();
-					result_value->value = std::get<bool>(found->second->value);
-					break;
-				}
-			}
+			result_value = found->second;
 			break;
 		}
 	}
@@ -786,7 +722,7 @@ RuntimeResult* Interpreter::visit_map_node(Node* node, Context* context)
 {
 	auto map_node = (MapNode*)node;
 	RuntimeResult* result = new RuntimeResult();
-	std::map<std::string, Type*> elements;;
+	std::map<std::string, Type*> elements;
 
 	for (auto it = map_node->elements.begin(); it != map_node->elements.end(); ++it) {
 		auto visit_element = visit(it->second, context);
@@ -795,8 +731,6 @@ RuntimeResult* Interpreter::visit_map_node(Node* node, Context* context)
 		if (result->error != nullptr)
 			return result;
 	}
-
-	
 
 	return result->success(new Map(elements));
 }

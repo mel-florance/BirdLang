@@ -74,11 +74,18 @@ void BaseFunction::populate_arguments(
 	Context* ctx
 )
 {
-	for (unsigned int i = 0; i < args.size(); ++i) {
+	for (int i = 0; i < args.size(); i++) {
 		auto name = names.at(i);
 		auto value = args.at(i);
-		value->context = ctx;
-		ctx->symbols->set(name, value->value);
+
+		//for (auto arg : std::get<std::map<std::string, Type*>>(args[0]->value)) {
+		//	std::cout << arg << std::endl;
+		//}
+
+		if (name.size() > 0 && value != nullptr) {
+			value->context = ctx;
+			ctx->symbols->set(name, value->value);
+		}
 	}
 }
 

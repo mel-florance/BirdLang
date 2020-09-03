@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Tests" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug x64">
+				<Option output="../bin/Debug-windows-x86_64/Tests/Tests" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../bin-int/Debug-windows-x86_64/Tests/" />
+				<Option deps_output="../bin/Debug-windows-x86_64/Tests/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DPLATFORM_WINDOWS" />
+					<Add option="-DDEBUG" />
+					<Add option="-O0" />
+					<Add option="-Wall" />
+					<Add directory="../Compiler/src/" />
+					<Add directory="../Vendor/googletest/include/" />
+				</Compiler>
+				<Linker>
+					<Add library="gtestd.lib" />
+					<Add library="winmm.lib" />
+					<Add library="comctl32.lib" />
+					<Add library="kernel32.lib" />
+					<Add library="user32.lib" />
+					<Add library="gdi32.lib" />
+					<Add library="winspool.lib" />
+					<Add library="comdlg32.lib" />
+					<Add library="advapi32.lib" />
+					<Add library="shell32.lib" />
+					<Add library="ole32.lib" />
+					<Add library="oleaut32.lib" />
+					<Add library="uuid.lib" />
+					<Add library="odbc32.lib" />
+					<Add library="odbccp32.lib" />
+					<Add directory="../Vendor/googletest/lib/" />
+				</Linker>
+			</Target>
+			<Target title="Release x64">
+				<Option output="../bin/Release-windows-x86_64/Tests/Tests" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../bin-int/Release-windows-x86_64/Tests/" />
+				<Option deps_output="../bin/Release-windows-x86_64/Tests/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-DPLATFORM_WINDOWS" />
+					<Add option="-DRELEASE" />
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add directory="../Compiler/src/" />
+					<Add directory="../Vendor/googletest/include/" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="gtestd.lib" />
+					<Add library="winmm.lib" />
+					<Add library="comctl32.lib" />
+					<Add library="kernel32.lib" />
+					<Add library="user32.lib" />
+					<Add library="gdi32.lib" />
+					<Add library="winspool.lib" />
+					<Add library="comdlg32.lib" />
+					<Add library="advapi32.lib" />
+					<Add library="shell32.lib" />
+					<Add library="ole32.lib" />
+					<Add library="oleaut32.lib" />
+					<Add library="uuid.lib" />
+					<Add library="odbc32.lib" />
+					<Add library="odbccp32.lib" />
+					<Add directory="../Vendor/googletest/lib/" />
+				</Linker>
+			</Target>
+		</Build>
+		<Unit filename="pch.cpp" />
+		<Unit filename="pch.h" />
+		<Unit filename="test.cpp" />
+		<Unit filename="tests/Context.h" />
+		<Unit filename="tests/Interpreter.h" />
+		<Unit filename="tests/Lexer.h" />
+		<Unit filename="tests/Parser.h" />
+		<Unit filename="tests/Symbols.h" />
+		<Unit filename="tests/Types.h" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

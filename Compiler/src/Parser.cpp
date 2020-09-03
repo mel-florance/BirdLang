@@ -244,7 +244,7 @@ Parser::Result* Parser::if_expr()
 			try { val = std::get<std::string>(current_token->value); }
 			catch (const std::bad_variant_access&) {}
 
-			return current_token->type == Token::Type::KEYWORD && val == "else if";
+			return current_token->type == Token::Type::KEYWORD && val == "elif";
 		};
 
 		while (isElseIf()) {
@@ -592,7 +592,7 @@ Parser::Result* Parser::atom()
 
 				return result->success(exp);
 			}
-			else if (current_token->type == Token::Type::KEYWORD && value == "fn") {
+			else if (current_token->type == Token::Type::KEYWORD && value == "function") {
 				auto exp = result->record(function_definition());
 
 				if (result->error != nullptr)
@@ -606,7 +606,7 @@ Parser::Result* Parser::atom()
 		return result->failure(new InvalidSyntaxError(
 			current_token->start,
 			current_token->end,
-			"Expected integer, float, identifier, if, for, while, fn,'+', '-', '(', '['"
+			"Expected integer, float, identifier, if, for, while, function,'+', '-', '(', '['"
 		));
 	}
 
@@ -669,11 +669,11 @@ Parser::Result* Parser::function_definition()
 	catch (const std::bad_variant_access&) {}
 
 
-	if (current_token->type != Token::Type::KEYWORD || value != "fn") {
+	if (current_token->type != Token::Type::KEYWORD || value != "function") {
 		return result->failure(new InvalidSyntaxError(
 			current_token->start,
 			current_token->end,
-			"Expected 'fn'"
+			"Expected 'function'"
 		));
 	}
 
@@ -795,7 +795,7 @@ Parser::Result* Parser::function_call()
 				return result->failure(new InvalidSyntaxError(
 					current_token->start,
 					current_token->end,
-					"Expected ')', 'var', 'if', 'for', 'while', 'fn', 'integer', 'double', 'identifier'"
+					"Expected ')', 'var', 'if', 'for', 'while', 'function', 'integer', 'double', 'identifier'"
 				));
 			}
 
@@ -855,7 +855,7 @@ Parser::Result* Parser::array_expr()
 			return result->failure(new InvalidSyntaxError(
 				current_token->start,
 				current_token->end,
-				"Expected ']', 'var', 'if', 'for', 'while', 'fn', 'integer', 'double', 'identifier'"
+				"Expected ']', 'var', 'if', 'for', 'while', 'function', 'integer', 'double', 'identifier'"
 			));
 		}
 
@@ -928,7 +928,7 @@ Parser::Result* Parser::map_expr()
 			return result->failure(new InvalidSyntaxError(
 				current_token->start,
 				current_token->end,
-				"Expected ']', 'var', 'if', 'for', 'while', 'fn', 'integer', 'double', 'identifier'"
+				"Expected ']', 'var', 'if', 'for', 'while', 'function', 'integer', 'double', 'identifier'"
 			));
 		}
 
