@@ -3,6 +3,8 @@
 #include "Function.h"
 #include "Str.h"
 #include "Array.h"
+#include "Map.h"
+#include "File.h"
 
 Interpreter::Interpreter()
 {
@@ -11,60 +13,39 @@ Interpreter::Interpreter()
 RuntimeResult* Interpreter::visit(Node* node, Context* context)
 {
 	if (node != nullptr && context != nullptr) {
-		BinaryOperationNode* binary_operation_node = dynamic_cast<BinaryOperationNode*>(node);
-		if (binary_operation_node)
+		if (BinaryOperationNode* binary_operation_node = dynamic_cast<BinaryOperationNode*>(node)) 
 			return visit_binary_operation_node(binary_operation_node, context);
-
-		NumericNode* numeric_node = dynamic_cast<NumericNode*>(node);
-		if (numeric_node)
+		else if (NumericNode* numeric_node = dynamic_cast<NumericNode*>(node))
 			return visit_numeric_node(numeric_node, context);
-
-		UnaryOperationNode* unary_operation_node = dynamic_cast<UnaryOperationNode*>(node);
-		if (unary_operation_node)
+		else if (UnaryOperationNode* unary_operation_node = dynamic_cast<UnaryOperationNode*>(node))
 			return visit_unary_operation_node(unary_operation_node, context);
-
-		VariableAccessNode* variable_access_node = dynamic_cast<VariableAccessNode*>(node);
-	    if (variable_access_node)
+		else if (VariableAccessNode* variable_access_node = dynamic_cast<VariableAccessNode*>(node))
 			return visit_variable_access_node(variable_access_node, context);
-
-		VariableAssignmentNode* variable_assignment_node = dynamic_cast<VariableAssignmentNode*>(node);
-		if (variable_assignment_node)
+		else if (VariableAssignmentNode* variable_assignment_node = dynamic_cast<VariableAssignmentNode*>(node))
 			return visit_variable_assignment_node(variable_assignment_node, context);
-
-		IfStatementNode* if_statement_node = dynamic_cast<IfStatementNode*>(node);
-		if (if_statement_node)
+		else if (IfStatementNode* if_statement_node = dynamic_cast<IfStatementNode*>(node))
 			return visit_if_statement_node(if_statement_node, context);
-		
-		ForStatementNode* for_statement_node = dynamic_cast<ForStatementNode*>(node);
-		if (for_statement_node)
+		else if (ForStatementNode* for_statement_node = dynamic_cast<ForStatementNode*>(node))
 			return visit_for_statement_node(for_statement_node, context);
-
-		WhileStatementNode* while_statement_node = dynamic_cast<WhileStatementNode*>(node);
-		if (while_statement_node)
+		else if (WhileStatementNode* while_statement_node = dynamic_cast<WhileStatementNode*>(node))
 			return visit_while_statement_node(while_statement_node, context);
-
-		FunctionDefinitionNode* function_definition_node = dynamic_cast<FunctionDefinitionNode*>(node);
-		if (function_definition_node)
+		else if (FunctionDefinitionNode* function_definition_node = dynamic_cast<FunctionDefinitionNode*>(node))
 			return visit_function_definition_node(function_definition_node, context);
-
-		FunctionCallNode* function_call_node = dynamic_cast<FunctionCallNode*>(node);
-		if (function_call_node)
+		else if (FunctionCallNode* function_call_node = dynamic_cast<FunctionCallNode*>(node))
 			return visit_function_call_node(function_call_node, context);
-
-		StringNode* string_node = dynamic_cast<StringNode*>(node);
-		if (string_node)
+		else if(StringNode* string_node = dynamic_cast<StringNode*>(node))
 			return visit_string_node(string_node, context);
-
-		ArrayNode* array_node = dynamic_cast<ArrayNode*>(node);
-		if (array_node)
+		else if(ArrayNode* array_node = dynamic_cast<ArrayNode*>(node))
 			return visit_array_node(array_node, context);
-
-		PropertyAccessNode* property_access_node = dynamic_cast<PropertyAccessNode*>(node);
-		if (property_access_node)
+		else if (PropertyAccessNode* property_access_node = dynamic_cast<PropertyAccessNode*>(node))
 			return visit_property_access_node(property_access_node, context);
-
+		else if(IndexAccessNode* index_access_node = dynamic_cast<IndexAccessNode*>(node))
+			return visit_index_access_node(index_access_node, context);
+		else if (MapNode* map_node = dynamic_cast<MapNode*>(node))
+			return visit_map_node(map_node, context);
 
 		auto type = typeid(*node).name();
+
 		std::cout << "No visit " << type << " method defined." << '\n';
 	}
 
@@ -253,13 +234,27 @@ RuntimeResult* Interpreter::visit_variable_access_node(Node* node, Context* cont
 
 	switch (value->second.index()) {
 	default:
-	case 0:
-	case 1:
+	case Type::Native::DOUBLE:
+	case Type::Native::INT:
+	case Type::Native::BOOL:
 		return result->success(new Number(value->second));
-	case 4:
+	case Type::Native::STRING:
 		return result->success(new String(value->second));
-	case 5:
+	case Type::Native::ARRAY:
 		return result->success(new Array(std::get<std::vector<Type*>>(value->second)));
+	case Type::Native::MAP:
+		return result->success(new Map(std::get<std::map<std::string, Type*>>(value->second)));
+	case Type::Native::FILE:
+		auto file = new File();
+		auto ref = std::get<File*>(value->second);
+		file->name = ref->name;
+		file->size = ref->size;
+		file->value = ref->value;
+		file->closed = ref->closed;
+
+		auto typePtr = new Type();
+		typePtr->value = file;
+		return result->success(typePtr);
 	}
 }
 
@@ -273,24 +268,22 @@ RuntimeResult* Interpreter::visit_variable_assignment_node(Node* node, Context* 
 	if (result->error != nullptr)
 		return result;
 
-	if (number->value.index() == 0) {
+	if (number->value.index() == Type::Native::DOUBLE)
 		context->symbols->set(std::get<std::string>(var_name), std::get<double>(number->value));
-	}
-	else if (number->value.index() == 1) {
+	else if (number->value.index() == Type::Native::INT)
 		context->symbols->set(std::get<std::string>(var_name), std::get<int>(number->value));
-	}
-	else if (number->value.index() == 2) {
+	else if (number->value.index() == Type::Native::BOOL)
 		context->symbols->set(std::get<std::string>(var_name), std::get<bool>(number->value));
-	}
-	else if (number->value.index() == 3) {
+	else if (number->value.index() == Type::Native::FUNCTION)
 		context->symbols->set(std::get<std::string>(var_name), (Function*)std::get<Function*>(number->value));
-	}
-	else if (number->value.index() == 4) {
+	else if (number->value.index() == Type::Native::STRING)
 		context->symbols->set(std::get<std::string>(var_name), std::get<std::string>(number->value));
-	}
-	else if (number->value.index() == 5) {
+	else if (number->value.index() == Type::Native::ARRAY)
 		context->symbols->set(std::get<std::string>(var_name), std::get<std::vector<Type*>>(number->value));
-	}
+	else if (number->value.index() == Type::Native::FILE)
+		context->symbols->set(std::get<std::string>(var_name), (File*)std::get<File*>(number->value));
+	else if (number->value.index() == Type::Native::MAP)
+		context->symbols->set(std::get<std::string>(var_name), std::get<std::map<std::string, Type*>>(number->value));
 
 	return result->success(number);
 }
@@ -594,11 +587,150 @@ RuntimeResult* Interpreter::visit_property_access_node(Node* node, Context* cont
 		result_value = new String();
 
 		auto value = std::get<std::string>(it->second);
-		auto constant = String::constants.find(std::get<std::string>(property_node->token->value));
+		auto prop_value = std::get<std::string>(property_node->token->value);
+		auto constant = String::constants.find(prop_value);
 
 		if (constant != String::constants.end())
 			result_value->value = constant->second;
+		else {
+			return result->failure(new RuntimeError(
+				node->token->start,
+				node->token->end,
+				"'" + prop_value + "' is not defined",
+				context
+			));
+		}
+	}
+	else if (it->second.index() == Type::Native::FILE) {
+		auto prop_value = std::get<std::string>(property_node->token->value);
+		auto file = std::get<File*>(it->second);
+
+		if (prop_value == "name") {
+			result_value = new String();
+			result_value->value = std::filesystem::path(file->name).filename().string();
+		}
+		else if (prop_value == "extension") {
+			result_value = new String();
+			result_value->value = std::filesystem::path(file->name).extension().string();
+		}
+		else if (prop_value == "path") {
+			result_value = new String();
+			result_value->value = file->name;
+		}
+		else if (prop_value == "size") {
+			result_value = new Number();
+			result_value->value = (int)file->size;
+		}
+		else if (prop_value == "data") {
+			result_value = new String();
+			result_value->value = std::get<std::string>(file->value);
+		}
+		else if (prop_value == "closed") {
+			result_value = new Number();
+			result_value->value = file->closed;
+		}
+		else if (prop_value == "mode") {
+			result_value = new String();
+			result_value->value = File::modeToStr(static_cast<File::Mode>(file->mode));
+		}
+	}
+	else if (it->second.index() == Type::Native::ARRAY) {
+		auto prop_value = std::get<std::string>(property_node->token->value);
+		auto array = std::get<std::vector<Type*>>(it->second);
+
+		if (prop_value == "size") {
+			result_value = new Number();
+			result_value->value = (int)array.size();
+		}
+		else if (prop_value == "keys") {
+			result_value = new Array();
+			std::vector<Type*> keys = {};
+
+			for (int i = 0; i < array.size(); ++i)
+				keys.push_back(new Number(i));
+
+			result_value->value = keys;
+		}
+		else if (prop_value == "values") {
+			result_value = new Array();
+			std::vector<Type*> keys = {};
+
+			for (auto item : array)
+				keys.push_back(item);
+
+			result_value->value = keys;
+		}
+	}
+	else if (it->second.index() == Type::Native::MAP) {
+		auto value = std::get<std::map<std::string, Type*>>(it->second);
+		auto search = value.find(std::get<std::string>(property_node->token->value));
+
+		if (search != value.end())
+			result_value = search->second;
 	}
 
 	return result->success(result_value);
+}
+
+RuntimeResult* Interpreter::visit_index_access_node(Node* node, Context* context)
+{
+	auto index_node = (IndexAccessNode*)node;
+	RuntimeResult* result = new RuntimeResult();
+	auto number_visit = visit(index_node->left, context);
+	Type* number = result->record(number_visit);
+
+	Type* result_value = nullptr;
+	auto var_name = std::get<std::string>(index_node->token->value);
+	auto it = context->symbols->get(var_name);
+
+	if (it == context->symbols->symbols.end()) {
+		return result->failure(new RuntimeError(
+			node->token->start,
+			node->token->end,
+			"'" + var_name + "' is not defined",
+			context
+		));
+	}
+
+	if (it->second.index() == Type::Native::ARRAY) {
+		auto array = std::get<std::vector<Type*>>(it->second);
+		auto index = array.at(std::get<int>(number->value));
+
+		result_value = index;
+	}
+	else if (it->second.index() == Type::Native::STRING) {
+		auto string = std::get<std::string>(it->second);
+		auto index = string.at(std::get<int>(number->value));
+
+		result_value = new String();
+		result_value->value = std::string(1, index);
+	}
+	else if (it->second.index() == Type::Native::MAP) {
+		switch (number->value.index()) {
+		case Type::Native::STRING:
+			auto map = std::get<std::map<std::string, Type*>>(it->second);
+			auto found = map.find(std::get<std::string>(number->value));
+			result_value = found->second;
+			break;
+		}
+	}
+
+	return result->success(result_value);
+}
+
+RuntimeResult* Interpreter::visit_map_node(Node* node, Context* context)
+{
+	auto map_node = (MapNode*)node;
+	RuntimeResult* result = new RuntimeResult();
+	std::map<std::string, Type*> elements;
+
+	for (auto it = map_node->elements.begin(); it != map_node->elements.end(); ++it) {
+		auto visit_element = visit(it->second, context);
+		elements.emplace(it->first, result->record(visit_element));
+
+		if (result->error != nullptr)
+			return result;
+	}
+
+	return result->success(new Map(elements));
 }

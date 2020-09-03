@@ -54,9 +54,10 @@ public:
 	Result* function_definition();
 	Result* function_call();
 	Result* array_expr();
+	Result* map_expr();
 	
 	Result* binary_operation(
-		std::function<Result*()> fna, 
+		std::function<Result*()> fna,
 		const std::vector<std::variant<Token::Type, std::pair<Token::Type, std::string>>>& operations,
 		std::function<Result* ()> fnb = nullptr
 	);

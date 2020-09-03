@@ -22,18 +22,34 @@ project "Compiler"
 	pchheader "pch.h"
 	pchsource "Compiler/src/pch.cpp"
 
+	disablewarnings {
+		"4141",
+		"4146",
+		"4244",
+		"4267",
+		"4624",
+		"4996"
+	}
+
 	files
 	{
 		"%{prj.name}/include/**.h",
 		"%{prj.name}/include/**.hpp",
 		"%{prj.name}/src/**.cpp",
-		"%{prj.name}/grammar.txt"
+		"%{prj.name}/grammar.txt",
+		"Vendor/llvm/include/**.h",
+		"Vendor/llvm/include/**.cpp"
 	}
 
 	includedirs
 	{
-		"%{prj.name}/include"
+		"%{prj.name}/include",
+		"Vendor/llvm/include"
 	}
+
+	--libdirs { 
+		--"Vendor/llvm/lib"
+	--}
 
 	filter "system:windows"
 		cppdialect "C++17"
@@ -45,6 +61,10 @@ project "Compiler"
 		{
 			"PLATFORM_WINDOWS"
 		}
+
+		--links {
+			--"LLVMCore.lib"
+		--}
 
 	filter "system:linux"
 		cppdialect "C++17"
@@ -164,7 +184,6 @@ project "Tests"
 		{
 			"PLATFORM_WINDOWS"
 		}
-
 
 		links {
 			"gtestd.lib"

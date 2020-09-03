@@ -19,7 +19,11 @@ public:
 		FN_CALL,
 		STRING,
 		ARRAY,
-		PROPERTY_ACCESS
+		MAP,
+		PROPERTY_ACCESS,
+		PROPERTY_ASSIGN,
+		INDEX_ACCESS,
+		INDEX_ASSIGN
 	};
 
 	Node(
@@ -61,6 +65,9 @@ public:
 		case Type::STRING:			return "STRING";
 		case Type::ARRAY:			return "ARRAY";
 		case Type::PROPERTY_ACCESS: return "PROPERTY_ACCESS";
+		case Type::PROPERTY_ASSIGN: return "PROPERTY_ASSIGN";
+		case Type::INDEX_ACCESS:	return "INDEX_ACCESS";
+		case Type::INDEX_ASSIGN:	return "INDEX_ASSIGN";
 		}
 	}
 
@@ -270,6 +277,16 @@ public:
 	std::vector<Node*> elements;
 };
 
+class MapNode : public Node {
+public:
+	MapNode(Token* token, const std::map<std::string, Node*>& elements) :
+		Node(token, nullptr, nullptr, Type::MAP),
+		elements(elements)
+	{}
+
+	std::map<std::string, Node*> elements;
+};
+
 class PropertyAccessNode : public Node {
 public:
 	PropertyAccessNode(Token* token, const std::string& var_name) :
@@ -278,4 +295,40 @@ public:
 	{}
 
 	std::string var_name;
+};
+
+class PropertyAssignmentNode : public Node {
+public:
+	PropertyAssignmentNode(Token* token, Node* node) :
+		Node(token, node, nullptr, Type::PROPERTY_ASSIGN),
+		start(token->start),
+		end(token->end)
+	{}
+
+	std::shared_ptr<Cursor> start;
+	std::shared_ptr<Cursor> end;
+};
+
+class IndexAccessNode : public Node {
+public:
+	IndexAccessNode(Token* token, Node* index, std::shared_ptr<Cursor> start, std::shared_ptr<Cursor> end) :
+		Node(token, index, nullptr, Type::INDEX_ACCESS),
+		start(token->start),
+		end(token->end)
+	{}
+
+	std::shared_ptr<Cursor> start;
+	std::shared_ptr<Cursor> end;
+};
+
+class IndexAssignmentNode : public Node {
+public:
+	IndexAssignmentNode(Token* token, Node* node) :
+		Node(token, node, nullptr, Type::INDEX_ASSIGN),
+		start(token->start),
+		end(token->end)
+	{}
+
+	std::shared_ptr<Cursor> start;
+	std::shared_ptr<Cursor> end;
 };
