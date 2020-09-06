@@ -14,6 +14,8 @@ public:
 		std::shared_ptr<Cursor> parent_cursor = nullptr
 	);
 
+	friend std::ostream& operator << (std::ostream& stream, Context* context);
+
 	std::string display_name;
 	Context* parent;
 	std::shared_ptr<Cursor> parent_cursor;
