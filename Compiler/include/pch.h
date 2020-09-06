@@ -12,5 +12,10 @@
 #include <any>
 #include <limits>
 #include <fstream>
+
+#ifdef PLATFORM_LINUX
+#include <experimental/filesystem>
+#endif
+#ifdef PLATFORM_WINDOWS
 #include <filesystem>
-#include <bitset>
+#endif
