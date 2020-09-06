@@ -7,6 +7,9 @@
 #include "Map.h"
 #include "Function.h"
 #include "Utils.h"
+#include "Http.h"
+#include "Url.h"
+#include "Map.h"
 
 NativeFunction::NativeFunctionList NativeFunction::list = {
 	{"str", {{ "value" }, &NativeFunction::fn_str}},
@@ -31,6 +34,8 @@ NativeFunction::NativeFunctionList NativeFunction::list = {
 	{"dec", {{ "value" }, &NativeFunction::fn_dec}},
 	{"bin", {{ "value" }, &NativeFunction::fn_bin}},
 	{"oct", {{ "value" }, &NativeFunction::fn_oct}},
+
+	{"wget", {{ "value" }, &NativeFunction::fn_wget}},
 
 	{"abs", {{ "value" }, &NativeFunction::fn_abs}},
 	{"acos", {{ "value" }, &NativeFunction::fn_acos}},
@@ -138,7 +143,6 @@ RuntimeResult* NativeFunction::fn_print(Context* ctx)
 		try {
 			auto map = std::get<std::map<std::string, Type*>>(value);
 			auto instance = new Map(map);
-
 			std::cout << instance << std::endl;
 		}
 		catch (const std::bad_variant_access&) {}
@@ -297,9 +301,8 @@ RuntimeResult* NativeFunction::fn_values(Context* ctx)
 			auto array = std::get<std::vector<Type*>>(value);
 			auto array_it = array.begin();
 
-			for (; array_it != array.end(); ++array_it) {
+			for (; array_it != array.end(); ++array_it)
 				values.push_back(*array_it);
-			}
 		}
 		catch (const std::bad_variant_access&) {}
 	}
@@ -316,6 +319,7 @@ RuntimeResult* NativeFunction::fn_values(Context* ctx)
 	}
 	break;
 	}
+
 	result_value->value = values;
 
 	return result->success(result_value);
@@ -400,7 +404,9 @@ RuntimeResult* NativeFunction::fn_chr(Context* ctx)
 	auto index = ctx->symbols->get("index")->second;
 	auto character = new String();
 
-	if (string.index() == Type::Native::STRING && index.index() == Type::Native::INT) {
+	if (string.index() == Type::Native::STRING &&
+		index.index() == Type::Native::INT) {
+
 		auto id = std::get<int>(index);
 		auto str = std::get<std::string>(string);
 
@@ -469,7 +475,12 @@ RuntimeResult* NativeFunction::fn_open(Context* ctx)
 	stream.open(filename_value, std::ifstream::in);
 
 	if (!stream) {
-		return result->failure(new RuntimeError(nullptr, nullptr, "Unable to open file: " + filename_value, nullptr));
+		return result->failure(new RuntimeError(
+			nullptr,
+			nullptr,
+			"Unable to open file: " + filename_value,
+			nullptr
+		));
 	}
 
 	stream.seekg(0, std::ios::end);
@@ -533,9 +544,11 @@ RuntimeResult* NativeFunction::fn_hex(Context* ctx)
 	case Type::Native::INT:
 		try {
 			std::stringstream stream;
+
 			stream << "0x"
 				<< std::setfill('0') << std::setw(sizeof(int) * 2)
 				<< std::hex << std::get<int>(value);
+
 			string->value = stream.str();
 		}
 		catch (const std::bad_variant_access&) {}
@@ -557,13 +570,13 @@ RuntimeResult* NativeFunction::fn_dec(Context* ctx)
 			auto n = std::get<int>(value);
 			int d = 0, i = 0, r;
 
-			while (n != 0)
-			{
+			while (n != 0) {
 				r = n % 10;
 				n /= 10;
 				d += r * pow(8, i);
 				++i;
 			}
+
 			number->value = d;
 		}
 		catch (const std::bad_variant_access&) {}
@@ -598,6 +611,58 @@ RuntimeResult* NativeFunction::fn_oct(Context* ctx)
 	}
 
 	return result->success(number);
+}
+
+RuntimeResult* NativeFunction::fn_wget(Context* ctx)
+{
+	RuntimeResult* result = new RuntimeResult();
+	auto value = ctx->symbols->get("value")->second;
+	auto map = new Map();
+	std::map<std::string, Type*> elements = {};
+
+	auto url = std::get<std::string>(value);
+	auto c_str = url.c_str();
+	std::wstring wstr(c_str, c_str + strlen(c_str));
+
+	auto parsed = Url::Parse(wstr);
+	auto host = std::string(parsed.Host.begin(), parsed.Host.end());
+	auto port = std::string(parsed.Port.begin(), parsed.Port.end());
+	auto protocol = std::string(parsed.Protocol.begin(), parsed.Protocol.end());
+	auto path = std::string(parsed.Path.begin(), parsed.Path.end());
+	auto qs = std::string(parsed.QueryString.begin(), parsed.QueryString.end());
+
+	std::string response = Http::get(parsed);
+	auto parts = Utils::splitString(response, "\r\n\r\n");
+
+	elements["host"] = new String(host);
+	elements["port"] = new Number(port.size() == 0 ? 80 : std::stoi(port));
+	elements["protocol"] = new String(protocol);
+	elements["path"] = new String(path.size() == 0 ? "/" : path);
+	elements["query"] = new String(qs);
+
+	auto headers_entries = new Map();
+	std::map<std::string, Type*> entries = {};
+
+	auto headers_lines = Utils::splitString(parts.at(0), "\n");
+	unsigned int i = 0;
+
+	for (auto line : headers_lines) {
+		if (i >= 1) {
+			auto line_parts = Utils::splitString(line, ": ");
+			entries[line_parts[0]] = new String(Utils::rtrim(Utils::ltrim(line_parts[1])));
+		}
+
+		i++;
+	}
+
+	headers_entries->value = entries;
+
+	elements["headers"] = headers_entries;
+	elements["body"] = new String(parts.at(1));
+
+	map->value = elements;
+
+	return result->success(map);
 }
 
 RuntimeResult* NativeFunction::fn_abs(Context* ctx)

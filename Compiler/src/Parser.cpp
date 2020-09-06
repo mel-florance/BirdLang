@@ -481,16 +481,38 @@ Parser::Result* Parser::atom()
 			result->record_advance();
 			advance();
 
+			while (current_token->type == Token::Type::COMMA) {
+				result->record_advance();
+				advance();
+			}
+
 			if (current_token->type == Token::Type::DOT) {
 				result->record_advance();
 				advance();
 
-				Token* prop_name = new Token(current_token);
+				auto prop_name = new Token(current_token);
+				std::vector<Token*> path = {};
+
+				path.push_back(new Token(current_token));
 
 				result->record_advance();
 				advance();
 
-				return result->success(new PropertyAccessNode(prop_name, std::get<std::string>(token->value)));
+				while (current_token->type == Token::Type::DOT) {
+					result->record_advance();
+					advance();
+
+					path.push_back(new Token(current_token));
+				}
+
+				result->record_advance();
+				advance();
+
+				return result->success(new PropertyAccessNode(
+					prop_name,
+					std::get<std::string>(token->value),
+					path
+				));
 			}
 			else if (current_token->type == Token::Type::LSBRACKET) {
 				result->record_advance();

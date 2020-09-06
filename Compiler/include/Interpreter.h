@@ -53,4 +53,11 @@ public:
 	RuntimeResult* visit_property_access_node(Node* node, Context* context);
 	RuntimeResult* visit_index_access_node(Node* node, Context* context);
 	RuntimeResult* visit_map_node(Node* node, Context* context);
+
+	Type* find_map_recursive(
+		const std::string& needle,
+		Context* context,
+		const std::vector<Token*>& path,
+		const std::map<std::string, Type*>& object
+	);
 };

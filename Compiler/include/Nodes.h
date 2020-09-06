@@ -289,12 +289,18 @@ public:
 
 class PropertyAccessNode : public Node {
 public:
-	PropertyAccessNode(Token* token, const std::string& var_name) :
+	PropertyAccessNode(
+		Token* token,
+		const std::string& var_name,
+		const std::vector<Token*>& path
+	) :
 		Node(token, nullptr, nullptr, Type::PROPERTY_ACCESS),
-		var_name(var_name)
+		var_name(var_name),
+		path(path)
 	{}
 
 	std::string var_name;
+	std::vector<Token*> path;
 };
 
 class PropertyAssignmentNode : public Node {
@@ -311,7 +317,12 @@ public:
 
 class IndexAccessNode : public Node {
 public:
-	IndexAccessNode(Token* token, Node* index, std::shared_ptr<Cursor> start, std::shared_ptr<Cursor> end) :
+	IndexAccessNode(
+		Token* token,
+		Node* index,
+		std::shared_ptr<Cursor> start,
+		std::shared_ptr<Cursor> end
+	) :
 		Node(token, index, nullptr, Type::INDEX_ACCESS),
 		start(token->start),
 		end(token->end)

@@ -662,14 +662,49 @@ RuntimeResult* Interpreter::visit_property_access_node(Node* node, Context* cont
 		}
 	}
 	else if (it->second.index() == Type::Native::MAP) {
-		auto value = std::get<std::map<std::string, Type*>>(it->second);
-		auto search = value.find(std::get<std::string>(property_node->token->value));
 
-		if (search != value.end())
-			result_value = search->second;
+		auto it = context->symbols->get(property_node->var_name);
+		auto value = std::get<std::map<std::string, Type*>>(it->second);
+
+		result_value = find_map_recursive(
+			property_node->var_name,
+			context,
+			property_node->path,
+			value
+		);
 	}
 
 	return result->success(result_value);
+}
+
+Type* Interpreter::find_map_recursive(
+	const std::string& needle,
+	Context* context,
+	const std::vector<Token*>& path,
+	const std::map<std::string, Type*>& object
+)
+{
+	Type* result = nullptr;
+
+	for (auto part : path) {
+		auto search = object.find(std::get<std::string>(part->value));
+
+		if (search != object.end()) {
+			if (search->second->is(Type::Native::MAP)) {
+				result = find_map_recursive(
+					search->first,
+					context,
+					path,
+					std::get<std::map<std::string, Type*>>(search->second->value)
+				);
+			}
+			else {
+				result = search->second;
+			}
+		}
+	}
+
+	return result;
 }
 
 RuntimeResult* Interpreter::visit_index_access_node(Node* node, Context* context)

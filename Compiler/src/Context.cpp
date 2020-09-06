@@ -12,3 +12,10 @@ Context::Context(
 	symbols(nullptr)
 {
 }
+
+std::ostream& operator<<(std::ostream& stream, Context* context)
+{
+
+
+	return stream;
+}

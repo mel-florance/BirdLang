@@ -41,6 +41,8 @@ public:
 	static RuntimeResult* fn_dec(Context* ctx);
 	static RuntimeResult* fn_oct(Context* ctx);
 
+	static RuntimeResult* fn_wget(Context* ctx);
+
 	static RuntimeResult* fn_abs(Context* ctx);
 	static RuntimeResult* fn_acos(Context* ctx);
 	static RuntimeResult* fn_acosh(Context* ctx);
